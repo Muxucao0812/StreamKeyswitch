@@ -1,0 +1,9 @@
+{
+  "editor.fontFamily": "'Maple Mono NF CN', 'JetBrains Mono', 'Cascadia Code', 'Consolas', 'Microsoft YaHei UI', monospace",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 15,
+  "editor.lineHeight": 24,
+  "editor.letterSpacing": 0.2,
+  "terminal.integrated.fontFamily": "'Maple Mono NF CN', 'JetBrains Mono', 'Cascadia Mono', 'Consolas', monospace",
+  "terminal.integrated.fontSize": 14
+}
