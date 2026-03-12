@@ -1,9 +1,13 @@
 #pragma once
-#include "model/system_state.h"
-#include "sim/event.h"
-#include "scheduler/scheduler.h"
+
 #include "backend/execution_backend.h"
+#include "scheduler/scheduler.h"
+#include "sim/event.h"
+#include "sim/metrics.h"
+#include "model/system_state.h"
+#include <cstdint>
 #include <memory>
+#include <ostream>
 #include <queue>
 #include <unordered_map>
 #include <vector>
@@ -17,6 +21,9 @@ public:
 
     void LoadWorkload(const std::vector<Request>& requests);
     void Run();
+
+    SimulationMetrics CollectMetrics() const;
+    void Report(std::ostream& os) const;
     void Report() const;
 
 private:
@@ -33,6 +40,7 @@ private:
     std::unordered_map<RequestId, Request> request_table_;
 
     EventId next_event_id_ = 1;
+    uint64_t reload_count_ = 0;
 
     struct CompletedRecord {
         Request request;
@@ -40,6 +48,9 @@ private:
         ExecutionResult result;
         Time start_time = 0;
         Time finish_time = 0;
+        Time queue_time = 0;
+        Time service_time = 0;
+        uint32_t reload_count = 0;
     };
     std::vector<CompletedRecord> completed_;
 };

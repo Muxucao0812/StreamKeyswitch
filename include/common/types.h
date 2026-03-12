@@ -1,6 +1,6 @@
 #pragma once
+
 #include <cstdint>
-#include <string>
 
 using Time = uint64_t;
 using RequestId = uint64_t;
@@ -10,11 +10,7 @@ using EventId = uint64_t;
 
 enum class EventType {
     RequestArrival,
-    DispatchReady,
-    TaskStart,
-    TaskFinish,
-    KeyLoadFinish,
-    MergeFinish
+    TaskFinish
 };
 
 enum class TaskType {
@@ -30,7 +26,8 @@ enum class BackendType {
 enum class SchedulerType {
     FIFO,
     Affinity,
-    RoundRobin,
     StaticPartition,
+    Score,
+    Pool,
     Hierarchical
 };

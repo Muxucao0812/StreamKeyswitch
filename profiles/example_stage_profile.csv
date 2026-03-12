@@ -1,0 +1,18 @@
+# Example stage profile table for KeyAwareSwitch TableBackend
+# Required columns:
+# stage_type,num_digits,num_rns_limbs,card_count,key_hit,latency_ns
+# Optional columns:
+# input_bytes_bucket,output_bytes_bucket,energy_nj,memory_bytes
+stage_type,num_digits,num_rns_limbs,card_count,key_hit,latency_ns,input_bytes_bucket,output_bytes_bucket,energy_nj,memory_bytes
+KeyLoad,3,4,1,0,780,2,2,390.0,2097152
+KeyLoad,3,4,1,1,110,2,2,55.0,2097152
+Dispatch,3,4,1,0,115,2,2,57.5,1048576
+Dispatch,3,4,1,1,90,2,2,45.0,1048576
+Decompose,3,4,1,0,820,2,2,410.0,3145728
+Decompose,3,4,1,1,690,2,2,345.0,3145728
+Multiply,3,4,1,0,1220,2,2,610.0,6291456
+Multiply,3,4,1,1,1080,2,2,540.0,6291456
+BasisConvert,3,4,1,0,520,2,2,260.0,2097152
+BasisConvert,3,4,1,1,430,2,2,215.0,2097152
+Merge,3,4,2,0,460,2,2,230.0,1048576
+Merge,3,4,2,1,400,2,2,200.0,1048576

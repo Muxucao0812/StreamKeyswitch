@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/keyaware_sim.dir/src/main.cpp.o -o keyaware_sim  libkeyaware_core.a 

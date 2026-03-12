@@ -1,0 +1,97 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug keyaware_sim (fifo + analytical + synthetic)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "fifo",
+        "--backend",
+        "analytical",
+        "--workload",
+        "synthetic",
+        "--seed",
+        "42",
+        "--num-users",
+        "4",
+        "--num-cards",
+        "8"
+      ],
+      "stopAtEntry": true,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "preLaunchTask": "build keyaware debug",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    },
+    {
+      "name": "Debug keyaware_sim (affinity + table + burst)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "affinity",
+        "--backend",
+        "table",
+        "--workload",
+        "burst",
+        "--seed",
+        "42",
+        "--num-users",
+        "4",
+        "--num-cards",
+        "8",
+        "--profile-table",
+        "profiles/example_stage_profile.csv"
+      ],
+      "stopAtEntry": true,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "preLaunchTask": "build keyaware debug",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    },
+    {
+      "name": "Debug keyaware_sim (hybrid + tree search)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "hierarchical_d",
+        "--backend",
+        "hybrid",
+        "--hybrid-coarse",
+        "table",
+        "--workload",
+        "synthetic",
+        "--seed",
+        "42",
+        "--num-users",
+        "4",
+        "--num-cards",
+        "8",
+        "--search-tree",
+        "--search-steps",
+        "5",
+        "--search-neighbors",
+        "4",
+        "--search-output-tree",
+        "trees/optimized_debug.cfg"
+      ],
+      "stopAtEntry": true,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "preLaunchTask": "build keyaware debug",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    }
+  ]
+}
