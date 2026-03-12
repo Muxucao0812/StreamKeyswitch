@@ -414,9 +414,7 @@ class Operation:
         write_limbs = out_q * comps
         
         # Rescale working set should be larger than add/pmult
-        print(comps)
-        working_set_limbs = min(read_limbs + write_limbs, comps * 4)
-        print(working_set_limbs)
+        working_set_limbs = min(read_limbs + write_limbs, q + 4)
         
         mem = estimate_io_and_spill_us(
             self.params,
@@ -427,11 +425,24 @@ class Operation:
             working_set_limbs=working_set_limbs,
         )
         
-        compute_us = (
-            self.primitive.intt_latency +
-            self.primitive.bconv_latency +
-            self.primitive.ntt_latency
-        ) * comps
+        # ------------------
+        # Compute Latency
+        # ------------------
+        # Estimate NTT latency. 
+        # For N=2^16, an NTT requires (16 / 2) = 8 times the operations of a vector element-wise multiplication.
+        # We use a factor of 8 relative to mul_latency as an architectural approximation.
+        ntt_us = 8.0 * self.primitive.mul_latency
+        # 1. iNTT on the dropped limb (for each component)
+        intt_us = comps * 1 * ntt_us
+        
+        # 2. NTT into the remaining out_q limbs
+        ntts_us = comps * out_q * ntt_us
+        
+        # 3. Element-wise ModSub and ModMult (comps * out_q limbs)
+        element_wise_us = comps * out_q * self.primitive.mul_latency
+        
+        compute_us = intt_us + ntts_us + element_wise_us
+
         
         return self._finalize(
             op="rescale",
@@ -461,7 +472,7 @@ class Operation:
 
         read_limbs = q * comps
         write_limbs = q * comps 
-        working_set_limbs = min(read_limbs + write_limbs, max(24, self.params.alpha + self.params.k + 4))
+        working_set_limbs = min(read_limbs + write_limbs, q+4)
         
         mem = estimate_io_and_spill_us(
             self.params,
@@ -488,9 +499,21 @@ class Operation:
         
     def estimate_latency_cmult(
         self,
-        
-    )
-                                
+        lhs: Ciphertext,
+        rhs: Ciphertext,
+        input_onchip: False,
+        output_onchip: False
+    ): 
+        raise NotImplementedError("CMUL not implement")
+    
+    def estimate_keyswitch_latency(
+        self,
+        lhs: Ciphertext,
+        method: str,
+        input_onchip: False,
+        output_onchip: False
+    ):
+        raise NotImplementedError("Keyswitch not implement")
 
 if __name__ == "__main__":
 
@@ -507,5 +530,8 @@ if __name__ == "__main__":
     print("="*60)
     print(f"Mult (ct * pt): {op.estimate("pmult", ct1, pt1, input_onchip=False, output_onchip=False)}")
     print("="*60)
-    print(f"Rescale: {op.estimate("rescale", ct1, input_onchip=True, output_onchip=True)}")
- 
+    print(f"Rescale: {op.estimate("rescale", ct1, input_onchip=False, output_onchip=False)}")
+    print("="*60)
+    print(f"Mult (ct * ct): {op.estimate("cmult", ct1, ct2, input_onchip=False, output_onchip=False)}")
+    print("="*60)
+    print(f"Keyswitch : {op.estimate("keyswitch", ct1, input_onchip=True)}")
