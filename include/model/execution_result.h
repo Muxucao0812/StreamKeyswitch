@@ -11,7 +11,9 @@ struct ExecutionBreakdown {
     Time queue_time = 0;
     Time key_load_time = 0;
     Time dispatch_time = 0;
-    Time compute_time = 0;
+    Time decompose_time = 0;
+    Time multiply_time = 0;
+    Time basis_convert_time = 0;
     Time merge_time = 0;
 };
 

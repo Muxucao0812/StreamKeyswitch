@@ -23,11 +23,15 @@ struct Stage {
 }
 
 class AnalyticalBackend : public ExecutionBackend {
-public:
-    ExecutionResult Estimate(
-        const Request& req,
-        const ExecutionPlan& plan,
-        const SystemState& state) const override;
+    public:
+        ExecutionResult Estimate(
+            const Request& req,
+            const ExecutionPlan& plan,
+            const SystemState& state) const override;
 
-    Priv
-};
+    private:
+        std::vector<Stage> BuildStages(
+            const Request& req,
+            const ExecutionPlan& plan,
+            const SystemState& state) const;
+    };
