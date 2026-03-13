@@ -1,28 +1,10 @@
 #include "scheduler/affinity_scheduler.h"
 
 #include "backend/execution_backend.h"
+#include "model/request_sizing.h"
 #include <algorithm>
 #include <cstddef>
 #include <vector>
-
-namespace {
-
-uint32_t DecideCardCount(const Request& req) {
-    uint32_t k = 1;
-    if (req.ks_profile.input_bytes <= 4096) {
-        k = 1;
-    } else if (req.ks_profile.input_bytes <= 8192) {
-        k = 2;
-    } else {
-        k = 4;
-    }
-
-    const uint32_t max_cards =
-        (req.ks_profile.max_cards == 0) ? k : req.ks_profile.max_cards;
-    return std::max<uint32_t>(1, std::min(k, max_cards));
-}
-
-} // namespace
 
 void AffinityScheduler::OnRequestArrival(const Request& req) {
     queue_.push_back(req);
@@ -65,7 +47,7 @@ std::optional<ExecutionPlan> AffinityScheduler::TrySchedule(
             }
         }
 
-        const uint32_t required_cards = DecideCardCount(req);
+        const uint32_t required_cards = DecideCardCountForRequest(req);
         const size_t total_candidates = preferred.size() + fallback.size();
         if (total_candidates < required_cards) {
             continue;
@@ -95,7 +77,7 @@ std::optional<ExecutionPlan> AffinityScheduler::TrySchedule(
 
     ExecutionPlan fallback;
     fallback.request_id = queue_.front().request_id;
-    const uint32_t required_cards = DecideCardCount(queue_.front());
+    const uint32_t required_cards = DecideCardCountForRequest(queue_.front());
     if (idle_cards.size() < required_cards) {
         return std::nullopt;
     }

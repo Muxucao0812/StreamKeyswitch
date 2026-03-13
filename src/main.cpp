@@ -7,6 +7,7 @@
 #include "common/experiment_config.h"
 #include "common/he_params_loader.h"
 #include "model/he_params.h"
+#include "model/request_sizing.h"
 #include "model/system_state.h"
 #include "model/workload.h"
 #include "scheduler/affinity_scheduler.h"
@@ -155,7 +156,7 @@ SystemState BuildInitialState(const ExperimentConfig& config) {
         CardState card;
         card.card_id = card_id;
         card.pool_id = card_to_pool[card_id].value();
-        card.memory_capacity_bytes = 16ULL * 1024ULL * 1024ULL * 1024ULL;
+        card.memory_capacity_bytes = kAlveoU280HbmBytes;
         state.cards.push_back(card);
     }
 

@@ -1,5 +1,6 @@
 #include "backend/analytical_backend.h"
 #include "backend/execution_backend.h"
+#include "model/request_sizing.h"
 #include "model/system_state.h"
 #include "model/workload.h"
 #include "scheduler/affinity_scheduler.h"
@@ -78,7 +79,7 @@ SystemState MakeState(uint32_t num_cards, uint32_t num_pools) {
         card.pool_id = card_id % num_pools;
         card.busy = false;
         card.available_time = 0;
-        card.memory_capacity_bytes = 16ULL * 1024ULL * 1024ULL * 1024ULL;
+        card.memory_capacity_bytes = kAlveoU280HbmBytes;
         state.cards.push_back(card);
         state.pools[card.pool_id].card_ids.push_back(card_id);
     }
@@ -224,7 +225,11 @@ void TestSchedulerConstraints(testfw::TestContext& ctx) {
     {
         SystemState state = MakeState(2, 1);
         AffinityScheduler scheduler;
-        Request req = MakeRequest(/*id=*/13, /*user=*/0, /*input_bytes=*/20000, /*max_cards=*/4);
+        Request req = MakeRequest(
+            /*id=*/13,
+            /*user=*/0,
+            /*input_bytes=*/3ULL * kAlveoU280HbmBytes,
+            /*max_cards=*/4);
         scheduler.OnRequestArrival(req);
 
         const auto plan_opt = scheduler.TrySchedule(state, backend);
@@ -252,7 +257,11 @@ void TestSchedulerConstraints(testfw::TestContext& ctx) {
         state.resource_tree_root = 0;
 
         HierarchicalScheduler scheduler(FixedTreeKind::TreeA_Shared, 1);
-        Request req = MakeRequest(/*id=*/14, /*user=*/0, /*input_bytes=*/20000, /*max_cards=*/4);
+        Request req = MakeRequest(
+            /*id=*/14,
+            /*user=*/0,
+            /*input_bytes=*/3ULL * kAlveoU280HbmBytes,
+            /*max_cards=*/4);
         scheduler.OnRequestArrival(req);
 
         const auto plan_opt = scheduler.TrySchedule(state, backend);
@@ -349,6 +358,7 @@ void TestHEParamsDrivenWorkload(testfw::TestContext& ctx) {
     params.num_polys = 23;
     params.key_component_count = 2;
     params.bytes_per_coeff = 8;
+    params.key_storage_divisor = 1;
     params.key_load_base_time = 144;
     params.key_load_bandwidth_bytes_per_ns = 32;
 
@@ -364,6 +374,13 @@ void TestHEParamsDrivenWorkload(testfw::TestContext& ctx) {
     const Request& req = requests.front();
     EXPECT_EQ(ctx, req.user_profile.key_bytes, params.ComputeKeyBytes());
     EXPECT_EQ(ctx, req.user_profile.key_load_time, params.ComputeKeyLoadTime());
+    EXPECT_EQ(
+        ctx,
+        req.user_profile.ct_bytes,
+        params.ComputeCiphertextBytes(
+            /*ciphertext_count=*/1,
+            params.num_polys,
+            params.num_rns_limbs));
     EXPECT_EQ(ctx, req.ks_profile.num_polys, params.num_polys);
     EXPECT_TRUE(ctx, req.ks_profile.num_digits >= params.num_digits - 1);
     EXPECT_TRUE(ctx, req.ks_profile.num_digits <= params.num_digits + 1);
@@ -371,6 +388,14 @@ void TestHEParamsDrivenWorkload(testfw::TestContext& ctx) {
         ctx,
         req.ks_profile.num_rns_limbs == params.num_rns_limbs
             || req.ks_profile.num_rns_limbs == params.num_rns_limbs + 2);
+    EXPECT_EQ(
+        ctx,
+        req.ks_profile.input_bytes,
+        params.ComputeCiphertextBytes(
+            req.ks_profile.num_ciphertexts,
+            req.ks_profile.num_polys,
+            req.ks_profile.num_rns_limbs));
+    EXPECT_EQ(ctx, req.ks_profile.output_bytes, req.ks_profile.input_bytes);
 }
 
 SimulationMetrics RunOneSimulation(uint64_t seed) {

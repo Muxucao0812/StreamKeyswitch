@@ -4,7 +4,7 @@
     {
       "label": "build keyaware debug",
       "type": "shell",
-      "command": "cmake -S ${workspaceFolder} -B ${workspaceFolder}/build-cmake -DCMAKE_BUILD_TYPE=Debug && cmake --build ${workspaceFolder}/build-cmake -j4",
+      "command": "cmake --fresh -S ${workspaceFolder} -B ${workspaceFolder}/build-cmake -DCMAKE_BUILD_TYPE=Debug && cmake --build ${workspaceFolder}/build-cmake -j4",
       "options": {
         "cwd": "${workspaceFolder}"
       },

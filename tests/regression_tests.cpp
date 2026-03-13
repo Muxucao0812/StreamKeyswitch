@@ -1,6 +1,7 @@
 #include "backend/analytical_backend.h"
 #include "backend/execution_backend.h"
 #include "backend/table_backend.h"
+#include "model/request_sizing.h"
 #include "model/system_state.h"
 #include "model/workload.h"
 #include "scheduler/affinity_scheduler.h"
@@ -44,7 +45,7 @@ SystemState BuildDefaultState(uint32_t num_cards, uint32_t num_pools) {
         CardState card;
         card.card_id = card_id;
         card.pool_id = card_id % num_pools;
-        card.memory_capacity_bytes = 16ULL * 1024ULL * 1024ULL * 1024ULL;
+        card.memory_capacity_bytes = kAlveoU280HbmBytes;
         state.cards.push_back(card);
         state.pools[card.pool_id].card_ids.push_back(card_id);
     }
@@ -121,8 +122,8 @@ int main() {
             "fifo+synthetic+analytical",
             metrics,
             /*completed=*/32,
-            /*reload=*/82,
-            /*mean_latency=*/2599.78125,
+            /*reload=*/29,
+            /*mean_latency=*/2875680.625,
             /*tol=*/1.0);
     }
 
@@ -137,8 +138,8 @@ int main() {
             "affinity+synthetic+table",
             metrics,
             /*completed=*/32,
-            /*reload=*/77,
-            /*mean_latency=*/6267.125,
+            /*reload=*/30,
+            /*mean_latency=*/11575247.5625,
             /*tol=*/1.0);
     }
 
@@ -153,8 +154,8 @@ int main() {
             "hierarchical_d+burst+table",
             metrics,
             /*completed=*/64,
-            /*reload=*/128,
-            /*mean_latency=*/5721.796875,
+            /*reload=*/54,
+            /*mean_latency=*/10262026.65625,
             /*tol=*/1.0);
     }
 

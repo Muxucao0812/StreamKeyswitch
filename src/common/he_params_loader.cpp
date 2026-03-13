@@ -161,6 +161,16 @@ HEParamsLoadResult LoadHEParamsFromFile(const std::string& path) {
             continue;
         }
 
+        if (key == "key_storage_divisor") {
+            if (!ParseUint32(value, &u32) || u32 == 0) {
+                result.error_message =
+                    path + ":" + std::to_string(line_no) + ": invalid key_storage_divisor";
+                return result;
+            }
+            params.key_storage_divisor = u32;
+            continue;
+        }
+
         if (key == "key_load_base_time") {
             if (!ParseUint64(value, &u64)) {
                 result.error_message =

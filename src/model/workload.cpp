@@ -1,4 +1,5 @@
 #include "model/workload.h"
+#include "model/request_sizing.h"
 
 #include <algorithm>
 #include <cstddef>
@@ -43,12 +44,18 @@ std::vector<UserProfile> WorkloadBuilder::BuildUserProfiles(uint32_t num_users) 
     profiles.reserve(static_cast<size_t>(num_users));
 
     const uint64_t shared_key_bytes = he_params_.ComputeKeyBytes();
+    const uint64_t shared_ct_bytes =
+        he_params_.ComputeCiphertextBytes(
+            /*ciphertext_count=*/1,
+            he_params_.num_polys,
+            he_params_.num_rns_limbs);
     const Time shared_key_load_time = he_params_.ComputeKeyLoadTime();
 
     for (uint32_t user = 0; user < num_users; ++user) {
         UserProfile profile;
         profile.user_id = user;
         profile.key_bytes = shared_key_bytes;
+        profile.ct_bytes = shared_ct_bytes;
         profile.key_load_time = shared_key_load_time;
         profile.latency_sensitive = (user % 3 == 0);
         profile.weight = 1 + (user % 4);
@@ -74,6 +81,7 @@ Request WorkloadBuilder::BuildRequest(
     req.priority = user_profile.latency_sensitive ? 0 : 1;
     req.sla_class = user_profile.latency_sensitive ? 0 : 1;
 
+    // Generate FHE Parameters
     req.ks_profile.num_ciphertexts = NextRange(1, 4);
     req.ks_profile.num_polys = he_params_.num_polys;
 
@@ -85,22 +93,28 @@ Request WorkloadBuilder::BuildRequest(
     req.ks_profile.num_rns_limbs =
         he_params_.num_rns_limbs + (NextBernoulli(0.3) ? 2U : 0U);
 
-    const uint64_t random_input_scale = static_cast<uint64_t>(NextRange(1, 4));
-    const uint64_t sequence_input_scale = static_cast<uint64_t>(1 + (sequence_idx % 4));
-    req.ks_profile.input_bytes = 4096ULL * ((random_input_scale + sequence_input_scale) / 2);
-    req.ks_profile.output_bytes = req.ks_profile.input_bytes;
+    const uint32_t sequence_ciphertext_bonus = 1U + (sequence_idx % 2U);
+    req.ks_profile.num_ciphertexts =
+        std::max(req.ks_profile.num_ciphertexts, sequence_ciphertext_bonus);
+
+    req.ks_profile.input_bytes = he_params_.ComputeCiphertextBytes(
+        req.ks_profile.num_ciphertexts,
+        req.ks_profile.num_polys,
+        req.ks_profile.num_rns_limbs);
+    req.ks_profile.output_bytes = he_params_.ComputeCiphertextBytes(
+        req.ks_profile.num_ciphertexts,
+        req.ks_profile.num_polys,
+        req.ks_profile.num_rns_limbs);
     req.ks_profile.key_bytes = user_profile.key_bytes;
 
-    uint32_t cards_by_size = 1;
-    if (req.ks_profile.input_bytes <= 4096) {
-        cards_by_size = 1;
-    } else if (req.ks_profile.input_bytes <= 8192) {
-        cards_by_size = 2;
-    } else {
-        cards_by_size = 4;
+    const uint32_t cards_by_working_set = RecommendCardCountForRequest(req);
+    req.ks_profile.preferred_cards = cards_by_working_set;
+    
+    if (req.latency_sensitive){
+        req.ks_profile.max_cards = std::max<u_int32_t>(cards_by_working_set, 4);
+    }else{
+        req.ks_profile.max_cards = cards_by_working_set;
     }
-    req.ks_profile.preferred_cards = cards_by_size;
-    req.ks_profile.max_cards = cards_by_size;
 
     return req;
 }

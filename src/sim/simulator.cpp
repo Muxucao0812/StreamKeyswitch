@@ -61,10 +61,9 @@ void Simulator::TryDispatch() {
 
         ExecutionResult result = backend_->Estimate(req, plan, state_);
         const Time dispatch_start_time = state_.now;
-        result.breakdown.queue_time =
-            (dispatch_start_time >= req.arrival_time)
-            ? (dispatch_start_time - req.arrival_time)
-            : 0;
+        result.breakdown.queue_time = (dispatch_start_time >= req.arrival_time) ? 
+                                            (dispatch_start_time - req.arrival_time) 
+                                            : 0;
         const Time finish_time = state_.now + result.total_latency;
         uint32_t dispatch_reload_count = 0;
 

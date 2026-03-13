@@ -116,7 +116,8 @@ Time AnalyticalBackend::EstimateStage(
 ExecutionResult AnalyticalBackend::Estimate(
     const Request& req,
     const ExecutionPlan& plan,
-    const SystemState& state) const {
+    const SystemState& state
+) const {
 
     ExecutionResult result{};
     const auto stages = BuildStages(req, plan, state);

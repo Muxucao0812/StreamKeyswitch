@@ -1,28 +1,10 @@
 #include "scheduler/static_partition_scheduler.h"
 
 #include "backend/execution_backend.h"
+#include "model/request_sizing.h"
 #include <algorithm>
 #include <cstddef>
 #include <vector>
-
-namespace {
-
-uint32_t DecideCardCount(const Request& req) {
-    uint32_t k = 1;
-    if (req.ks_profile.input_bytes <= 4096) {
-        k = 1;
-    } else if (req.ks_profile.input_bytes <= 8192) {
-        k = 2;
-    } else {
-        k = 4;
-    }
-
-    const uint32_t max_cards =
-        (req.ks_profile.max_cards == 0) ? k : req.ks_profile.max_cards;
-    return std::max<uint32_t>(1, std::min(k, max_cards));
-}
-
-} // namespace
 
 StaticPartitionScheduler::StaticPartitionScheduler(uint32_t num_pools)
     : num_pools_(num_pools == 0 ? 1 : num_pools) {}
@@ -46,7 +28,7 @@ std::optional<ExecutionPlan> StaticPartitionScheduler::TrySchedule(
     for (size_t req_idx = 0; req_idx < queue_.size(); ++req_idx) {
         const Request& req = queue_[req_idx];
         const uint32_t target_pool = PoolForUser(req.user_id);
-        const uint32_t required_cards = DecideCardCount(req);
+        const uint32_t required_cards = DecideCardCountForRequest(req);
 
         std::vector<CardId> pool_idle_cards;
         pool_idle_cards.reserve(state.cards.size());
