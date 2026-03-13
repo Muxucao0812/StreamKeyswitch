@@ -86,10 +86,9 @@ bool ParseBackendKind(
     const std::string& text,
     BackendKind* value) {
     static const std::unordered_map<std::string, BackendKind> mapping = {
-        {"analytical", BackendKind::Analytical},
-        {"table", BackendKind::Table},
+        {"cycle", BackendKind::CycleStub},
         {"cycle_stub", BackendKind::CycleStub},
-        {"hybrid", BackendKind::Hybrid}};
+    };
 
     const auto it = mapping.find(text);
     if (it == mapping.end()) {
@@ -112,6 +111,56 @@ bool ParseWorkloadKind(
     }
     *value = it->second;
     return true;
+}
+
+bool ParseKeySwitchMethod(
+    const std::string& text,
+    KeySwitchMethod* value) {
+    static const std::unordered_map<std::string, KeySwitchMethod> mapping = {
+        {"auto", KeySwitchMethod::Auto},
+        {"poseidon", KeySwitchMethod::Poseidon},
+        {"fab", KeySwitchMethod::FAB},
+        {"fast", KeySwitchMethod::FAST},
+        {"ola", KeySwitchMethod::OLA},
+        {"hera", KeySwitchMethod::HERA},
+        {"cinnamon", KeySwitchMethod::Cinnamon}};
+
+    const auto it = mapping.find(text);
+    if (it == mapping.end()) {
+        return false;
+    }
+    *value = it->second;
+    return true;
+}
+
+const char* ToString(KeySwitchMethod method) {
+    switch (method) {
+    case KeySwitchMethod::Auto:
+        return "auto";
+    case KeySwitchMethod::Poseidon:
+        return "poseidon";
+    case KeySwitchMethod::FAB:
+        return "fab";
+    case KeySwitchMethod::FAST:
+        return "fast";
+    case KeySwitchMethod::OLA:
+        return "ola";
+    case KeySwitchMethod::HERA:
+        return "hera";
+    case KeySwitchMethod::Cinnamon:
+        return "cinnamon";
+    case KeySwitchMethod::SingleBoardClassic:
+        return "single_board_classic";
+    case KeySwitchMethod::SingleBoardFused:
+        return "single_board_fused";
+    case KeySwitchMethod::ScaleOutLimb:
+        return "scaleout_limb";
+    case KeySwitchMethod::ScaleOutDigit:
+        return "scaleout_digit";
+    case KeySwitchMethod::ScaleOutCiphertext:
+        return "scaleout_ciphertext";
+    }
+    return "auto";
 }
 
 } // namespace
@@ -142,16 +191,10 @@ const char* ToString(SchedulerKind scheduler) {
 
 const char* ToString(BackendKind backend) {
     switch (backend) {
-    case BackendKind::Analytical:
-        return "analytical";
-    case BackendKind::Table:
-        return "table";
     case BackendKind::CycleStub:
         return "cycle_stub";
-    case BackendKind::Hybrid:
-        return "hybrid";
     }
-    return "analytical";
+    return "cycle_stub";
 }
 
 const char* ToString(WorkloadKind workload) {
@@ -174,12 +217,12 @@ std::string BuildUsageText(const std::string& program_name) {
         << "  fifo | affinity | static_partition | score | pool |\n"
         << "  hierarchical_a | hierarchical_b | hierarchical_c | hierarchical_d | hierarchical\n\n"
         << "Backends:\n"
-        << "  analytical | table | cycle_stub | hybrid\n\n"
+        << "  cycle | cycle_stub\n\n"
         << "Workloads:\n"
         << "  synthetic | burst\n\n"
         << "Options:\n"
         << "  --scheduler <name>                    Select scheduler policy.\n"
-        << "  --backend <name>                      Select execution backend.\n"
+        << "  --backend <name>                      Select backend runtime (cycle/cycle_stub).\n"
         << "  --workload <name>                     Select workload generator mode.\n"
         << "  --seed <uint64>                       RNG seed for reproducible runs.\n"
         << "  --num-cards <uint32>                  Number of accelerator cards.\n"
@@ -198,9 +241,9 @@ std::string BuildUsageText(const std::string& program_name) {
         << "  --disable-multi-card                  Force single-card requests only.\n"
         << "  --pool-config <path>                  External pool config file.\n"
         << "  --tree-config <path>                  External resource-tree config file.\n"
-        << "  --profile-table <path>                CSV table for table/hybrid backend.\n"
         << "  --he-params <path>                    HE parameter file for workload derivation.\n"
-        << "  --hybrid-coarse <analytical|table>    Coarse backend used by hybrid mode.\n"
+        << "  --ks-method <auto|poseidon|fab|fast|ola|hera|cinnamon>\n"
+        << "                                        Keyswitch execution method for generated requests.\n"
         << "  --csv-output <path>                   Append run metrics to CSV file.\n"
         << "  --search-tree                         Enable tree search before simulation.\n"
         << "  --search-steps <uint32>               Tree search optimization steps.\n"
@@ -511,15 +554,6 @@ ParseExperimentConfigResult ParseExperimentConfig(int argc, char** argv) {
                 continue;
             }
 
-            if (arg == "--profile-table") {
-                std::string value_text;
-                if (!require_value("--profile-table", &value_text)) {
-                    return result;
-                }
-                config.profile_table_path = value_text;
-                continue;
-            }
-
             if (arg == "--he-params") {
                 std::string value_text;
                 if (!require_value("--he-params", &value_text)) {
@@ -529,23 +563,20 @@ ParseExperimentConfigResult ParseExperimentConfig(int argc, char** argv) {
                 continue;
             }
 
-            if (arg == "--hybrid-coarse") {
+            if (arg == "--ks-method") {
                 std::string value_text;
-                if (!require_value("--hybrid-coarse", &value_text)) {
+                if (!require_value("--ks-method", &value_text)) {
                     return result;
                 }
-                if (value_text == "analytical") {
-                    config.hybrid_use_table_coarse = false;
-                    continue;
+                KeySwitchMethod method = KeySwitchMethod::Auto;
+                if (!ParseKeySwitchMethod(value_text, &method)) {
+                    result.error_message =
+                        "Invalid --ks-method: " + value_text
+                        + " (expected auto|poseidon|fab|fast|ola|hera|cinnamon)";
+                    return result;
                 }
-                if (value_text == "table") {
-                    config.hybrid_use_table_coarse = true;
-                    continue;
-                }
-                result.error_message =
-                    "Invalid --hybrid-coarse: " + value_text
-                    + " (expected analytical|table)";
-                return result;
+                config.keyswitch_method = method;
+                continue;
             }
 
             if (arg == "--csv-output") {
@@ -796,6 +827,7 @@ void PrintExperimentConfig(std::ostream& os, const ExperimentConfig& config) {
     os << "Scheduler: " << ToString(config.scheduler) << "\n";
     os << "Backend: " << ToString(config.backend) << "\n";
     os << "Workload: " << ToString(config.workload) << "\n";
+    os << "KeySwitchMethod: " << ToString(config.keyswitch_method) << "\n";
     os << "Seed: " << config.seed << "\n";
     os << "NumCards: " << config.num_cards << "\n";
     os << "NumUsers: " << config.num_users << "\n";
@@ -816,14 +848,8 @@ void PrintExperimentConfig(std::ostream& os, const ExperimentConfig& config) {
     os << "TreeConfigSource: "
        << (config.tree_config_path.empty() ? "built-in default" : config.tree_config_path)
        << "\n";
-    os << "ProfileTableSource: "
-       << (config.profile_table_path.empty() ? "built-in default" : config.profile_table_path)
-       << "\n";
     os << "HEParamsSource: "
        << (config.he_params_path.empty() ? "built-in default" : config.he_params_path)
-       << "\n";
-    os << "HybridCoarseBackend: "
-       << (config.hybrid_use_table_coarse ? "table" : "analytical")
        << "\n";
     os << "CSVOutput: "
        << (config.csv_output_path.empty() ? "disabled" : config.csv_output_path)

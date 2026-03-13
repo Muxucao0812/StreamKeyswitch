@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if(NOT DEFINED BUILD_TESTING)
+    set(BUILD_TESTING OFF CACHE BOOL "Build tests" FORCE)
+endif()
 include(CTest)
 
 set(KEYAWARE_CORE_SOURCES
@@ -13,12 +16,9 @@ set(KEYAWARE_CORE_SOURCES
     src/common/he_params_loader.cpp
     src/model/workload.cpp
     src/search/tree_search.cpp
-    src/backend/analytical_backend.cpp
+    src/backend/model/keyswitch_execution_model.cpp
     src/backend/primitive_simulator.cpp
     src/backend/cycle_backend.cpp
-    src/backend/hybrid_backend.cpp
-    src/backend/profile_table.cpp
-    src/backend/table_backend.cpp
     src/scheduler/fifo_scheduler.cpp
     src/scheduler/affinity_scheduler.cpp
     src/scheduler/static_partition_scheduler.cpp

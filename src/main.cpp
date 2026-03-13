@@ -1,8 +1,5 @@
-#include "backend/analytical_backend.h"
 #include "backend/cycle_backend.h"
 #include "backend/execution_backend.h"
-#include "backend/hybrid_backend.h"
-#include "backend/table_backend.h"
 #include "common/config_loader.h"
 #include "common/experiment_config.h"
 #include "common/he_params_loader.h"
@@ -74,24 +71,8 @@ std::unique_ptr<Scheduler> BuildScheduler(
 }
 
 std::unique_ptr<ExecutionBackend> BuildBackend(const ExperimentConfig& config) {
-    if (config.backend == BackendKind::Table) {
-        if (config.profile_table_path.empty()) {
-            return std::make_unique<TableBackend>();
-        }
-        return std::make_unique<TableBackend>(config.profile_table_path);
-    }
-
-    if (config.backend == BackendKind::CycleStub) {
-        return std::make_unique<CycleBackend>();
-    }
-
-    if (config.backend == BackendKind::Hybrid) {
-        return std::make_unique<HybridBackend>(
-            config.hybrid_use_table_coarse,
-            config.profile_table_path);
-    }
-
-    return std::make_unique<AnalyticalBackend>();
+    (void)config;
+    return std::make_unique<CycleBackend>();
 }
 
 std::vector<ResourcePool> BuildDefaultPools(uint32_t num_cards, uint32_t num_pools) {
@@ -157,6 +138,7 @@ SystemState BuildInitialState(const ExperimentConfig& config) {
         card.card_id = card_id;
         card.pool_id = card_to_pool[card_id].value();
         card.memory_capacity_bytes = kAlveoU280HbmBytes;
+        card.bram_capacity_bytes = kAlveoU280BramBytes;
         state.cards.push_back(card);
     }
 
@@ -176,6 +158,7 @@ SystemState BuildInitialState(const ExperimentConfig& config) {
 std::vector<Request> BuildWorkload(
     WorkloadBuilder& builder,
     const ExperimentConfig& config) {
+    builder.SetDefaultKeySwitchMethod(config.keyswitch_method);
     if (config.workload == WorkloadKind::Burst) {
         const uint32_t reqs_per_user_per_burst =
             config.burst_requests_per_user_per_burst * config.burst_level;
@@ -270,21 +253,18 @@ void AppendMetricsCsvRow(
             << "scheduler,backend,workload,seed,num_users,num_cards,enable_multi_card,"
             << "completed_requests,mean_latency,p95_latency,p99_latency,max_latency,"
             << "total_throughput,total_reload_count,fairness_index,"
-            << "pool_config_source,tree_config_source,profile_table_source,he_params_source,"
-            << "pool_config_mode,tree_config_mode,profile_table_mode,he_params_mode\n";
+            << "pool_config_source,tree_config_source,he_params_source,"
+            << "pool_config_mode,tree_config_mode,he_params_mode\n";
     }
 
     const std::string pool_source =
         config.pool_config_path.empty() ? "built-in default" : config.pool_config_path;
     const std::string tree_source =
         config.tree_config_path.empty() ? "built-in default" : config.tree_config_path;
-    const std::string profile_source =
-        config.profile_table_path.empty() ? "built-in default" : config.profile_table_path;
     const std::string he_params_source =
         config.he_params_path.empty() ? "built-in default" : config.he_params_path;
     const std::string pool_mode = config.pool_config_path.empty() ? "built-in" : "external";
     const std::string tree_mode = config.tree_config_path.empty() ? "built-in" : "external";
-    const std::string profile_mode = config.profile_table_path.empty() ? "built-in" : "external";
     const std::string he_params_mode = config.he_params_path.empty() ? "built-in" : "external";
 
     out
@@ -305,11 +285,9 @@ void AppendMetricsCsvRow(
         << metrics.jain_fairness_index << ","
         << CsvEscape(pool_source) << ","
         << CsvEscape(tree_source) << ","
-        << CsvEscape(profile_source) << ","
         << CsvEscape(he_params_source) << ","
         << pool_mode << ","
         << tree_mode << ","
-        << profile_mode << ","
         << he_params_mode
         << "\n";
 }
@@ -440,9 +418,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    TableBackend* table_backend = dynamic_cast<TableBackend*>(backend.get());
     CycleBackend* cycle_backend = dynamic_cast<CycleBackend*>(backend.get());
-    HybridBackend* hybrid_backend = dynamic_cast<HybridBackend*>(backend.get());
 
     Simulator sim(std::move(initial_state), std::move(scheduler), std::move(backend));
 
@@ -452,6 +428,7 @@ int main(int argc, char** argv) {
 
     std::cout << "Scheduler=" << ToString(config.scheduler) << "\n";
     std::cout << "Backend=" << ToString(config.backend) << "\n";
+    std::cout << "RuntimeBackend=cycle_stub\n";
     std::cout << "Workload=" << ToString(config.workload) << "\n";
     std::cout << "Seed=" << config.seed << "\n";
     std::cout << "NumCards=" << config.num_cards << "\n";
@@ -462,20 +439,11 @@ int main(int argc, char** argv) {
     std::cout << "TreeConfigSource="
               << (config.tree_config_path.empty() ? "built-in default" : config.tree_config_path)
               << "\n";
-    std::cout << "ProfileTableSource="
-              << (config.profile_table_path.empty() ? "built-in default" : config.profile_table_path)
-              << "\n";
     std::cout << "HEParamsSource="
               << (config.he_params_path.empty() ? "built-in default" : config.he_params_path)
               << "\n";
-    if (table_backend != nullptr) {
-        table_backend->PrintLookupStats(std::cout);
-    }
     if (cycle_backend != nullptr) {
         cycle_backend->PrintStats(std::cout);
-    }
-    if (hybrid_backend != nullptr) {
-        hybrid_backend->PrintStats(std::cout);
     }
     if (tree_search_executed) {
         std::cout << "TreeSearchInitialSource=" << tree_search_initial_source << "\n";

@@ -2,16 +2,12 @@
 
 #include "backend/execution_backend.h"
 #include "backend/primitive_simulator.h"
-#include "model/stage.h"
 
 #include <cstdint>
 #include <iosfwd>
-#include <vector>
 
 struct CycleBackendStats {
     uint64_t estimate_calls = 0;
-    uint64_t primitive_sim_calls = 0;
-    uint64_t primitive_ops_total = 0;
     uint64_t fallback_count = 0;
 };
 
@@ -26,18 +22,37 @@ public:
     void PrintStats(std::ostream& os) const;
 
 private:
-    std::vector<Stage> BuildStages(
+    KeySwitchMethod ResolveKeySwitchMethod(
         const Request& req,
         const ExecutionPlan& plan,
         const SystemState& state) const;
 
-    PrimitiveTrace BuildPrimitiveTrace(
-        const std::vector<Stage>& stages,
+    ExecutionResult EstimatePoseidon(
         const Request& req,
         const ExecutionPlan& plan,
         const SystemState& state) const;
 
-    bool ResidentKeyHit(
+    ExecutionResult EstimateFAB(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state) const;
+
+    ExecutionResult EstimateFAST(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state) const;
+
+    ExecutionResult EstimateOLA(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state) const;
+
+    ExecutionResult EstimateHERA(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state) const;
+
+    ExecutionResult EstimateCinnamon(
         const Request& req,
         const ExecutionPlan& plan,
         const SystemState& state) const;

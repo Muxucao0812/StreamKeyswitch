@@ -14,6 +14,7 @@ struct CardState {
 
     uint64_t memory_capacity_bytes = 0;
     uint64_t memory_used_bytes = 0;
+    uint64_t bram_capacity_bytes = 32ULL * 1024ULL * 1024ULL;
 
     // Runtime counters for metrics.
     Time last_start_time = 0;

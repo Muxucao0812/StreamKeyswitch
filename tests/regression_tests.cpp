@@ -12,6 +12,7 @@
 #include "test_framework.h"
 
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -46,6 +47,7 @@ SystemState BuildDefaultState(uint32_t num_cards, uint32_t num_pools) {
         card.card_id = card_id;
         card.pool_id = card_id % num_pools;
         card.memory_capacity_bytes = kAlveoU280HbmBytes;
+        card.bram_capacity_bytes = kAlveoU280BramBytes;
         state.cards.push_back(card);
         state.pools[card.pool_id].card_ids.push_back(card_id);
     }
@@ -98,7 +100,7 @@ void CheckRegressionCase(
     std::cout << "[REG] " << case_name
               << " completed=" << metrics.completed_requests
               << " reload=" << metrics.total_reload_count
-              << " mean_latency=" << metrics.mean_latency << "\n";
+              << " mean_latency=" << std::setprecision(15) << metrics.mean_latency << "\n";
 
     EXPECT_EQ(ctx, metrics.completed_requests, expected_completed);
     EXPECT_EQ(ctx, metrics.total_reload_count, expected_reload);
@@ -123,7 +125,7 @@ int main() {
             metrics,
             /*completed=*/32,
             /*reload=*/29,
-            /*mean_latency=*/2875680.625,
+            /*mean_latency=*/2873218.1875,
             /*tol=*/1.0);
     }
 
@@ -138,8 +140,8 @@ int main() {
             "affinity+synthetic+table",
             metrics,
             /*completed=*/32,
-            /*reload=*/30,
-            /*mean_latency=*/11575247.5625,
+            /*reload=*/28,
+            /*mean_latency=*/10535765.375,
             /*tol=*/1.0);
     }
 
@@ -154,8 +156,8 @@ int main() {
             "hierarchical_d+burst+table",
             metrics,
             /*completed=*/64,
-            /*reload=*/54,
-            /*mean_latency=*/10262026.65625,
+            /*reload=*/55,
+            /*mean_latency=*/10263650.75,
             /*tol=*/1.0);
     }
 

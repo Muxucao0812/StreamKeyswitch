@@ -7,6 +7,7 @@
 #include <limits>
 
 inline constexpr uint64_t kAlveoU280HbmBytes = 8ULL * 1024ULL * 1024ULL * 1024ULL;
+inline constexpr uint64_t kAlveoU280BramBytes = 32ULL * 1024ULL * 1024ULL;
 
 inline uint64_t EstimateRequestWorkingSetBytes(const Request& req) {
     return req.ks_profile.input_bytes + req.ks_profile.key_bytes;
@@ -31,6 +32,9 @@ inline uint32_t DecideCardCountForRequest(
     const Request& req,
     uint64_t per_card_memory_bytes = kAlveoU280HbmBytes
 ) {
+    if (req.ks_profile.method == KeySwitchMethod::SingleBoardClassic) {
+        return 1;
+    }
     const uint32_t recommended_cards = RecommendCardCountForRequest(req, per_card_memory_bytes);
     const uint32_t max_cards = (req.ks_profile.max_cards == 0) ? recommended_cards : req.ks_profile.max_cards;
     return std::max<uint32_t>(1, std::min(recommended_cards, max_cards));

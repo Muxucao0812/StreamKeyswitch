@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/types.h"
+#include "model/request.h"
 
 #include <cstdint>
 #include <iosfwd>
@@ -19,10 +20,7 @@ enum class SchedulerKind {
 };
 
 enum class BackendKind {
-    Analytical,
-    Table,
-    CycleStub,
-    Hybrid
+    CycleStub
 };
 
 enum class WorkloadKind {
@@ -33,14 +31,13 @@ enum class WorkloadKind {
 struct ExperimentConfig {
     // Core mode switches.
     SchedulerKind scheduler = SchedulerKind::FIFO;
-    BackendKind backend = BackendKind::Analytical;
+    BackendKind backend = BackendKind::CycleStub;
     WorkloadKind workload = WorkloadKind::Synthetic;
 
     // Global experiment controls.
     uint64_t seed = 20260312ULL;
     uint32_t num_cards = 8;
     bool enable_multi_card = true;
-    bool hybrid_use_table_coarse = false;
 
     // Workload size controls.
     uint32_t num_users = 8;
@@ -64,7 +61,6 @@ struct ExperimentConfig {
     // External input/output files.
     std::string pool_config_path;
     std::string tree_config_path;
-    std::string profile_table_path;
     // Optional HE parameter file used to derive key size and related workload fields.
     std::string he_params_path;
     std::string csv_output_path;
@@ -74,6 +70,9 @@ struct ExperimentConfig {
     uint32_t tree_search_steps = 30;
     uint32_t tree_search_neighbors = 8;
     std::string tree_search_output_path;
+
+    // Keyswitch execution method selection.
+    KeySwitchMethod keyswitch_method = KeySwitchMethod::Auto;
 
     // Tree-search objective weights.
     double objective_w_mean_latency = 1.0;

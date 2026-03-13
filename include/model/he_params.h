@@ -61,10 +61,8 @@ struct HEParams {
     }
 
     Time ComputeKeyLoadTime() const {
-        const uint64_t bandwidth =
-            std::max<uint64_t>(1, key_load_bandwidth_bytes_per_ns);
-        return key_load_base_time
-            + static_cast<Time>((ComputeKeyBytes() + bandwidth - 1) / bandwidth);
+        const uint64_t bandwidth = std::max<uint64_t>(1, key_load_bandwidth_bytes_per_ns);
+        return key_load_base_time + static_cast<Time>((ComputeKeyBytes() + bandwidth - 1) / bandwidth);
     }
 
     static HEParams BuiltInDefault() {

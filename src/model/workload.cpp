@@ -21,6 +21,10 @@ void WorkloadBuilder::SetHEParams(const HEParams& he_params) {
     he_params_ = he_params;
 }
 
+void WorkloadBuilder::SetDefaultKeySwitchMethod(KeySwitchMethod method) {
+    keyswitch_method_ = method;
+}
+
 Time WorkloadBuilder::NextJitter(Time max_jitter) {
     if (max_jitter == 0) {
         return 0;
@@ -43,19 +47,20 @@ std::vector<UserProfile> WorkloadBuilder::BuildUserProfiles(uint32_t num_users) 
     std::vector<UserProfile> profiles;
     profiles.reserve(static_cast<size_t>(num_users));
 
-    const uint64_t shared_key_bytes = he_params_.ComputeKeyBytes();
-    const uint64_t shared_ct_bytes =
-        he_params_.ComputeCiphertextBytes(
-            /*ciphertext_count=*/1,
-            he_params_.num_polys,
-            he_params_.num_rns_limbs);
-    const Time shared_key_load_time = he_params_.ComputeKeyLoadTime();
+    const uint64_t shared_key_bytes =   he_params_.ComputeKeyBytes();
+    const uint64_t shared_ct_bytes  =   he_params_.ComputeCiphertextBytes(
+                                            /*ciphertext_count=*/1,
+                                            he_params_.num_polys,
+                                            he_params_.num_rns_limbs
+                                        );
+    const Time shared_key_load_time =   he_params_.ComputeKeyLoadTime();
 
     for (uint32_t user = 0; user < num_users; ++user) {
         UserProfile profile;
         profile.user_id = user;
         profile.key_bytes = shared_key_bytes;
         profile.ct_bytes = shared_ct_bytes;
+        // SSD -> PCIE -> HBM： Load Time
         profile.key_load_time = shared_key_load_time;
         profile.latency_sensitive = (user % 3 == 0);
         profile.weight = 1 + (user % 4);
@@ -84,6 +89,8 @@ Request WorkloadBuilder::BuildRequest(
     // Generate FHE Parameters
     req.ks_profile.num_ciphertexts = NextRange(1, 4);
     req.ks_profile.num_polys = he_params_.num_polys;
+    req.ks_profile.poly_modulus_degree = he_params_.poly_modulus_degree;
+    req.ks_profile.bytes_per_coeff = he_params_.bytes_per_coeff;
 
     // Use HE params as the center of the distribution while keeping
     // some request-to-request variation for synthetic workloads.
@@ -106,13 +113,17 @@ Request WorkloadBuilder::BuildRequest(
         req.ks_profile.num_polys,
         req.ks_profile.num_rns_limbs);
     req.ks_profile.key_bytes = user_profile.key_bytes;
+    req.ks_profile.method = keyswitch_method_;
 
     const uint32_t cards_by_working_set = RecommendCardCountForRequest(req);
     req.ks_profile.preferred_cards = cards_by_working_set;
-    
-    if (req.latency_sensitive){
-        req.ks_profile.max_cards = std::max<u_int32_t>(cards_by_working_set, 4);
-    }else{
+
+    if (keyswitch_method_ == KeySwitchMethod::SingleBoardClassic) {
+        req.ks_profile.preferred_cards = 1;
+        req.ks_profile.max_cards = 1;
+    } else if (req.latency_sensitive) {
+        req.ks_profile.max_cards = std::max<uint32_t>(cards_by_working_set, 4);
+    } else {
         req.ks_profile.max_cards = cards_by_working_set;
     }
 

@@ -3,6 +3,8 @@
 #include "common/types.h"
 
 enum class StageType {
+    // Compatibility-level coarse stages.
+    // Primitive-only main path should not use these as the primary execution abstraction.
     KeyLoad,
     Dispatch,
     Decompose,

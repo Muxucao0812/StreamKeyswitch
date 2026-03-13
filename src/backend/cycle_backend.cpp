@@ -1,175 +1,142 @@
 #include "backend/cycle_backend.h"
 
-#include "backend/analytical_backend.h"
-
-#include <algorithm>
 #include <ostream>
-#include <unordered_map>
+#include <string>
 
 namespace {
 
-Time StageTimeFromBreakdown(
-    const ExecutionBreakdown& breakdown,
-    StageType stage_type) {
-
-    switch (stage_type) {
-    case StageType::KeyLoad:
-        return breakdown.key_load_time;
-    case StageType::Dispatch:
-        return breakdown.dispatch_time;
-    case StageType::Decompose:
-        return breakdown.decompose_time;
-    case StageType::Multiply:
-        return breakdown.multiply_time;
-    case StageType::BasisConvert:
-        return breakdown.basis_convert_time;
-    case StageType::Merge:
-        return breakdown.merge_time;
+const char* KeySwitchMethodName(KeySwitchMethod method) {
+    switch (method) {
+    case KeySwitchMethod::Auto:
+        return "Auto";
+    case KeySwitchMethod::SingleBoardClassic:
+        return "SingleBoardClassic";
+    case KeySwitchMethod::SingleBoardFused:
+        return "SingleBoardFused";
+    case KeySwitchMethod::ScaleOutLimb:
+        return "ScaleOutLimb";
+    case KeySwitchMethod::ScaleOutDigit:
+        return "ScaleOutDigit";
+    case KeySwitchMethod::ScaleOutCiphertext:
+        return "ScaleOutCiphertext";
+    case KeySwitchMethod::Poseidon:
+        return "Poseidon";
+    case KeySwitchMethod::OLA:
+        return "OLA";
+    case KeySwitchMethod::FAB:
+        return "FAB";
+    case KeySwitchMethod::FAST:
+        return "FAST";
+    case KeySwitchMethod::HERA:
+        return "HERA";
+    case KeySwitchMethod::Cinnamon:
+        return "Cinnamon";
     }
 
-    return 0;
+    return "Unknown";
 }
 
-void AddStageTime(
-    ExecutionBreakdown* breakdown,
-    StageType stage_type,
-    Time value) {
-
-    switch (stage_type) {
-    case StageType::KeyLoad:
-        breakdown->key_load_time += value;
-        break;
-    case StageType::Dispatch:
-        breakdown->dispatch_time += value;
-        break;
-    case StageType::Decompose:
-        breakdown->decompose_time += value;
-        break;
-    case StageType::Multiply:
-        breakdown->multiply_time += value;
-        break;
-    case StageType::BasisConvert:
-        breakdown->basis_convert_time += value;
-        break;
-    case StageType::Merge:
-        breakdown->merge_time += value;
-        break;
+void NormalizeStatusFlags(ExecutionResult* result) {
+    if (result->fallback_reason != KeySwitchFallbackReason::None
+        && result->fallback_reason_message.empty()) {
+        result->fallback_reason_message = ToString(result->fallback_reason);
     }
-}
-
-Time TotalLatency(const ExecutionBreakdown& breakdown) {
-    return breakdown.key_load_time
-        + breakdown.dispatch_time
-        + breakdown.decompose_time
-        + breakdown.multiply_time
-        + breakdown.basis_convert_time
-        + breakdown.merge_time;
-}
-
-PrimitiveType PrimitiveTypeForStage(StageType stage_type) {
-    switch (stage_type) {
-    case StageType::KeyLoad:
-        return PrimitiveType::KeyLoadDMA;
-    case StageType::Dispatch:
-        return PrimitiveType::DispatchDMA;
-    case StageType::Decompose:
-        return PrimitiveType::DecomposeKernel;
-    case StageType::Multiply:
-        return PrimitiveType::MultiplyKernel;
-    case StageType::BasisConvert:
-        return PrimitiveType::BasisConvertKernel;
-    case StageType::Merge:
-        return PrimitiveType::MergeReduce;
+    if (result->degraded_reason != KeySwitchFallbackReason::None
+        && result->degraded_reason_message.empty()) {
+        result->degraded_reason_message = ToString(result->degraded_reason);
     }
 
-    return PrimitiveType::DispatchDMA;
+    result->unsupported_method =
+        result->fallback_used
+        && result->fallback_reason == KeySwitchFallbackReason::UnsupportedMethod;
+    result->unsupported_config =
+        result->fallback_used
+        && result->fallback_reason == KeySwitchFallbackReason::UnsupportedConfig;
+    result->compatibility_fallback =
+        result->fallback_used
+        && result->fallback_reason == KeySwitchFallbackReason::LegacyStageFallback;
+    result->degraded_to_single_board =
+        result->method_degraded
+        && result->degraded_reason == KeySwitchFallbackReason::DegradedToSingleBoard;
+    result->normal_execution = !result->fallback_used && !result->method_degraded;
+}
+
+ExecutionResult MakeFallbackResult(
+    const Request& req,
+    KeySwitchMethod effective_method,
+    KeySwitchFallbackReason reason) {
+
+    ExecutionResult result{};
+    result.requested_method = req.ks_profile.method;
+    result.effective_method = effective_method;
+
+    result.fallback_used = (reason != KeySwitchFallbackReason::None);
+    result.fallback_reason = reason;
+
+    result.method_degraded = false;
+    result.degraded_reason = KeySwitchFallbackReason::None;
+    result.tiled_execution = false;
+
+    // Keep primary-path semantics explicit even for stubs/fallbacks.
+    result.primitive_breakdown_primary = true;
+    result.stage_breakdown_compat_only = true;
+
+    // Minimal compatibility fill for downstream metric/report consumers.
+    result.tile_count = 1;
+    result.key_host_to_hbm_bytes = req.ks_profile.key_bytes;
+    result.key_hbm_to_bram_bytes = 0;
+    result.ct_hbm_to_bram_bytes = req.ks_profile.input_bytes;
+    result.out_bram_to_hbm_bytes = req.ks_profile.output_bytes;
+    result.hbm_read_bytes =
+        result.key_host_to_hbm_bytes
+        + result.key_hbm_to_bram_bytes
+        + result.ct_hbm_to_bram_bytes;
+    result.hbm_write_bytes = result.out_bram_to_hbm_bytes;
+    result.working_set_bytes = req.ks_profile.input_bytes + req.ks_profile.key_bytes;
+
+    NormalizeStatusFlags(&result);
+    return result;
+}
+
+ExecutionResult MakeMethodStubNotImplemented(
+    const Request& req,
+    const ExecutionPlan& plan,
+    KeySwitchMethod method) {
+
+    if (plan.assigned_cards.empty()) {
+        return MakeFallbackResult(req, method, KeySwitchFallbackReason::NoAssignedCard);
+    }
+
+    ExecutionResult result = MakeFallbackResult(
+        req,
+        method,
+        KeySwitchFallbackReason::UnsupportedConfig);
+    result.fallback_reason_message =
+        std::string(ToString(result.fallback_reason))
+        + ": " + KeySwitchMethodName(method)
+        + "_stub_not_implemented";
+    NormalizeStatusFlags(&result);
+    return result;
 }
 
 } // namespace
 
-std::vector<Stage> CycleBackend::BuildStages(
+KeySwitchMethod CycleBackend::ResolveKeySwitchMethod(
     const Request& req,
     const ExecutionPlan& plan,
-    const SystemState& state) const {
+    const SystemState& /*state*/) const {
 
-    std::vector<Stage> stages;
-    const auto& p = req.ks_profile;
-    const size_t cards = std::max<size_t>(1, plan.assigned_cards.size());
-
-    bool need_key_load = false;
-    for (const CardId card_id : plan.assigned_cards) {
-        const auto& card = state.cards.at(card_id);
-        if (!card.resident_user.has_value() || card.resident_user.value() != req.user_id) {
-            need_key_load = true;
-            break;
-        }
+    const KeySwitchMethod requested = req.ks_profile.method;
+    if (requested != KeySwitchMethod::Auto) {
+        return requested;
     }
 
-    if (need_key_load) {
-        stages.push_back(Stage{StageType::KeyLoad, p.key_bytes, 1});
-    }
-
-    stages.push_back(Stage{StageType::Dispatch, p.input_bytes, 1});
-    stages.push_back(Stage{
-        StageType::Decompose,
-        0,
-        p.num_ciphertexts * p.num_digits * p.num_rns_limbs});
-    stages.push_back(Stage{
-        StageType::Multiply,
-        0,
-        p.num_ciphertexts * p.num_polys * p.num_digits});
-    stages.push_back(Stage{
-        StageType::BasisConvert,
-        0,
-        p.num_ciphertexts * p.num_rns_limbs});
-
-    if (cards > 1) {
-        stages.push_back(Stage{
-            StageType::Merge,
-            p.output_bytes,
-            static_cast<uint32_t>(cards)});
-    }
-
-    return stages;
-}
-
-bool CycleBackend::ResidentKeyHit(
-    const Request& req,
-    const ExecutionPlan& plan,
-    const SystemState& state) const {
-
-    for (const CardId card_id : plan.assigned_cards) {
-        const auto& card = state.cards.at(card_id);
-        if (!card.resident_user.has_value() || card.resident_user.value() != req.user_id) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-PrimitiveTrace CycleBackend::BuildPrimitiveTrace(
-    const std::vector<Stage>& stages,
-    const Request& req,
-    const ExecutionPlan& plan,
-    const SystemState& state) const {
-
-    PrimitiveTrace trace;
-    trace.ops.reserve(stages.size());
-
-    const bool key_hit = ResidentKeyHit(req, plan, state);
-    for (const Stage& stage : stages) {
-        PrimitiveOp op;
-        op.type = PrimitiveTypeForStage(stage.type);
-        op.stage_type = stage.type;
-        op.bytes = stage.bytes;
-        op.work_units = stage.work_units;
-        op.assigned_cards = plan.assigned_cards;
-        op.key_hit = key_hit;
-        trace.ops.push_back(std::move(op));
-    }
-
-    return trace;
+    // Skeleton default policy for Auto:
+    // - multi-card assigned -> Cinnamon
+    // - single/no card assigned -> Poseidon
+    return (plan.assigned_cards.size() > 1)
+        ? KeySwitchMethod::Cinnamon
+        : KeySwitchMethod::Poseidon;
 }
 
 ExecutionResult CycleBackend::Estimate(
@@ -179,53 +146,98 @@ ExecutionResult CycleBackend::Estimate(
 
     ++stats_.estimate_calls;
 
+    const KeySwitchMethod method = ResolveKeySwitchMethod(req, plan, state);
+
     ExecutionResult result{};
-    const std::vector<Stage> stages = BuildStages(req, plan, state);
-    const PrimitiveTrace trace = BuildPrimitiveTrace(stages, req, plan, state);
+    switch (method) {
+    case KeySwitchMethod::Poseidon:
+        result = EstimatePoseidon(req, plan, state);
+        break;
 
-    ++stats_.primitive_sim_calls;
-    stats_.primitive_ops_total += trace.ops.size();
+    case KeySwitchMethod::FAB:
+        result = EstimateFAB(req, plan, state);
+        break;
 
-    const PrimitiveResult primitive_result = primitive_simulator_.Simulate(trace, state);
+    case KeySwitchMethod::FAST:
+        result = EstimateFAST(req, plan, state);
+        break;
 
-    std::unordered_map<StageType, Time> stage_latencies;
-    stage_latencies.reserve(primitive_result.stage_breakdown.size());
-    for (const auto& entry : primitive_result.stage_breakdown) {
-        stage_latencies[entry.stage_type] += entry.latency_ns;
+    case KeySwitchMethod::OLA:
+        result = EstimateOLA(req, plan, state);
+        break;
+
+    case KeySwitchMethod::HERA:
+        result = EstimateHERA(req, plan, state);
+        break;
+
+    case KeySwitchMethod::Cinnamon:
+        result = EstimateCinnamon(req, plan, state);
+        break;
+
+    default:
+        result = MakeFallbackResult(req, method, KeySwitchFallbackReason::UnsupportedMethod);
+        break;
     }
 
-    AnalyticalBackend analytical_fallback;
-    ExecutionResult fallback_result{};
-    bool fallback_ready = false;
-
-    for (const Stage& stage : stages) {
-        auto it = stage_latencies.find(stage.type);
-        if (it != stage_latencies.end()) {
-            AddStageTime(&result.breakdown, stage.type, it->second);
-            continue;
-        }
-
-        if (!fallback_ready) {
-            fallback_result = analytical_fallback.Estimate(req, plan, state);
-            fallback_ready = true;
-        }
-
+    NormalizeStatusFlags(&result);
+    if (result.fallback_used) {
         ++stats_.fallback_count;
-        const Time fallback_stage = StageTimeFromBreakdown(fallback_result.breakdown, stage.type);
-        AddStageTime(&result.breakdown, stage.type, fallback_stage);
-        result.energy_nj += static_cast<double>(fallback_stage) * 0.5;
     }
-
-    result.total_latency = TotalLatency(result.breakdown);
-
-    const uint64_t request_working_set = req.ks_profile.input_bytes + req.ks_profile.key_bytes;
-    result.peak_memory_bytes = std::max<uint64_t>(
-        primitive_result.peak_memory_bytes,
-        request_working_set);
-
-    result.energy_nj += primitive_result.total_energy_nj;
-
     return result;
+}
+
+ExecutionResult CycleBackend::EstimatePoseidon(
+    const Request& req,
+    const ExecutionPlan& plan,
+    const SystemState& state) const {
+
+    (void)state;
+    return MakeMethodStubNotImplemented(req, plan, KeySwitchMethod::Poseidon);
+}
+
+ExecutionResult CycleBackend::EstimateFAB(
+    const Request& req,
+    const ExecutionPlan& plan,
+    const SystemState& state) const {
+
+    (void)state;
+    return MakeMethodStubNotImplemented(req, plan, KeySwitchMethod::FAB);
+}
+
+ExecutionResult CycleBackend::EstimateFAST(
+    const Request& req,
+    const ExecutionPlan& plan,
+    const SystemState& state) const {
+
+    (void)state;
+    return MakeMethodStubNotImplemented(req, plan, KeySwitchMethod::FAST);
+}
+
+ExecutionResult CycleBackend::EstimateOLA(
+    const Request& req,
+    const ExecutionPlan& plan,
+    const SystemState& state) const {
+
+    (void)state;
+    return MakeMethodStubNotImplemented(req, plan, KeySwitchMethod::OLA);
+}
+
+ExecutionResult CycleBackend::EstimateHERA(
+    const Request& req,
+    const ExecutionPlan& plan,
+    const SystemState& state) const {
+
+    (void)state;
+    return MakeMethodStubNotImplemented(req, plan, KeySwitchMethod::HERA);
+}
+
+ExecutionResult CycleBackend::EstimateCinnamon(
+    const Request& req,
+    const ExecutionPlan& plan,
+    const SystemState& state) const {
+
+    (void)state;
+    return MakeMethodStubNotImplemented(req, plan, KeySwitchMethod::Cinnamon);
 }
 
 CycleBackendStats CycleBackend::GetStats() const {
@@ -235,8 +247,7 @@ CycleBackendStats CycleBackend::GetStats() const {
 void CycleBackend::PrintStats(std::ostream& os) const {
     const CycleBackendStats s = GetStats();
 
-    os << "=== CycleBackend Stub Stats ===\n";
-    os << "PrimitiveSimulatorCalls=" << s.primitive_sim_calls << "\n";
-    os << "PrimitiveOpsTotal=" << s.primitive_ops_total << "\n";
+    os << "=== CycleBackend Method Dispatch Stats ===\n";
+    os << "EstimateCalls=" << s.estimate_calls << "\n";
     os << "CycleFallbackCount=" << s.fallback_count << "\n";
 }

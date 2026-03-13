@@ -13,6 +13,7 @@ public:
 
     void ResetSeed(uint64_t seed);
     void SetHEParams(const HEParams& he_params);
+    void SetDefaultKeySwitchMethod(KeySwitchMethod method);
 
     std::vector<Request> GenerateSynthetic(
         uint32_t num_users,
@@ -48,5 +49,6 @@ private:
 
 private:
     HEParams he_params_;
+    KeySwitchMethod keyswitch_method_ = KeySwitchMethod::Auto;
     std::mt19937_64 rng_;
 };

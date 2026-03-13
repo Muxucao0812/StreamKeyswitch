@@ -1,8 +1,7 @@
 #include "search/tree_search.h"
 
-#include "backend/analytical_backend.h"
+#include "backend/cycle_backend.h"
 #include "backend/execution_backend.h"
-#include "backend/table_backend.h"
 #include "scheduler/hierarchical_scheduler.h"
 #include "sim/simulator.h"
 
@@ -381,13 +380,8 @@ FixedTreeKind ToFixedTreeKind(SchedulerKind scheduler) {
 }
 
 std::unique_ptr<ExecutionBackend> BuildBackendForEval(const ExperimentConfig& config) {
-    if (config.backend == BackendKind::Table) {
-        if (config.profile_table_path.empty()) {
-            return std::make_unique<TableBackend>();
-        }
-        return std::make_unique<TableBackend>(config.profile_table_path);
-    }
-    return std::make_unique<AnalyticalBackend>();
+    (void)config;
+    return std::make_unique<CycleBackend>();
 }
 
 SimulationMetrics EvaluateCandidateTree(
