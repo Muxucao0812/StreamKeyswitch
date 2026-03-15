@@ -18,10 +18,19 @@ public:
     ExecutionResult Estimate(
         const Request& req,
         const ExecutionPlan& plan,
-        const SystemState& state) const override;
+        const SystemState& state
+    ) const override;
 
     CycleBackendStats GetStats() const;
     void PrintStats(std::ostream& os) const;
+
+    
+    ExecutionResult EstimateMethod(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state,
+        KeySwitchMethod method
+    ) const;
 
 private:
     KeySwitchMethod ResolveKeySwitchMethod(
@@ -29,45 +38,10 @@ private:
         const ExecutionPlan& plan,
         const SystemState& state) const;
 
-    ExecutionResult EstimatePoseidon(
-        const Request& req,
-        const ExecutionPlan& plan,
-        const SystemState& state) const;
-
-    ExecutionResult EstimateFAB(
-        const Request& req,
-        const ExecutionPlan& plan,
-        const SystemState& state) const;
-
-    ExecutionResult EstimateFAST(
-        const Request& req,
-        const ExecutionPlan& plan,
-        const SystemState& state) const;
-
-    ExecutionResult EstimateOLA(
-        const Request& req,
-        const ExecutionPlan& plan,
-        const SystemState& state) const;
-
-    ExecutionResult EstimateHERA(
-        const Request& req,
-        const ExecutionPlan& plan,
-        const SystemState& state) const;
-
-    ExecutionResult EstimateCinnamon(
-        const Request& req,
-        const ExecutionPlan& plan,
-        const SystemState& state) const;
-
-    ExecutionResult EstimateMethod(
-        const Request& req,
-        const ExecutionPlan& plan,
-        const SystemState& state,
-        KeySwitchMethod method) const;
 
 private:
     KeySwitchExecutionModel execution_model_;
     HardwareModel hw_model_;
-    [[maybe_unused]] PrimitiveSimulatorStub primitive_simulator_;
+    PrimitiveSimulatorStub primitive_simulator_;
     mutable CycleBackendStats stats_;
 };

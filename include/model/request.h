@@ -68,7 +68,7 @@ struct KeySwitchProfile {
     uint32_t max_cards = 1;
 
     // Method-aware keyswitch policy controls.
-    KeySwitchMethod method = KeySwitchMethod::Auto;
+    KeySwitchMethod method = KeySwitchMethod::Poseidon;
     PartitionStrategy partition = PartitionStrategy::Auto;
     KeyPlacement key_placement = KeyPlacement::Auto;
     CollectiveStrategy collective = CollectiveStrategy::Auto;

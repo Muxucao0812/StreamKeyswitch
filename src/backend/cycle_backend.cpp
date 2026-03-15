@@ -412,27 +412,27 @@ ExecutionResult CycleBackend::Estimate(
     ExecutionResult result{};
     switch (method) {
     case KeySwitchMethod::Poseidon:
-        result = EstimatePoseidon(req, plan, state);
+        result = EstimateMethod(req, plan, state, KeySwitchMethod::Poseidon);
         break;
 
     case KeySwitchMethod::FAB:
-        result = EstimateFAB(req, plan, state);
+        result = EstimateMethod(req, plan, state, KeySwitchMethod::FAB);
         break;
 
     case KeySwitchMethod::FAST:
-        result = EstimateFAST(req, plan, state);
+        result = EstimateMethod(req, plan, state, KeySwitchMethod::FAST);
         break;
 
     case KeySwitchMethod::OLA:
-        result = EstimateOLA(req, plan, state);
+        result = EstimateMethod(req, plan, state, KeySwitchMethod::OLA);
         break;
 
     case KeySwitchMethod::HERA:
-        result = EstimateHERA(req, plan, state);
+        result = EstimateMethod(req, plan, state, KeySwitchMethod::HERA);
         break;
 
     case KeySwitchMethod::Cinnamon:
-        result = EstimateCinnamon(req, plan, state);
+        result = EstimateMethod(req, plan, state, KeySwitchMethod::Cinnamon);
         break;
 
     default:
@@ -445,18 +445,6 @@ ExecutionResult CycleBackend::Estimate(
         ++stats_.fallback_count;
     }
     return result;
-}
-
-ExecutionResult CycleBackend::EstimatePoseidon(
-    const Request& req,
-    const ExecutionPlan& plan,
-    const SystemState& state) const {
-
-    return EstimateMethod(
-        req,
-        plan,
-        state,
-        KeySwitchMethod::Poseidon);
 }
 
 ExecutionResult CycleBackend::EstimateMethod(
@@ -567,66 +555,6 @@ ExecutionResult CycleBackend::EstimateMethod(
     result.peak_memory_bytes = result.peak_total_bytes;
     result.total_latency = TotalLatency(result.breakdown);
     return result;
-}
-
-ExecutionResult CycleBackend::EstimateFAB(
-    const Request& req,
-    const ExecutionPlan& plan,
-    const SystemState& state) const {
-
-    return EstimateMethod(
-        req,
-        plan,
-        state,
-        KeySwitchMethod::FAB);
-}
-
-ExecutionResult CycleBackend::EstimateFAST(
-    const Request& req,
-    const ExecutionPlan& plan,
-    const SystemState& state) const {
-
-    return EstimateMethod(
-        req,
-        plan,
-        state,
-        KeySwitchMethod::FAST);
-}
-
-ExecutionResult CycleBackend::EstimateOLA(
-    const Request& req,
-    const ExecutionPlan& plan,
-    const SystemState& state) const {
-
-    return EstimateMethod(
-        req,
-        plan,
-        state,
-        KeySwitchMethod::OLA);
-}
-
-ExecutionResult CycleBackend::EstimateHERA(
-    const Request& req,
-    const ExecutionPlan& plan,
-    const SystemState& state) const {
-
-    return EstimateMethod(
-        req,
-        plan,
-        state,
-        KeySwitchMethod::HERA);
-}
-
-ExecutionResult CycleBackend::EstimateCinnamon(
-    const Request& req,
-    const ExecutionPlan& plan,
-    const SystemState& state) const {
-
-    return EstimateMethod(
-        req,
-        plan,
-        state,
-        KeySwitchMethod::Cinnamon);
 }
 
 CycleBackendStats CycleBackend::GetStats() const {

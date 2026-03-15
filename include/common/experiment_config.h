@@ -3,6 +3,7 @@
 #include "common/types.h"
 #include "model/request.h"
 
+#include <chrono>
 #include <cstdint>
 #include <iosfwd>
 #include <string>
@@ -35,15 +36,19 @@ struct ExperimentConfig {
     WorkloadKind workload = WorkloadKind::Synthetic;
 
     // Global experiment controls.
-    uint64_t seed = 20260312ULL;
-    uint32_t num_cards = 8;
+    uint64_t seed = static_cast<uint64_t>(
+            std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::system_clock::now().time_since_epoch())
+            .count()
+        );
+    uint32_t num_cards = 1;
     bool enable_multi_card = true;
 
     // Workload size controls.
-    uint32_t num_users = 8;
+    uint32_t num_users = 1;
 
     // Synthetic workload parameters.
-    uint32_t synthetic_requests_per_user = 4;
+    uint32_t synthetic_requests_per_user = 1;
     Time synthetic_inter_arrival = 300;
     Time synthetic_start_time = 0;
 
@@ -56,7 +61,7 @@ struct ExperimentConfig {
     uint32_t burst_level = 1;
 
     // Built-in pool layout parameters.
-    uint32_t num_pools = 2;
+    uint32_t num_pools = 1;
 
     // External input/output files.
     std::string pool_config_path;
@@ -72,7 +77,7 @@ struct ExperimentConfig {
     std::string tree_search_output_path;
 
     // Keyswitch execution method selection.
-    KeySwitchMethod keyswitch_method = KeySwitchMethod::Auto;
+    KeySwitchMethod keyswitch_method = KeySwitchMethod::Poseidon;
 
     // Tree-search objective weights.
     double objective_w_mean_latency = 1.0;

@@ -117,7 +117,6 @@ bool ParseKeySwitchMethod(
     const std::string& text,
     KeySwitchMethod* value) {
     static const std::unordered_map<std::string, KeySwitchMethod> mapping = {
-        {"auto", KeySwitchMethod::Auto},
         {"poseidon", KeySwitchMethod::Poseidon},
         {"fab", KeySwitchMethod::FAB},
         {"fast", KeySwitchMethod::FAST},
@@ -160,7 +159,7 @@ const char* ToString(KeySwitchMethod method) {
     case KeySwitchMethod::ScaleOutCiphertext:
         return "scaleout_ciphertext";
     }
-    return "auto";
+    return "poseidon";
 }
 
 } // namespace
@@ -242,7 +241,7 @@ std::string BuildUsageText(const std::string& program_name) {
         << "  --pool-config <path>                  External pool config file.\n"
         << "  --tree-config <path>                  External resource-tree config file.\n"
         << "  --he-params <path>                    HE parameter file for workload derivation.\n"
-        << "  --ks-method <auto|poseidon|fab|fast|ola|hera|cinnamon>\n"
+        << "  --ks-method <poseidon|fab|fast|ola|hera|cinnamon>\n"
         << "                                        Keyswitch execution method for generated requests.\n"
         << "  --csv-output <path>                   Append run metrics to CSV file.\n"
         << "  --search-tree                         Enable tree search before simulation.\n"
@@ -568,11 +567,11 @@ ParseExperimentConfigResult ParseExperimentConfig(int argc, char** argv) {
                 if (!require_value("--ks-method", &value_text)) {
                     return result;
                 }
-                KeySwitchMethod method = KeySwitchMethod::Auto;
+                KeySwitchMethod method = KeySwitchMethod::Poseidon;
                 if (!ParseKeySwitchMethod(value_text, &method)) {
                     result.error_message =
                         "Invalid --ks-method: " + value_text
-                        + " (expected auto|poseidon|fab|fast|ola|hera|cinnamon)";
+                        + " (expected poseidon|fab|fast|ola|hera|cinnamon)";
                     return result;
                 }
                 config.keyswitch_method = method;
