@@ -67,8 +67,8 @@ struct CycleInstruction {
     uint32_t ct_tile_index = 0;
     uint32_t limb_tile_index = 0;
     uint32_t digit_tile_index = 0;
-    IntermediateStorageLevel input_storage = IntermediateStorageLevel::SRAM;
-    IntermediateStorageLevel output_storage = IntermediateStorageLevel::SRAM;
+    IntermediateStorageLevel input_storage = IntermediateStorageLevel::BRAM;
+    IntermediateStorageLevel output_storage = IntermediateStorageLevel::BRAM;
     bool fused_with_prev = false;
     bool fused_with_next = false;
     bool is_shortcut_path = false;
@@ -87,8 +87,8 @@ struct CycleInstructionGroup {
     uint32_t ct_tile_index = 0;
     uint32_t limb_tile_index = 0;
     uint32_t digit_tile_index = 0;
-    IntermediateStorageLevel input_storage = IntermediateStorageLevel::SRAM;
-    IntermediateStorageLevel output_storage = IntermediateStorageLevel::SRAM;
+    IntermediateStorageLevel input_storage = IntermediateStorageLevel::BRAM;
+    IntermediateStorageLevel output_storage = IntermediateStorageLevel::BRAM;
     bool fused_with_prev = false;
     bool fused_with_next = false;
     bool is_shortcut_path = false;
@@ -98,10 +98,6 @@ struct CycleInstructionGroup {
     uint64_t live_bytes_after = 0;
     int64_t live_bytes_delta_on_issue = 0;
     int64_t live_bytes_delta_on_complete = 0;
-    int64_t rf_live_bytes_delta_on_issue = 0;
-    int64_t rf_live_bytes_delta_on_complete = 0;
-    int64_t sram_live_bytes_delta_on_issue = 0;
-    int64_t sram_live_bytes_delta_on_complete = 0;
     std::vector<uint32_t> dependencies;
     std::vector<CycleInstruction> instructions;
 };

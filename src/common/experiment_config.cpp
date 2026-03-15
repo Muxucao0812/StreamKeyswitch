@@ -248,6 +248,8 @@ std::string BuildUsageText(const std::string& program_name) {
         << "  --search-steps <uint32>               Tree search optimization steps.\n"
         << "  --search-neighbors <uint32>           Tree neighbors sampled per step.\n"
         << "  --search-output-tree <path>           Output path of optimized tree.\n"
+        << "  --dump-logical-graph                  Print the shared single-board logical graph for the first request.\n"
+        << "  --dump-runtime-plan                   Print the runtime-planned physical step graph for the first request.\n"
         << "  --obj-w-mean-latency <double>         Objective weight: mean latency.\n"
         << "  --obj-w-p99-latency <double>          Objective weight: p99 latency.\n"
         << "  --obj-w-fairness-penalty <double>     Objective weight: fairness penalty.\n"
@@ -637,6 +639,16 @@ ParseExperimentConfigResult ParseExperimentConfig(int argc, char** argv) {
                 continue;
             }
 
+            if (arg == "--dump-logical-graph") {
+                config.dump_logical_graph = true;
+                continue;
+            }
+
+            if (arg == "--dump-runtime-plan") {
+                config.dump_runtime_plan = true;
+                continue;
+            }
+
             if (arg == "--obj-w-mean-latency") {
                 std::string value_text;
                 if (!require_value("--obj-w-mean-latency", &value_text)) {
@@ -859,6 +871,8 @@ void PrintExperimentConfig(std::ostream& os, const ExperimentConfig& config) {
     os << "TreeSearchOutputPath: "
        << (config.tree_search_output_path.empty() ? "auto" : config.tree_search_output_path)
        << "\n";
+    os << "DumpLogicalGraph: " << (config.dump_logical_graph ? "true" : "false") << "\n";
+    os << "DumpRuntimePlan: " << (config.dump_runtime_plan ? "true" : "false") << "\n";
     os << "ObjectiveWeights: "
        << "mean_latency=" << config.objective_w_mean_latency
        << ", p99_latency=" << config.objective_w_p99_latency

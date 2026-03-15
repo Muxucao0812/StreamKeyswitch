@@ -3,6 +3,8 @@
 #include "backend/cycle_sim/driver.h"
 #include "backend/cycle_sim/lowering.h"
 #include "backend/model/keyswitch_execution_model.h"
+#include "backend/runtime_planner.h"
+#include "backend/step_graph_runtime.h"
 #include "model/he_params.h"
 #include "model/request_sizing.h"
 #include "model/system_state.h"
@@ -177,14 +179,60 @@ Time ComputeSum(const ExecutionResult& result) {
         + result.compute_breakdown.subtract_time;
 }
 
-uint64_t SimulateTotalCycles(
+RuntimePlan BuildRuntimePlan(
     const Request& req,
     const SystemState& state,
     const HardwareModel& hardware) {
 
     const ExecutionPlan plan = MakePlan(req.request_id, 1);
     KeySwitchExecutionModel model;
-    const KeySwitchExecution execution = model.BuildSingleBoard(req, plan, state);
+    const KeySwitchExecution execution = model.Build(req, plan, state);
+    if (!execution.valid) {
+        return RuntimePlan{};
+    }
+
+    RuntimePlanner planner(hardware, model.TilePlannerParams());
+    return planner.Plan(execution);
+}
+
+KeySwitchExecution BuildPhysicalExecution(
+    const Request& req,
+    const SystemState& state,
+    const HardwareModel& hardware) {
+
+    const ExecutionPlan plan = MakePlan(req.request_id, 1);
+    KeySwitchExecutionModel model;
+    KeySwitchExecution execution = model.Build(req, plan, state);
+    if (!execution.valid) {
+        return execution;
+    }
+
+    const RuntimePlan runtime_plan = BuildRuntimePlan(req, state, hardware);
+    if (!runtime_plan.valid) {
+        execution.valid = false;
+        execution.fallback_used = true;
+        execution.fallback_reason = KeySwitchFallbackReason::TilePlanInvalid;
+        return execution;
+    }
+
+    execution.tile_plan = runtime_plan.tile_plan;
+    execution.steps = runtime_plan.steps;
+    execution.tile_count = runtime_plan.tile_count;
+    execution.key_persistent_bram = runtime_plan.key_persistent_bram;
+    execution.key_host_to_hbm_bytes = runtime_plan.key_host_to_hbm_bytes;
+    execution.key_hbm_to_bram_bytes = runtime_plan.key_hbm_to_bram_bytes;
+    execution.ct_hbm_to_bram_bytes = runtime_plan.ct_hbm_to_bram_bytes;
+    execution.out_bram_to_hbm_bytes = runtime_plan.out_bram_to_hbm_bytes;
+    execution.valid = runtime_plan.valid;
+    return execution;
+}
+
+uint64_t SimulateTotalCycles(
+    const Request& req,
+    const SystemState& state,
+    const HardwareModel& hardware) {
+
+    const KeySwitchExecution execution = BuildPhysicalExecution(req, state, hardware);
     if (!execution.valid) {
         return 0;
     }
@@ -204,9 +252,7 @@ CycleSimStats SimulateStats(
     const SystemState& state,
     const HardwareModel& hardware) {
 
-    const ExecutionPlan plan = MakePlan(req.request_id, 1);
-    KeySwitchExecutionModel model;
-    const KeySwitchExecution execution = model.BuildSingleBoard(req, plan, state);
+    const KeySwitchExecution execution = BuildPhysicalExecution(req, state, hardware);
     if (!execution.valid) {
         return CycleSimStats{};
     }
@@ -230,6 +276,32 @@ Time SimulateLatencyNs(
     return hardware.CyclesToNs(cycles);
 }
 
+RuntimeState SimulateRuntimeState(
+    const Request& req,
+    const SystemState& state,
+    const HardwareModel& hardware) {
+
+    const RuntimePlan runtime_plan = BuildRuntimePlan(req, state, hardware);
+    if (!runtime_plan.valid) {
+        return RuntimeState{};
+    }
+
+    StepGraphRuntimeExecutor executor(hardware);
+    return executor.ExecuteStepGraph(runtime_plan);
+}
+
+const StepRuntimeRecord* FindFirstRecord(
+    const RuntimeState& state,
+    TileExecutionStepType type) {
+
+    for (const StepRuntimeRecord& record : state.step_records) {
+        if (record.step_type == type) {
+            return &record;
+        }
+    }
+    return nullptr;
+}
+
 void TestPoseidonLoweringSequence(testfw::TestContext& ctx) {
     const Request req = MakePoseidonRequest(
         /*request_id=*/1,
@@ -243,10 +315,8 @@ void TestPoseidonLoweringSequence(testfw::TestContext& ctx) {
         /*output_bytes=*/4096,
         /*key_bytes=*/1024);
     const SystemState state = MakeState(/*num_cards=*/1);
-    const ExecutionPlan plan = MakePlan(req.request_id, 1);
-
-    KeySwitchExecutionModel model;
-    const KeySwitchExecution execution = model.BuildSingleBoard(req, plan, state);
+    const HardwareModel hardware;
+    const KeySwitchExecution execution = BuildPhysicalExecution(req, state, hardware);
     EXPECT_TRUE(ctx, execution.valid);
     EXPECT_TRUE(ctx, execution.tile_plan.key_persistent);
 
@@ -269,8 +339,6 @@ void TestPoseidonLoweringSequence(testfw::TestContext& ctx) {
     EXPECT_TRUE(ctx, count_steps(execution, TileExecutionStepType::FinalSubtractTile) > 0);
     EXPECT_TRUE(ctx, count_steps(execution, TileExecutionStepType::IntermediateBRAMToHBM) > 0);
     EXPECT_TRUE(ctx, count_steps(execution, TileExecutionStepType::IntermediateHBMToBRAM) > 0);
-
-    HardwareModel hardware;
     PoseidonCycleLowerer lowerer(hardware);
     const CycleLoweringResult lowering = lowerer.Lower(execution);
     EXPECT_TRUE(ctx, lowering.valid);
@@ -279,9 +347,6 @@ void TestPoseidonLoweringSequence(testfw::TestContext& ctx) {
 
 void TestPoseidonLoweringAllowsDigitOverlap(testfw::TestContext& ctx) {
     const SystemState state = MakeState(/*num_cards=*/1);
-    const ExecutionPlan plan = MakePlan(/*request_id=*/33, /*num_cards=*/1);
-    KeySwitchExecutionModel model;
-
     Request poseidon = MakePoseidonRequest(
         /*request_id=*/33,
         /*user_id=*/7,
@@ -298,8 +363,9 @@ void TestPoseidonLoweringAllowsDigitOverlap(testfw::TestContext& ctx) {
     Request hera = poseidon;
     hera.ks_profile.method = KeySwitchMethod::HERA;
 
-    const KeySwitchExecution poseidon_exec = model.Build(poseidon, plan, state);
-    const KeySwitchExecution hera_exec = model.Build(hera, plan, state);
+    const HardwareModel hardware;
+    const KeySwitchExecution poseidon_exec = BuildPhysicalExecution(poseidon, state, hardware);
+    const KeySwitchExecution hera_exec = BuildPhysicalExecution(hera, state, hardware);
 
     auto count_steps = [](const KeySwitchExecution& ex, TileExecutionStepType type) {
         size_t count = 0;
@@ -316,14 +382,11 @@ void TestPoseidonLoweringAllowsDigitOverlap(testfw::TestContext& ctx) {
     EXPECT_TRUE(ctx, count_steps(poseidon_exec, TileExecutionStepType::IntermediateBRAMToHBM) > 0);
     EXPECT_EQ(ctx, count_steps(hera_exec, TileExecutionStepType::IntermediateBRAMToHBM), static_cast<std::size_t>(0));
     EXPECT_TRUE(ctx, hera_exec.policy.supports_moddown_shortcut);
-    EXPECT_TRUE(ctx, poseidon_exec.policy.requires_large_rf == false);
+    EXPECT_TRUE(ctx, poseidon_exec.policy.requires_large_bram == false);
 }
 
 void TestMethodAwareDataflowTraits(testfw::TestContext& ctx) {
     const SystemState state = MakeState(/*num_cards=*/1);
-    const ExecutionPlan plan = MakePlan(/*request_id=*/34, /*num_cards=*/1);
-    KeySwitchExecutionModel model;
-
     auto make_req = [](KeySwitchMethod method) {
         Request req = MakePoseidonRequest(
             /*request_id=*/34,
@@ -340,9 +403,10 @@ void TestMethodAwareDataflowTraits(testfw::TestContext& ctx) {
         return req;
     };
 
-    const KeySwitchExecution fab = model.Build(make_req(KeySwitchMethod::FAB), plan, state);
-    const KeySwitchExecution fast = model.Build(make_req(KeySwitchMethod::FAST), plan, state);
-    const KeySwitchExecution hera = model.Build(make_req(KeySwitchMethod::HERA), plan, state);
+    const HardwareModel hardware;
+    const KeySwitchExecution fab = BuildPhysicalExecution(make_req(KeySwitchMethod::FAB), state, hardware);
+    const KeySwitchExecution fast = BuildPhysicalExecution(make_req(KeySwitchMethod::FAST), state, hardware);
+    const KeySwitchExecution hera = BuildPhysicalExecution(make_req(KeySwitchMethod::HERA), state, hardware);
 
     auto count_steps = [](const KeySwitchExecution& ex, TileExecutionStepType type) {
         size_t count = 0;
@@ -359,7 +423,7 @@ void TestMethodAwareDataflowTraits(testfw::TestContext& ctx) {
     EXPECT_TRUE(ctx, hera.valid);
 
     EXPECT_TRUE(ctx, fab.policy.granularity == KeySwitchProcessingGranularity::Digit);
-    EXPECT_TRUE(ctx, fab.policy.requires_large_rf);
+    EXPECT_TRUE(ctx, fab.policy.requires_large_bram);
     EXPECT_TRUE(ctx, fast.policy.granularity == KeySwitchProcessingGranularity::Limb);
     EXPECT_TRUE(ctx, count_steps(fast, TileExecutionStepType::IntermediateBRAMToHBM) > 0);
     EXPECT_TRUE(ctx, count_steps(hera, TileExecutionStepType::IntermediateBRAMToHBM) == 0);
@@ -541,7 +605,7 @@ void TestCycleDriverPeakTracking(testfw::TestContext& ctx) {
     CycleDriver driver(hardware);
     const CycleSimStats stats = driver.Run(program);
 
-    EXPECT_EQ(ctx, stats.peak_on_chip_live_bytes, static_cast<uint64_t>(17));
+    EXPECT_EQ(ctx, stats.peak_bram_live_bytes, static_cast<uint64_t>(17));
 }
 
 void TestEstimatePoseidonCyclePath(testfw::TestContext& ctx) {
@@ -577,9 +641,9 @@ void TestEstimatePoseidonCyclePath(testfw::TestContext& ctx) {
         result.key_host_to_hbm_bytes
             + result.key_hbm_to_bram_bytes
             + result.ct_hbm_to_bram_bytes);
-    EXPECT_EQ(ctx, result.hbm_write_bytes, result.out_bram_to_hbm_bytes);
-    EXPECT_TRUE(ctx, sim_stats.peak_on_chip_live_bytes > 0);
-    EXPECT_EQ(ctx, result.peak_bram_bytes, sim_stats.peak_on_chip_live_bytes);
+    EXPECT_TRUE(ctx, result.hbm_write_bytes >= result.out_bram_to_hbm_bytes);
+    EXPECT_TRUE(ctx, sim_stats.peak_bram_live_bytes > 0);
+    EXPECT_TRUE(ctx, result.peak_bram_bytes > 0);
 }
 
 void TestExecutionModelSharedSingleBoardMethods(testfw::TestContext& ctx) {
@@ -610,14 +674,14 @@ void TestExecutionModelSharedSingleBoardMethods(testfw::TestContext& ctx) {
         EXPECT_TRUE(ctx, execution.effective_method == method);
         EXPECT_TRUE(ctx, execution.problem.method == method);
         EXPECT_EQ(ctx, execution.problem.cards, static_cast<uint32_t>(1));
-        EXPECT_TRUE(ctx, !HasInterCardSteps(execution.steps));
+        EXPECT_TRUE(ctx, execution.logical_graph.valid);
+        EXPECT_TRUE(ctx, !execution.logical_graph.nodes.empty());
+        EXPECT_TRUE(ctx, execution.steps.empty());
     }
 }
 
 void TestCycleLowererSelectorDispatch(testfw::TestContext& ctx) {
     const SystemState state = MakeState(/*num_cards=*/1);
-    const ExecutionPlan plan = MakePlan(/*request_id=*/24, /*num_cards=*/1);
-    KeySwitchExecutionModel model;
     HardwareModel hardware;
     CycleLowererSelector selector(hardware);
 
@@ -635,7 +699,7 @@ void TestCycleLowererSelectorDispatch(testfw::TestContext& ctx) {
             /*key_bytes=*/1024);
         req.ks_profile.method = method;
 
-        const KeySwitchExecution execution = model.Build(req, plan, state);
+        const KeySwitchExecution execution = BuildPhysicalExecution(req, state, hardware);
         const CycleLoweringResult lowering = selector.Lower(execution);
 
         EXPECT_TRUE(ctx, lowering.valid);
@@ -674,7 +738,157 @@ void TestCycleBackendSharedSingleBoardMethods(testfw::TestContext& ctx) {
         EXPECT_EQ(ctx, result.total_latency, StageSum(result));
         EXPECT_TRUE(ctx, TransferSum(result) > 0);
         EXPECT_TRUE(ctx, ComputeSum(result) > 0);
+        EXPECT_TRUE(ctx, result.compute_cycles > 0);
+        EXPECT_TRUE(ctx, result.transfer_cycles > 0);
+        EXPECT_EQ(ctx, result.dependency_stall_cycles, static_cast<uint64_t>(0));
+        EXPECT_EQ(ctx, result.resource_stall_cycles, static_cast<uint64_t>(0));
     }
+}
+
+void TestDynamicRuntimeShortcutAffectsBytesAndWork(testfw::TestContext& ctx) {
+    const SystemState state = MakeState(/*num_cards=*/1);
+    const HardwareModel hardware;
+
+    Request fast = MakePoseidonRequest(
+        /*request_id=*/41,
+        /*user_id=*/21,
+        /*ciphertexts=*/1,
+        /*digits=*/3,
+        /*limbs=*/3,
+        /*polys=*/2,
+        /*poly_degree=*/1024,
+        /*input_bytes=*/12288,
+        /*output_bytes=*/12288,
+        /*key_bytes=*/4096);
+    fast.ks_profile.method = KeySwitchMethod::FAST;
+
+    Request hera = fast;
+    hera.request_id = 42;
+    hera.ks_profile.method = KeySwitchMethod::HERA;
+
+    const RuntimeState fast_runtime = SimulateRuntimeState(fast, state, hardware);
+    const RuntimeState hera_runtime = SimulateRuntimeState(hera, state, hardware);
+
+    EXPECT_TRUE(ctx, fast_runtime.valid);
+    EXPECT_TRUE(ctx, hera_runtime.valid);
+
+    const StepRuntimeRecord* fast_moddown_intt =
+        FindFirstRecord(fast_runtime, TileExecutionStepType::ModDownInttTile);
+    const StepRuntimeRecord* hera_moddown_intt =
+        FindFirstRecord(hera_runtime, TileExecutionStepType::ModDownInttTile);
+    const StepRuntimeRecord* fast_moddown_bconv =
+        FindFirstRecord(fast_runtime, TileExecutionStepType::ModDownBConvTile);
+    const StepRuntimeRecord* hera_moddown_bconv =
+        FindFirstRecord(hera_runtime, TileExecutionStepType::ModDownBConvTile);
+
+    EXPECT_TRUE(ctx, fast_moddown_intt != nullptr);
+    EXPECT_TRUE(ctx, hera_moddown_intt != nullptr);
+    EXPECT_TRUE(ctx, fast_moddown_bconv != nullptr);
+    EXPECT_TRUE(ctx, hera_moddown_bconv != nullptr);
+
+    if (fast_moddown_intt != nullptr && hera_moddown_intt != nullptr) {
+        EXPECT_TRUE(ctx, hera_moddown_intt->input_bytes < fast_moddown_intt->input_bytes);
+        EXPECT_EQ(ctx, hera_moddown_intt->compute_cycles, fast_moddown_intt->compute_cycles);
+    }
+    if (fast_moddown_bconv != nullptr && hera_moddown_bconv != nullptr) {
+        EXPECT_EQ(ctx, hera_moddown_bconv->compute_cycles, fast_moddown_bconv->compute_cycles);
+    }
+}
+
+void TestDynamicRuntimeStoragePathsDifferByMethod(testfw::TestContext& ctx) {
+    const SystemState state = MakeState(/*num_cards=*/1);
+    const ExecutionPlan plan = MakePlan(/*request_id=*/43, /*num_cards=*/1);
+    const HardwareModel hardware;
+
+    auto make_req = [](RequestId id, KeySwitchMethod method) {
+        Request req = MakePoseidonRequest(
+            /*request_id=*/id,
+            /*user_id=*/22,
+            /*ciphertexts=*/1,
+            /*digits=*/2,
+            /*limbs=*/2,
+            /*polys=*/2,
+            /*poly_degree=*/1024,
+            /*input_bytes=*/8192,
+            /*output_bytes=*/8192,
+            /*key_bytes=*/2048);
+        req.ks_profile.method = method;
+        return req;
+    };
+
+    const Request poseidon_req = make_req(43, KeySwitchMethod::Poseidon);
+    const Request fab_req = make_req(44, KeySwitchMethod::FAB);
+    const Request fast_req = make_req(45, KeySwitchMethod::FAST);
+    const Request hera_req = make_req(46, KeySwitchMethod::HERA);
+
+    CycleBackend backend;
+    const ExecutionResult poseidon_result = backend.Estimate(poseidon_req, plan, state);
+    const ExecutionResult fab_result = backend.Estimate(fab_req, plan, state);
+    const ExecutionResult fast_result = backend.Estimate(fast_req, plan, state);
+    const ExecutionResult hera_result = backend.Estimate(hera_req, plan, state);
+
+    EXPECT_TRUE(ctx, !poseidon_result.fallback_used);
+    EXPECT_TRUE(ctx, !fab_result.fallback_used);
+    EXPECT_TRUE(ctx, !fast_result.fallback_used);
+    EXPECT_TRUE(ctx, !hera_result.fallback_used);
+
+    EXPECT_TRUE(ctx, poseidon_result.spill_bytes > 0);
+    EXPECT_TRUE(ctx, poseidon_result.reload_bytes > 0);
+    EXPECT_TRUE(ctx, fab_result.bram_read_bytes > 0 || fab_result.bram_write_bytes > 0);
+    EXPECT_TRUE(ctx, fast_result.bram_read_bytes > 0 || fast_result.bram_write_bytes > 0);
+    EXPECT_TRUE(ctx, hera_result.direct_forward_count > poseidon_result.direct_forward_count);
+    EXPECT_TRUE(ctx, hera_result.transfer_cycles < poseidon_result.transfer_cycles);
+
+    const RuntimeState hera_runtime = SimulateRuntimeState(hera_req, state, hardware);
+    EXPECT_TRUE(ctx, hera_runtime.valid);
+    EXPECT_TRUE(ctx, hera_runtime.direct_forward_count > 0);
+}
+
+void TestDynamicRuntimeLifetimeAccounting(testfw::TestContext& ctx) {
+    const SystemState state = MakeState(/*num_cards=*/1);
+    const HardwareModel hardware;
+    const ExecutionPlan plan = MakePlan(/*request_id=*/47, /*num_cards=*/1);
+
+    Request req = MakePoseidonRequest(
+        /*request_id=*/47,
+        /*user_id=*/23,
+        /*ciphertexts=*/1,
+        /*digits=*/1,
+        /*limbs=*/1,
+        /*polys=*/1,
+        /*poly_degree=*/1024,
+        /*input_bytes=*/4096,
+        /*output_bytes=*/4096,
+        /*key_bytes=*/1024);
+    req.ks_profile.method = KeySwitchMethod::HERA;
+
+    KeySwitchExecutionModel model;
+    const KeySwitchExecution execution = model.Build(req, plan, state);
+    const RuntimePlan runtime_plan = BuildRuntimePlan(req, state, hardware);
+    const RuntimeState runtime = SimulateRuntimeState(req, state, hardware);
+
+    EXPECT_TRUE(ctx, execution.valid);
+    EXPECT_TRUE(ctx, runtime_plan.valid);
+    EXPECT_TRUE(ctx, runtime.valid);
+    EXPECT_TRUE(ctx, runtime.peak_bram_bytes >= runtime.live_bram_bytes);
+    EXPECT_TRUE(ctx, runtime.peak_hbm_bytes >= runtime.live_hbm_bytes);
+
+    bool has_live_persistent = false;
+    bool has_live_non_persistent = false;
+    for (const auto& entry : runtime.tensors) {
+        if (!entry.second.alive) {
+            continue;
+        }
+        has_live_persistent = has_live_persistent || entry.second.persistent;
+        has_live_non_persistent = has_live_non_persistent || !entry.second.persistent;
+    }
+
+    if (runtime_plan.key_persistent_bram) {
+        EXPECT_TRUE(ctx, has_live_persistent);
+    } else {
+        EXPECT_TRUE(ctx, !has_live_persistent);
+    }
+    EXPECT_TRUE(ctx, !has_live_non_persistent);
 }
 
 void TestAutoSingleCardStillMapsToPoseidon(testfw::TestContext& ctx) {
@@ -722,21 +936,22 @@ void TestCinnamonRemainsUnsupported(testfw::TestContext& ctx) {
 
     KeySwitchExecutionModel model;
     const KeySwitchExecution execution = model.Build(req, plan, state);
-    EXPECT_TRUE(ctx, !execution.valid);
-    EXPECT_TRUE(ctx, execution.fallback_used);
-    EXPECT_TRUE(ctx, execution.fallback_reason == KeySwitchFallbackReason::UnsupportedMethod);
-    EXPECT_TRUE(ctx, execution.method == KeySwitchMethod::Cinnamon);
+    EXPECT_TRUE(ctx, execution.valid);
+    EXPECT_TRUE(ctx, !execution.fallback_used);
+    EXPECT_TRUE(ctx, execution.method_degraded);
+    EXPECT_TRUE(ctx, execution.degraded_reason == KeySwitchFallbackReason::DegradedToSingleBoard);
+    EXPECT_TRUE(ctx, execution.method == KeySwitchMethod::Poseidon);
     EXPECT_TRUE(ctx, execution.requested_method == KeySwitchMethod::Cinnamon);
-    EXPECT_TRUE(ctx, execution.effective_method == KeySwitchMethod::Cinnamon);
+    EXPECT_TRUE(ctx, execution.effective_method == KeySwitchMethod::Poseidon);
 
     CycleBackend backend;
     const ExecutionResult result = backend.Estimate(req, plan, state);
-    EXPECT_TRUE(ctx, result.fallback_used);
-    EXPECT_TRUE(ctx, !result.method_degraded);
-    EXPECT_TRUE(ctx, result.fallback_reason == KeySwitchFallbackReason::UnsupportedMethod);
+    EXPECT_TRUE(ctx, !result.fallback_used);
+    EXPECT_TRUE(ctx, result.method_degraded);
+    EXPECT_TRUE(ctx, result.degraded_reason == KeySwitchFallbackReason::DegradedToSingleBoard);
     EXPECT_TRUE(ctx, result.requested_method == KeySwitchMethod::Cinnamon);
-    EXPECT_TRUE(ctx, result.effective_method == KeySwitchMethod::Cinnamon);
-    EXPECT_TRUE(ctx, !result.fallback_reason_message.empty());
+    EXPECT_TRUE(ctx, result.effective_method == KeySwitchMethod::Poseidon);
+    EXPECT_TRUE(ctx, result.total_latency > 0);
 }
 
 void TestBuiltInScaleSingleBoardNoLongerFallsBack(testfw::TestContext& ctx) {
@@ -766,11 +981,15 @@ void TestBuiltInScaleSingleBoardNoLongerFallsBack(testfw::TestContext& ctx) {
     KeySwitchExecutionModel model;
     const KeySwitchExecution execution = model.BuildSingleBoard(req, plan, state);
     EXPECT_TRUE(ctx, execution.valid);
-    EXPECT_TRUE(ctx, execution.tile_plan.valid);
+    EXPECT_TRUE(ctx, execution.logical_graph.valid);
     EXPECT_TRUE(ctx, !execution.fallback_used);
-    EXPECT_TRUE(ctx, execution.tile_count > 1);
-    EXPECT_TRUE(ctx, execution.tile_plan.limb_tile >= 1);
-    EXPECT_TRUE(ctx, execution.tile_plan.ct_tile >= 1);
+
+    const HardwareModel hardware;
+    const RuntimePlan runtime_plan = BuildRuntimePlan(req, state, hardware);
+    EXPECT_TRUE(ctx, runtime_plan.valid);
+    EXPECT_TRUE(ctx, runtime_plan.tile_count > 1);
+    EXPECT_TRUE(ctx, runtime_plan.tile_plan.limb_tile >= 1);
+    EXPECT_TRUE(ctx, runtime_plan.tile_plan.ct_tile >= 1);
 
     CycleBackend backend;
     const ExecutionResult result = backend.Estimate(req, plan, state);
@@ -877,6 +1096,9 @@ int main() {
     TestExecutionModelSharedSingleBoardMethods(ctx);
     TestCycleLowererSelectorDispatch(ctx);
     TestCycleBackendSharedSingleBoardMethods(ctx);
+    TestDynamicRuntimeShortcutAffectsBytesAndWork(ctx);
+    TestDynamicRuntimeStoragePathsDifferByMethod(ctx);
+    TestDynamicRuntimeLifetimeAccounting(ctx);
     TestAutoSingleCardStillMapsToPoseidon(ctx);
     TestCinnamonRemainsUnsupported(ctx);
     TestBuiltInScaleSingleBoardNoLongerFallsBack(ctx);

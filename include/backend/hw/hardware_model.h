@@ -83,6 +83,9 @@ public:
     uint64_t EstimateTransferCycles(
         HardwareTransferPath path,
         uint64_t bytes) const;
+    uint64_t EstimateBRAMReadCycles(uint64_t bytes) const;
+    uint64_t EstimateBRAMWriteCycles(uint64_t bytes) const;
+    uint64_t EstimateDirectForwardCycles(uint64_t bytes) const;
 
     uint64_t EstimateDecomposeCycles(
         const KeySwitchProblem& problem) const;

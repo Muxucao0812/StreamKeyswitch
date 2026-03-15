@@ -18,11 +18,7 @@ struct GroupRuntime {
     uint64_t dependency_wait_cycles = 0;
     uint64_t resource_wait_cycles = 0;
     uint64_t live_bytes_before = 0;
-    uint64_t rf_live_bytes_before = 0;
-    uint64_t sram_live_bytes_before = 0;
     uint64_t live_bytes_after = 0;
-    uint64_t rf_live_bytes_after = 0;
-    uint64_t sram_live_bytes_after = 0;
 };
 
 bool GroupReadyToIssue(
@@ -63,6 +59,7 @@ CycleSimStats CycleDriver::Run(const CycleProgram& program) const {
 
     // 每个 group 的运行时状态（依赖计数、发射进度、开始/结束周期、等待周期等）。
     std::vector<GroupRuntime> runtime(program.groups.size());
+    
     // 指令 ID -> 所属 group ID 的索引表，便于“指令完成事件”反查 group。
     std::vector<uint32_t> instruction_to_group(
         static_cast<std::size_t>(program.instruction_count),
@@ -86,12 +83,10 @@ CycleSimStats CycleDriver::Run(const CycleProgram& program) const {
     // 全局运行状态：
     // - finished_groups: 已完成 group 数
     // - issue_cursor: 轮询发射起点（做简单公平性）
-    // - current_*_live_bytes: 当前片上 live 占用（总/RF/SRAM）
+    // - current_live_bytes: 当前片上 BRAM live 占用
     uint64_t finished_groups = 0;
     uint32_t issue_cursor = 0;
     uint64_t current_live_bytes = 0;
-    uint64_t current_rf_live_bytes = 0;
-    uint64_t current_sram_live_bytes = 0;
     // CycleArch 负责建模各类执行单元与 in-flight 指令行为。
     CycleArch arch(hardware_);
 
@@ -145,25 +140,11 @@ CycleSimStats CycleDriver::Run(const CycleProgram& program) const {
                 current_live_bytes = ApplyLiveBytesDelta(
                     current_live_bytes,
                     program.groups[group_id].live_bytes_delta_on_complete);
-                current_rf_live_bytes = ApplyLiveBytesDelta(
-                    current_rf_live_bytes,
-                    program.groups[group_id].rf_live_bytes_delta_on_complete);
-                current_sram_live_bytes = ApplyLiveBytesDelta(
-                    current_sram_live_bytes,
-                    program.groups[group_id].sram_live_bytes_delta_on_complete);
                 group_runtime.live_bytes_after = current_live_bytes;
-                group_runtime.rf_live_bytes_after = current_rf_live_bytes;
-                group_runtime.sram_live_bytes_after = current_sram_live_bytes;
                 // 更新峰值统计。
-                stats.peak_on_chip_live_bytes = std::max<uint64_t>(
-                    stats.peak_on_chip_live_bytes,
+                stats.peak_bram_live_bytes = std::max<uint64_t>(
+                    stats.peak_bram_live_bytes,
                     current_live_bytes);
-                stats.peak_rf_live_bytes = std::max<uint64_t>(
-                    stats.peak_rf_live_bytes,
-                    current_rf_live_bytes);
-                stats.peak_sram_live_bytes = std::max<uint64_t>(
-                    stats.peak_sram_live_bytes,
-                    current_sram_live_bytes);
                 ++finished_groups;
                 // 释放其后继 group 的依赖计数。
                 for (uint32_t dependent : group_runtime.dependents) {
@@ -217,26 +198,12 @@ CycleSimStats CycleDriver::Run(const CycleProgram& program) const {
                     group_runtime.started = true;
                     group_runtime.start_cycle = cycle;
                     group_runtime.live_bytes_before = current_live_bytes;
-                    group_runtime.rf_live_bytes_before = current_rf_live_bytes;
-                    group_runtime.sram_live_bytes_before = current_sram_live_bytes;
                     current_live_bytes = ApplyLiveBytesDelta(
                         current_live_bytes,
                         group.live_bytes_delta_on_issue);
-                    current_rf_live_bytes = ApplyLiveBytesDelta(
-                        current_rf_live_bytes,
-                        group.rf_live_bytes_delta_on_issue);
-                    current_sram_live_bytes = ApplyLiveBytesDelta(
-                        current_sram_live_bytes,
-                        group.sram_live_bytes_delta_on_issue);
-                    stats.peak_on_chip_live_bytes = std::max<uint64_t>(
-                        stats.peak_on_chip_live_bytes,
+                    stats.peak_bram_live_bytes = std::max<uint64_t>(
+                        stats.peak_bram_live_bytes,
                         current_live_bytes);
-                    stats.peak_rf_live_bytes = std::max<uint64_t>(
-                        stats.peak_rf_live_bytes,
-                        current_rf_live_bytes);
-                    stats.peak_sram_live_bytes = std::max<uint64_t>(
-                        stats.peak_sram_live_bytes,
-                        current_sram_live_bytes);
                 }
 
                 // 发射该 group 当前待发射的下一条指令。
@@ -339,10 +306,6 @@ CycleSimStats CycleDriver::Run(const CycleProgram& program) const {
         timing.is_shortcut_path = group.is_shortcut_path;
         timing.live_bytes_before = group_runtime.live_bytes_before;
         timing.live_bytes_after = group_runtime.live_bytes_after;
-        timing.rf_live_bytes_before = group_runtime.rf_live_bytes_before;
-        timing.rf_live_bytes_after = group_runtime.rf_live_bytes_after;
-        timing.sram_live_bytes_before = group_runtime.sram_live_bytes_before;
-        timing.sram_live_bytes_after = group_runtime.sram_live_bytes_after;
         stats.group_timings.push_back(timing);
 
         // 汇总总周期与分项周期统计。

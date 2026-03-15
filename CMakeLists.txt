@@ -5,6 +5,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+option(KEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH
+    "Always print the shared single-board logical graph at runtime"
+    ON)
+option(KEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN
+    "Always print the runtime-planned physical step graph at runtime"
+    ON)
+
 if(NOT DEFINED BUILD_TESTING)
     set(BUILD_TESTING OFF CACHE BOOL "Build tests" FORCE)
 endif()
@@ -20,6 +27,8 @@ set(KEYAWARE_CORE_SOURCES
     src/backend/cycle_sim/arch.cpp
     src/backend/cycle_sim/driver.cpp
     src/backend/cycle_sim/lowering.cpp
+    src/backend/step_graph_runtime.cpp
+    src/backend/runtime_planner.cpp
     src/backend/model/keyswitch_execution_model.cpp
     src/backend/primitive_simulator.cpp
     src/backend/cycle_backend.cpp
@@ -38,6 +47,15 @@ add_library(keyaware_core STATIC
 )
 
 target_include_directories(keyaware_core PUBLIC include)
+
+if(KEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH)
+    target_compile_definitions(keyaware_core PUBLIC
+        KEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1)
+endif()
+if(KEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN)
+    target_compile_definitions(keyaware_core PUBLIC
+        KEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1)
+endif()
 
 target_compile_options(keyaware_core PRIVATE
     -Wall

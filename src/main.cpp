@@ -1,5 +1,8 @@
 #include "backend/cycle_backend.h"
 #include "backend/execution_backend.h"
+#include "backend/hw/hardware_model.h"
+#include "backend/model/keyswitch_execution_model.h"
+#include "backend/runtime_planner.h"
 #include "common/config_loader.h"
 #include "common/experiment_config.h"
 #include "common/he_params_loader.h"
@@ -200,6 +203,92 @@ void ApplyMultiCardConfig(
         req.ks_profile.preferred_cards = 1;
         req.ks_profile.max_cards = 1;
     }
+}
+
+void DumpFirstLogicalGraphIfRequested(
+    const ExperimentConfig& config,
+    const std::vector<Request>& requests,
+    const SystemState& initial_state) {
+
+    if (!config.dump_logical_graph) {
+        return;
+    }
+
+    if (requests.empty()) {
+        std::cout << "LogicalGraph: no requests generated\n";
+        return;
+    }
+
+    ExecutionPlan plan;
+    plan.request_id = requests.front().request_id;
+    if (!initial_state.cards.empty()) {
+        plan.assigned_cards.push_back(initial_state.cards.front().card_id);
+    }
+
+    KeySwitchExecutionModel model;
+    const KeySwitchExecution execution = model.Build(requests.front(), plan, initial_state);
+    if (!execution.valid) {
+        std::cout << "LogicalGraph: execution build failed";
+        if (execution.fallback_reason != KeySwitchFallbackReason::None) {
+            std::cout << " reason=" << ToString(execution.fallback_reason);
+        }
+        std::cout << "\n";
+        return;
+    }
+
+    if (!execution.logical_graph.valid || execution.logical_graph.nodes.empty()) {
+        std::cout << "LogicalGraph: unavailable for method="
+                  << static_cast<int>(execution.method) << "\n";
+        return;
+    }
+
+    std::cout << "=== Logical Graph ===\n";
+    DumpLogicalGraph(execution.logical_graph, std::cout);
+    std::cout << "=====================\n";
+}
+
+void DumpFirstRuntimePlanIfRequested(
+    const ExperimentConfig& config,
+    const std::vector<Request>& requests,
+    const SystemState& initial_state) {
+
+    if (!config.dump_runtime_plan) {
+        return;
+    }
+
+    if (requests.empty()) {
+        std::cout << "RuntimePlan: no requests generated\n";
+        return;
+    }
+
+    ExecutionPlan plan;
+    plan.request_id = requests.front().request_id;
+    if (!initial_state.cards.empty()) {
+        plan.assigned_cards.push_back(initial_state.cards.front().card_id);
+    }
+
+    KeySwitchExecutionModel model;
+    const KeySwitchExecution execution = model.Build(requests.front(), plan, initial_state);
+    if (!execution.valid) {
+        std::cout << "RuntimePlan: execution build failed";
+        if (execution.fallback_reason != KeySwitchFallbackReason::None) {
+            std::cout << " reason=" << ToString(execution.fallback_reason);
+        }
+        std::cout << "\n";
+        return;
+    }
+
+    HardwareModel hardware;
+    RuntimePlanner planner(hardware, model.TilePlannerParams());
+    const RuntimePlan runtime_plan = planner.Plan(execution);
+    if (!runtime_plan.valid) {
+        std::cout << "RuntimePlan: unavailable\n";
+        return;
+    }
+
+    std::cout << "=== Runtime Plan ===\n";
+    DumpRuntimePlan(runtime_plan, std::cout);
+    std::cout << "====================\n";
 }
 
 std::string CsvEscape(const std::string& value) {
@@ -407,6 +496,8 @@ int main(int argc, char** argv) {
     }
 
     PrintExperimentConfig(std::cout, config);
+    DumpFirstLogicalGraphIfRequested(config, requests, initial_state);
+    DumpFirstRuntimePlanIfRequested(config, requests, initial_state);
 
     std::unique_ptr<Scheduler> scheduler;
     std::unique_ptr<ExecutionBackend> backend;

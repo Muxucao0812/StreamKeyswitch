@@ -2,8 +2,11 @@
 #include "model/keyswitch_method_resolver.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <limits>
+#include <ostream>
+#include <sstream>
 
 namespace {
 
@@ -175,10 +178,8 @@ IntermediateStorageLevel StorageForConnection(
     switch (mode) {
     case StageConnectionMode::DirectForward:
         return fallback_level;
-    case StageConnectionMode::BufferInRF:
-        return IntermediateStorageLevel::RF;
-    case StageConnectionMode::BufferInSRAM:
-        return IntermediateStorageLevel::SRAM;
+    case StageConnectionMode::BufferInBRAM:
+        return IntermediateStorageLevel::BRAM;
     case StageConnectionMode::SpillToHBM:
         return IntermediateStorageLevel::HBM;
     }
@@ -194,6 +195,23 @@ std::vector<uint32_t> IterationOrder(uint32_t count) {
     return order;
 }
 
+std::vector<StageConnectionMode> FallbackOrderForConnection(
+    StageConnectionMode preferred) {
+
+    std::vector<StageConnectionMode> order = {preferred};
+    const std::array<StageConnectionMode, 3> defaults = {
+        StageConnectionMode::DirectForward,
+        StageConnectionMode::BufferInBRAM,
+        StageConnectionMode::SpillToHBM,
+    };
+    for (StageConnectionMode mode : defaults) {
+        if (std::find(order.begin(), order.end(), mode) == order.end()) {
+            order.push_back(mode);
+        }
+    }
+    return order;
+}
+
 void AddDependencyId(
     std::vector<uint64_t>* deps,
     uint64_t step_id) {
@@ -203,6 +221,32 @@ void AddDependencyId(
     }
     if (std::find(deps->begin(), deps->end(), step_id) == deps->end()) {
         deps->push_back(step_id);
+    }
+}
+
+template <typename T>
+void AppendCommaSeparated(
+    const std::vector<T>& values,
+    std::ostream& os,
+    const char* (*formatter)(T)) {
+
+    for (std::size_t idx = 0; idx < values.size(); ++idx) {
+        if (idx != 0) {
+            os << ", ";
+        }
+        os << formatter(values[idx]);
+    }
+}
+
+void AppendCommaSeparatedU64(
+    const std::vector<uint64_t>& values,
+    std::ostream& os) {
+
+    for (std::size_t idx = 0; idx < values.size(); ++idx) {
+        if (idx != 0) {
+            os << ", ";
+        }
+        os << values[idx];
     }
 }
 
@@ -486,33 +530,41 @@ CandidateEval EvaluateCandidate(
     uint32_t ct_tile,
     uint32_t limb_tile,
     uint32_t digit_tile,
-    bool key_persistent) {
+    bool key_persistent
+) {
 
+    // 作用：
+    // 评估一个 tile 候选 (ct_tile, limb_tile, digit_tile, key_persistent) 是否可行，
+    // 并在可行时给出该候选的峰值 BRAM 占用与分项成本。
     CandidateEval eval;
 
+    // 基础合法性检查：tile 维度不能为 0，也不能超过问题规模上界。
     if (ct_tile == 0 || limb_tile == 0 || digit_tile == 0) {
         return eval;
     }
-    if (ct_tile > problem.ciphertexts
-        || limb_tile > problem.limbs
-        || digit_tile > problem.digits) {
+    if (ct_tile > problem.ciphertexts || limb_tile > problem.limbs || digit_tile > problem.digits) {
         return eval;
     }
 
+    // 根据 tile 大小推导三维 tile 个数与总 tile 数。
     eval.ct_tiles = CeilDivU32(problem.ciphertexts, ct_tile);
     eval.limb_tiles = CeilDivU32(problem.limbs, limb_tile);
     eval.digit_tiles = CeilDivU32(problem.digits, digit_tile);
     eval.total_tile_count = SaturateU32(
-        static_cast<uint64_t>(eval.ct_tiles)
-        * static_cast<uint64_t>(eval.limb_tiles)
-        * static_cast<uint64_t>(eval.digit_tiles));
+            static_cast<uint64_t>(eval.ct_tiles)
+            * static_cast<uint64_t>(eval.limb_tiles)
+            * static_cast<uint64_t>(eval.digit_tiles)
+        );
 
+    // 有效容量预算 = bram_budget - guard（保留保护带，避免贴边溢出）。
     const uint64_t occupancy_budget =
         (problem.bram_budget_bytes > problem.bram_guard_bytes)
         ? (problem.bram_budget_bytes - problem.bram_guard_bytes)
         : 0;
+    // BufferTracker 用于在“模拟执行过程中”追踪 persistent/static/dynamic 占用峰值。
     BufferTracker tracker(occupancy_budget);
 
+    // 传输流量与次数统计（用于 CostTransfer）。
     uint64_t key_bytes = 0;
     uint64_t ct_bytes = 0;
     uint64_t out_bytes_total = 0;
@@ -520,6 +572,7 @@ CandidateEval EvaluateCandidate(
     uint64_t ct_transfer_count = 0;
     uint64_t out_transfer_count = 0;
 
+    // 计算工作量与 launch 次数统计（用于 CostCompute）。
     uint64_t decompose_work = 0;
     uint64_t ks_inner_work = 0;
     uint64_t accumulate_work = 0;
@@ -529,20 +582,26 @@ CandidateEval EvaluateCandidate(
     uint64_t accumulate_launch = 0;
     uint64_t basis_launch = 0;
 
+    // key 常驻模式：先一次性加载并占用 persistent key。
+    // 后续内层循环不再重复加载 key 分块。
     if (key_persistent) {
         tracker.AcquirePersistentKey(problem.key_bytes);
         key_bytes += problem.key_bytes;
         key_transfer_count += 1;
     }
 
+    // 三维遍历所有 tile 组合，模拟该候选的资源占用与工作量。
     for (uint32_t ct_idx = 0; ct_idx < eval.ct_tiles; ++ct_idx) {
+        // 尾块保护：最后一个 ct tile 的真实大小可能小于 ct_tile。
         const uint32_t ct_remain = problem.ciphertexts - ct_idx * ct_tile;
         const uint32_t ct_now = std::min<uint32_t>(ct_tile, ct_remain);
 
         for (uint32_t limb_idx = 0; limb_idx < eval.limb_tiles; ++limb_idx) {
+            // 尾块保护：limb 维度同理。
             const uint32_t limb_remain = problem.limbs - limb_idx * limb_tile;
             const uint32_t limb_now = std::min<uint32_t>(limb_tile, limb_remain);
 
+            // 当前 (ct, limb) 下的输出静态缓冲、静态 temp 与输入分块字节。
             const uint64_t out_bytes =
                 static_cast<uint64_t>(ct_now) * limb_now * problem.out_limb_bytes;
             const uint64_t static_temp_bytes =
@@ -550,6 +609,7 @@ CandidateEval EvaluateCandidate(
             const uint64_t ct_chunk_bytes =
                 static_cast<uint64_t>(ct_now) * limb_now * problem.ct_limb_bytes;
 
+            // 进入该层时先占用静态/动态资源。
             tracker.AcquireStaticAccum(out_bytes);
             tracker.AcquireStaticTemp(static_temp_bytes);
             tracker.AcquireDynamicCt(ct_chunk_bytes);
@@ -557,11 +617,13 @@ CandidateEval EvaluateCandidate(
             ct_transfer_count += 1;
 
             for (uint32_t digit_idx = 0; digit_idx < eval.digit_tiles; ++digit_idx) {
+                // 尾块保护：digit 维度同理。
                 const uint32_t digit_remain = problem.digits - digit_idx * digit_tile;
                 const uint32_t digit_now = std::min<uint32_t>(digit_tile, digit_remain);
 
                 uint64_t key_chunk_bytes = 0;
                 if (!key_persistent) {
+                    // 非常驻模式：每个 (limb, digit) 组合都需要一次 key 分块加载。
                     key_chunk_bytes =
                         static_cast<uint64_t>(limb_now) * digit_now * problem.key_digit_limb_bytes;
                     tracker.AcquireDynamicKey(key_chunk_bytes);
@@ -569,10 +631,13 @@ CandidateEval EvaluateCandidate(
                     key_transfer_count += 1;
                 }
 
+                // 动态 temp 工作区：估算该组合执行中的临时峰值占用。
                 const uint64_t dynamic_temp_bytes =
                     DynamicWorkingTempBytes(problem, ct_now, limb_now, digit_now);
                 tracker.AcquireDynamicTemp(dynamic_temp_bytes);
 
+                // 工作量模型：
+                // local_decompose 作为基准，派生 inner/accumulate 的计算量与 launch 数。
                 const uint64_t local_decompose =
                     static_cast<uint64_t>(ct_now)
                     * static_cast<uint64_t>(limb_now)
@@ -585,12 +650,14 @@ CandidateEval EvaluateCandidate(
                 ks_inner_launch += 1;
                 accumulate_launch += 1;
 
+                // 该 (ct,limb,digit) 组合结束后释放动态占用。
                 tracker.ReleaseDynamicTemp(dynamic_temp_bytes);
                 if (!key_persistent) {
                     tracker.ReleaseDynamicKey(key_chunk_bytes);
                 }
             }
 
+            // basis 阶段按 (ct, limb) 维度累计一次。
             basis_work +=
                 static_cast<uint64_t>(ct_now)
                 * static_cast<uint64_t>(limb_now)
@@ -598,6 +665,7 @@ CandidateEval EvaluateCandidate(
                 * static_cast<uint64_t>(problem.poly_modulus_degree);
             basis_launch += 1;
 
+            // 记录输出回写流量并释放本层 (ct,limb) 占用。
             out_bytes_total += out_bytes;
             out_transfer_count += 1;
             tracker.ReleaseDynamicCt(ct_chunk_bytes);
@@ -606,17 +674,24 @@ CandidateEval EvaluateCandidate(
         }
     }
 
+    // 常驻 key 在评估结束时释放，恢复 tracker 状态闭环。
     if (key_persistent) {
         tracker.ReleasePersistentKey(problem.key_bytes);
     }
 
+    // 超预算（任意时刻溢出）即判定候选不可行。
     if (tracker.overflowed()) {
         return eval;
     }
 
+    // 可行候选：回填有效标记与估算峰值占用。
     eval.valid = true;
     eval.estimated_peak_bram_bytes = tracker.Peaks().total_peak_bytes;
 
+    // 成本分项：
+    // - tile_overhead_cost：每 tile 固定开销
+    // - key/ct/output：传输成本
+    // - decompose/inner/accumulate/basis：计算成本
     const double tile_overhead_cost =
         static_cast<double>(eval.total_tile_count) * static_cast<double>(params.per_tile_fixed_overhead_ns);
     const double key_transfer_cost = CostTransfer(
@@ -655,6 +730,7 @@ CandidateEval EvaluateCandidate(
         params.basis_work_per_ns,
         params.kernel_launch_ns);
 
+    // 回填分项，便于诊断 planner 选型原因。
     eval.cost.tile_overhead_cost = tile_overhead_cost;
     eval.cost.key_transfer_cost = key_transfer_cost;
     eval.cost.ct_transfer_cost = ct_transfer_cost;
@@ -662,6 +738,7 @@ CandidateEval EvaluateCandidate(
     eval.cost.decompose_compute_cost = decompose_cost;
     eval.cost.multiply_compute_cost = ks_inner_cost + accumulate_cost;
     eval.cost.basis_convert_cost = basis_cost;
+    // 总成本 = 分项成本按权重线性组合。
     eval.cost.total_cost =
         params.w_tile_overhead * tile_overhead_cost
         + params.w_key_transfer * key_transfer_cost
@@ -676,6 +753,113 @@ CandidateEval EvaluateCandidate(
 
 } // namespace
 
+const char* ToString(LogicalNodeKind kind) {
+    switch (kind) {
+    case LogicalNodeKind::Input:
+        return "Input";
+    case LogicalNodeKind::KeySource:
+        return "KeySource";
+    case LogicalNodeKind::ModUp:
+        return "ModUp";
+    case LogicalNodeKind::InnerProd:
+        return "InnerProd";
+    case LogicalNodeKind::Reduction:
+        return "Reduction";
+    case LogicalNodeKind::ModDown:
+        return "ModDown";
+    case LogicalNodeKind::Output:
+        return "Output";
+    }
+    return "Unknown";
+}
+
+const char* ToString(LogicalTensorRole role) {
+    switch (role) {
+    case LogicalTensorRole::None:
+        return "None";
+    case LogicalTensorRole::CiphertextTile:
+        return "CiphertextTile";
+    case LogicalTensorRole::KeyTile:
+        return "KeyTile";
+    case LogicalTensorRole::AccumTile:
+        return "AccumTile";
+    case LogicalTensorRole::TempTile:
+        return "TempTile";
+    }
+    return "Unknown";
+}
+
+const char* ToString(StageConnectionMode mode) {
+    switch (mode) {
+    case StageConnectionMode::DirectForward:
+        return "DirectForward";
+    case StageConnectionMode::BufferInBRAM:
+        return "BufferInBRAM";
+    case StageConnectionMode::SpillToHBM:
+        return "SpillToHBM";
+    }
+    return "Unknown";
+}
+
+const char* ToString(StageType stage_type) {
+    switch (stage_type) {
+    case StageType::KeyLoad:
+        return "KeyLoad";
+    case StageType::Dispatch:
+        return "Dispatch";
+    case StageType::Decompose:
+        return "Decompose";
+    case StageType::Multiply:
+        return "Multiply";
+    case StageType::BasisConvert:
+        return "BasisConvert";
+    case StageType::Merge:
+        return "Merge";
+    }
+    return "Unknown";
+}
+
+void DumpLogicalGraph(const LogicalGraph& graph, std::ostream& os) {
+    os << "LogicalGraph(valid=" << (graph.valid ? "true" : "false")
+       << ", nodes=" << graph.nodes.size() << ")\n";
+    for (const LogicalNode& node : graph.nodes) {
+        std::vector<StageConnectionMode> fallback_display;
+        for (const StageConnectionMode mode : node.edge_policy.fallback_order) {
+            bool duplicate = false;
+            for (const StageConnectionMode existing : fallback_display) {
+                if (std::string(ToString(existing)) == ToString(mode)) {
+                    duplicate = true;
+                    break;
+                }
+            }
+            if (!duplicate) {
+                fallback_display.push_back(mode);
+            }
+        }
+        os << "  [" << node.node_id << "] "
+           << ToString(node.kind)
+           << " stage=" << ToString(node.stage_type)
+           << " output=" << ToString(node.produced_output)
+           << " deps=[";
+        AppendCommaSeparatedU64(node.depends_on, os);
+        os << "] inputs=[";
+        AppendCommaSeparated(node.required_inputs, os, ToString);
+        os << "] preferred=" << ToString(node.edge_policy.preferred_connection)
+           << " fallback=[";
+        AppendCommaSeparated(fallback_display, os, ToString);
+        os << "] shortcut=" << (node.edge_policy.allow_shortcut ? "true" : "false")
+           << " key_persistent="
+           << (node.edge_policy.allow_key_persistent ? "true" : "false")
+           << "\n";
+    }
+}
+
+std::string FormatLogicalGraph(const LogicalGraph& graph) {
+    std::ostringstream os;
+    DumpLogicalGraph(graph, os);
+    return os.str();
+}
+
 TilePlanner::TilePlanner()
     : params_(Params{}) {}
 
@@ -683,19 +867,26 @@ TilePlanner::TilePlanner(const Params& params)
     : params_(params) {}
 
 TilePlan TilePlanner::Plan(const KeySwitchProblem& problem) const {
+    // 作用：
+    // 在给定问题规模与 BRAM 预算约束下，遍历 tile 候选并选出“可执行且代价最低”的方案，
+    // 同时回填该方案的分项成本与每个 ct_tile 的缓冲占用明细。
     TilePlan plan;
+    // 输入问题无效时直接返回 invalid plan（调用方据此走 fallback）。
     if (!problem.valid) {
         return plan;
     }
 
+    // 预算保护：可用预算必须大于 guard，否则说明几乎没有可分配空间，不进行搜索。
     const uint64_t budget = problem.bram_budget_bytes;
     const uint64_t guard = problem.bram_guard_bytes;
     if (budget <= guard) {
         return plan;
     }
 
+    // best / best_eval 用于记录当前最优候选及其详细评估结果。
     TileCandidate best;
     CandidateEval best_eval;
+    // 浮点比较容差，避免 total_cost 在数值误差下抖动导致不稳定选择。
     constexpr double kCostEps = 1e-6;
     const auto cost_less = [kCostEps](double lhs, double rhs) {
         return lhs + kCostEps < rhs;
@@ -708,6 +899,8 @@ TilePlan TilePlanner::Plan(const KeySwitchProblem& problem) const {
                                      uint32_t ct_tile,
                                      uint32_t limb_tile,
                                      uint32_t digit_tile) {
+        // EvaluateCandidate 会检查容量约束与成本模型；
+        // invalid 候选（超预算/不可执行）直接丢弃。
         const CandidateEval eval = EvaluateCandidate(
             problem,
             params_,
@@ -729,6 +922,10 @@ TilePlan TilePlanner::Plan(const KeySwitchProblem& problem) const {
         candidate.estimated_peak_bram_bytes = eval.estimated_peak_bram_bytes;
         candidate.estimated_total_cost = eval.cost.total_cost;
 
+        // 选择规则（按优先级）：
+        // 1) total_cost 更小优先；
+        // 2) 若成本近似相等，peak_bram 更小优先；
+        // 3) 若仍相等，score（tile 覆盖体积）更大优先，倾向更粗粒度分块。
         bool choose = false;
         if (!best.valid) {
             choose = true;
@@ -750,6 +947,11 @@ TilePlan TilePlanner::Plan(const KeySwitchProblem& problem) const {
         }
     };
 
+    // 搜索空间：
+    // - ct_tile:   [1, ciphertexts]
+    // - limb_tile: [1, limbs]
+    // - digit_tile:[1, digits]
+    // 另外若允许 key 常驻，单独评估一类“digit_tile=digits 且 key_persistent=true”的候选。
     for (uint32_t ct_tile = 1; ct_tile <= problem.ciphertexts; ++ct_tile) {
         for (uint32_t limb_tile = 1; limb_tile <= problem.limbs; ++limb_tile) {
             if (params_.allow_key_persistent) {
@@ -770,10 +972,12 @@ TilePlan TilePlanner::Plan(const KeySwitchProblem& problem) const {
         }
     }
 
+    // 无任何可行候选，返回 invalid plan，交由上游 fallback。
     if (!best.valid) {
         return plan;
     }
 
+    // 将最优候选落地为最终 plan，并计算各维 tile 数。
     plan.valid = true;
     plan.key_persistent = best.key_persistent;
     plan.ct_tile = best.ct_tile;
@@ -786,11 +990,17 @@ TilePlan TilePlanner::Plan(const KeySwitchProblem& problem) const {
     plan.estimated_peak_bram_bytes = best.estimated_peak_bram_bytes;
     plan.estimated_total_cost = best.estimated_total_cost;
     plan.cost = best_eval.cost;
+    // 预留每个 ct_tile 一条统计记录，减少 push_back 期间扩容。
     plan.per_tile_buffer_usage.reserve(plan.ct_tiles);
     for (uint32_t ct_idx = 0; ct_idx < plan.ct_tiles; ++ct_idx) {
+        // 当前 ct_tile 实际覆盖 ct 数（尾块可能小于 ct_tile）。
         const uint32_t ct_remain = problem.ciphertexts - ct_idx * plan.ct_tile;
         const uint32_t ct_now = std::min<uint32_t>(plan.ct_tile, ct_remain);
 
+        // 逐 ct_tile 回填缓冲明细：
+        // persistent：长生命周期（如常驻 key）
+        // static：     tile 级静态开销（如累计缓冲）
+        // dynamic：    执行期峰值工作集（key/ct/temp 动态峰值）
         TileBufferUsage entry;
         entry.ct_tile_index = ct_idx;
         entry.ct_count = ct_now;
@@ -801,6 +1011,7 @@ TilePlan TilePlanner::Plan(const KeySwitchProblem& problem) const {
         uint64_t static_temp_peak = 0;
         uint64_t total_out_bytes = 0;
         for (uint32_t limb_idx = 0; limb_idx < plan.limb_tiles; ++limb_idx) {
+            // 先按 limb_tile 估算输入/输出与静态临时区峰值。
             const uint32_t limb_remain = problem.limbs - limb_idx * plan.limb_tile;
             const uint32_t limb_now = std::min<uint32_t>(plan.limb_tile, limb_remain);
             const uint64_t ct_chunk_bytes =
@@ -817,6 +1028,8 @@ TilePlan TilePlanner::Plan(const KeySwitchProblem& problem) const {
                 ct_chunk_bytes);
 
             for (uint32_t digit_idx = 0; digit_idx < plan.digit_tiles; ++digit_idx) {
+                // 再按 digit_tile 估算 key 分块和动态 temp 峰值；
+                // 若 key 常驻，则当前组合不再额外占用动态 key 块。
                 const uint32_t digit_remain = problem.digits - digit_idx * plan.digit_tile;
                 const uint32_t digit_now = std::min<uint32_t>(plan.digit_tile, digit_remain);
                 const uint64_t key_chunk_bytes = plan.key_persistent
@@ -834,6 +1047,7 @@ TilePlan TilePlanner::Plan(const KeySwitchProblem& problem) const {
             }
         }
 
+        // 汇总该 ct_tile 的三类占用与语义分类统计。
         entry.static_buffers.accumulation_buffer_bytes = static_out_peak;
         entry.static_buffers.temp_working_buffer_bytes = static_temp_peak;
         entry.dynamic_peak_buffers = dynamic_peak;
@@ -865,6 +1079,7 @@ TilePlan TilePlanner::Plan(const KeySwitchProblem& problem) const {
             entry.persistent_bytes + entry.static_bytes + entry.dynamic_working_bytes;
 
         plan.per_tile_buffer_usage.push_back(entry);
+        // 计划峰值取所有 ct_tile 峰值的最大值。
         plan.estimated_peak_bram_bytes =
             std::max<uint64_t>(plan.estimated_peak_bram_bytes, entry.peak_live_bytes);
     }
@@ -913,6 +1128,108 @@ KeySwitchExecutionModel::KeySwitchExecutionModel(
     : params_(params),
       planner_(params.tile_planner) {}
 
+TilePlanner::Params KeySwitchExecutionModel::TilePlannerParams() const {
+    return params_.tile_planner;
+}
+
+LogicalGraph KeySwitchExecutionModel::BuildSharedSingleBoardLogicalGraph(
+    const KeySwitchMethodPolicy& policy
+) const {
+
+    LogicalGraph graph;
+    graph.valid = true;
+    graph.nodes.reserve(7);
+
+    auto append_node = [&](LogicalNodeKind kind,
+                           StageType stage_type,
+                           std::vector<uint64_t> deps,
+                           std::vector<LogicalTensorRole> inputs,
+                           LogicalTensorRole output,
+                           StageConnectionMode preferred_connection,
+                           bool allow_shortcut,
+                           bool allow_key_persistent) {
+        LogicalNode node;
+        node.node_id = static_cast<uint64_t>(graph.nodes.size() + 1);
+        node.kind = kind;
+        node.stage_type = stage_type;
+        node.depends_on = std::move(deps);
+        node.required_inputs = std::move(inputs);
+        node.produced_output = output;
+        node.edge_policy.preferred_connection = preferred_connection;
+        node.edge_policy.fallback_order = FallbackOrderForConnection(preferred_connection);
+        node.edge_policy.allow_shortcut = allow_shortcut;
+        node.edge_policy.allow_key_persistent = allow_key_persistent;
+        graph.nodes.push_back(std::move(node));
+        return graph.nodes.back().node_id;
+    };
+
+    const uint64_t input_id = append_node(
+        LogicalNodeKind::Input,
+        StageType::Dispatch,
+        {},
+        {},
+        LogicalTensorRole::CiphertextTile,
+        StageConnectionMode::BufferInBRAM,
+        false,
+        false);
+    const uint64_t key_id = append_node(
+        LogicalNodeKind::KeySource,
+        StageType::KeyLoad,
+        {},
+        {},
+        LogicalTensorRole::KeyTile,
+        StageConnectionMode::BufferInBRAM,
+        false,
+        true);
+    const uint64_t modup_id = append_node(
+        LogicalNodeKind::ModUp,
+        StageType::BasisConvert,
+        {input_id},
+        {LogicalTensorRole::CiphertextTile},
+        LogicalTensorRole::TempTile,
+        policy.modup_to_innerprod,
+        false,
+        false);
+    const uint64_t inner_id = append_node(
+        LogicalNodeKind::InnerProd,
+        StageType::Multiply,
+        {modup_id, key_id},
+        {LogicalTensorRole::TempTile, LogicalTensorRole::KeyTile},
+        LogicalTensorRole::AccumTile,
+        policy.innerprod_to_reduction,
+        false,
+        policy.key_pref_storage != IntermediateStorageLevel::HBM);
+    const uint64_t reduction_id = append_node(
+        LogicalNodeKind::Reduction,
+        StageType::Multiply,
+        {inner_id},
+        {LogicalTensorRole::AccumTile},
+        LogicalTensorRole::AccumTile,
+        policy.reduction_to_moddown,
+        policy.supports_moddown_shortcut,
+        false);
+    const uint64_t moddown_id = append_node(
+        LogicalNodeKind::ModDown,
+        StageType::BasisConvert,
+        {reduction_id},
+        {LogicalTensorRole::AccumTile},
+        LogicalTensorRole::TempTile,
+        policy.moddown_to_subtract,
+        policy.supports_moddown_shortcut,
+        false);
+    append_node(
+        LogicalNodeKind::Output,
+        StageType::Dispatch,
+        {moddown_id},
+        {LogicalTensorRole::TempTile},
+        LogicalTensorRole::None,
+        StageConnectionMode::BufferInBRAM,
+        false,
+        false);
+
+    return graph;
+}
+
 bool KeySwitchExecutionModel::ResidentKeyHit(
     const Request& req,
     const ExecutionPlan& plan,
@@ -933,55 +1250,66 @@ KeySwitchProblem KeySwitchExecutionModel::BuildProblem(
     const SystemState& state
 ) const {
 
+    // 初始化问题描述，并先写入与 tile planner 直接相关的全局参数。
+    // working_set_bytes：用于估算总体内存压力（输入密文 + key）。
+    // temp_buffer_ratio / bram_guard_bytes：影响后续 tile 规划安全边界。
     KeySwitchProblem problem;
     problem.working_set_bytes = req.ks_profile.input_bytes + req.ks_profile.key_bytes;
     problem.temp_buffer_ratio = params_.tile_planner.temp_buffer_ratio;
     problem.bram_guard_bytes = params_.tile_planner.bram_guard_bytes;
 
+    // 没有任何分配卡时，本次构建不具备执行条件，直接返回 invalid。
     if (plan.assigned_cards.empty()) {
         problem.valid = false;
         return problem;
     }
 
-    const uint32_t assigned_cards =
-        static_cast<uint32_t>(std::max<size_t>(1, plan.assigned_cards.size()));
+    // 解析“本次真正执行的方法”：
+    // - 若请求是 Auto，则按分配卡数自动解析（单卡 -> Poseidon，多卡 -> Cinnamon）。
+    // - 非 Auto 时保持请求方法不变。
+    // 同时确定问题视角下真正参与计算的 cards 数量：
+    // - Cinnamon 按实际分配卡数参与；
+    // - 其它单板方法固定视为 1 卡。
+    const uint32_t assigned_cards = static_cast<uint32_t>(std::max<size_t>(1, plan.assigned_cards.size()));
     problem.method = ResolveKeySwitchMethodForAssignedCards(req.ks_profile.method, assigned_cards);
-    problem.cards = (problem.method == KeySwitchMethod::Cinnamon)
-        ? assigned_cards
-        : 1;
+    problem.cards = (problem.method == KeySwitchMethod::Cinnamon) ? assigned_cards : 1;
 
+    // 归一化问题维度（至少为 1，避免后续除法/分块出现 0）。
+    // ciphertexts 当前两分支逻辑一致，保留分支便于后续按方法扩展差异规则。
     if (problem.method == KeySwitchMethod::Cinnamon) {
         problem.ciphertexts = std::max<uint32_t>(1, req.ks_profile.num_ciphertexts);
     } else {
         problem.ciphertexts = std::max<uint32_t>(1, req.ks_profile.num_ciphertexts);
     }
     problem.digits = std::max<uint32_t>(1, req.ks_profile.num_digits);
+    // 多卡 Cinnamon 下 limbs 按卡数切分到“每卡局部问题”；
+    // 单板方法直接沿用原始 limbs。
     if (problem.method == KeySwitchMethod::Cinnamon) {
-        problem.limbs = std::max<uint32_t>(
-            1,
-            static_cast<uint32_t>(CeilDivU64(req.ks_profile.num_rns_limbs, problem.cards)));
+        problem.limbs = std::max<uint32_t>(1, static_cast<uint32_t>(CeilDivU64(req.ks_profile.num_rns_limbs, problem.cards)));
     } else {
         problem.limbs = std::max<uint32_t>(1, req.ks_profile.num_rns_limbs);
     }
     problem.polys = std::max<uint32_t>(1, req.ks_profile.num_polys);
     problem.poly_modulus_degree = std::max<uint32_t>(1, req.ks_profile.poly_modulus_degree);
 
+    // 归一化输入/输出/key 字节：
+    // - Cinnamon：按卡均摊，得到“单卡本地处理字节量”；
+    // - 单板：保持请求给出的总字节量。
     if (problem.method == KeySwitchMethod::Cinnamon) {
-        problem.input_bytes = std::max<uint64_t>(
-            1,
-            CeilDivU64(req.ks_profile.input_bytes, problem.cards));
-        problem.output_bytes = std::max<uint64_t>(
-            1,
-            CeilDivU64(req.ks_profile.output_bytes, problem.cards));
-        problem.key_bytes = std::max<uint64_t>(
-            1,
-            CeilDivU64(req.ks_profile.key_bytes, problem.cards));
+        problem.input_bytes = std::max<uint64_t>(1, CeilDivU64(req.ks_profile.input_bytes, problem.cards));
+        problem.output_bytes = std::max<uint64_t>(1, CeilDivU64(req.ks_profile.output_bytes, problem.cards));
+        problem.key_bytes = std::max<uint64_t>(1, CeilDivU64(req.ks_profile.key_bytes, problem.cards));
     } else {
         problem.input_bytes = std::max<uint64_t>(1, req.ks_profile.input_bytes);
         problem.output_bytes = std::max<uint64_t>(1, req.ks_profile.output_bytes);
         problem.key_bytes = std::max<uint64_t>(1, req.ks_profile.key_bytes);
     }
 
+    // 由总字节反推到“最小分块粒度”的字节：
+    // - ct_limb_bytes：每个 (ciphertext, limb) 的输入字节；
+    // - out_limb_bytes：每个 (ciphertext, limb) 的输出字节；
+    // - key_digit_limb_bytes：每个 (digit, limb) 的 key 字节。
+    // 这些字段是后续构图和周期估算的核心粒度参数。
     const uint64_t ct_limb_denom = static_cast<uint64_t>(problem.ciphertexts) * problem.limbs;
     const uint64_t out_limb_denom = static_cast<uint64_t>(problem.ciphertexts) * problem.limbs;
     const uint64_t key_denom = static_cast<uint64_t>(problem.digits) * problem.limbs;
@@ -989,6 +1317,8 @@ KeySwitchProblem KeySwitchExecutionModel::BuildProblem(
     problem.out_limb_bytes = std::max<uint64_t>(1, CeilDivU64(problem.output_bytes, out_limb_denom));
     problem.key_digit_limb_bytes = std::max<uint64_t>(1, CeilDivU64(problem.key_bytes, key_denom));
 
+    // 计算参与卡中的最小 BRAM 容量（保守策略，规划按最小卡能力约束）。
+    // card_limit 用于防御：当 plan.cards 与 problem.cards 不一致时，只遍历有效交集。
     uint64_t min_bram_capacity = 0;
     const size_t card_limit = std::min<size_t>(plan.assigned_cards.size(), problem.cards);
     for (size_t idx = 0; idx < card_limit; ++idx) {
@@ -1004,15 +1334,19 @@ KeySwitchProblem KeySwitchExecutionModel::BuildProblem(
             min_bram_capacity = cap;
         }
     }
+    // 若状态里拿不到有效 BRAM 容量，回退到模型缺省值，保证可继续规划。
     if (min_bram_capacity == 0) {
         min_bram_capacity = params_.default_bram_capacity_bytes;
     }
     problem.min_card_bram_capacity_bytes = min_bram_capacity;
+    // 可用预算 = 最小 BRAM * 可用比例，再做下界保护。
     problem.bram_budget_bytes = std::max<uint64_t>(
         1,
         static_cast<uint64_t>(
             std::floor(static_cast<double>(min_bram_capacity) * params_.tile_planner.bram_usable_ratio)));
 
+    // 判断是否命中驻留 key：
+    // 仅当所有参与卡都存在且 resident_user 与请求 user 一致时，才视为命中。
     bool key_hit = true;
     for (size_t idx = 0; idx < card_limit; ++idx) {
         const CardId card_id = plan.assigned_cards[idx];
@@ -1028,6 +1362,7 @@ KeySwitchProblem KeySwitchExecutionModel::BuildProblem(
     }
     problem.key_resident_hit = key_hit;
 
+    // 到这里问题描述已完整可用。
     problem.valid = true;
     return problem;
 }
@@ -1126,49 +1461,14 @@ uint64_t KeySwitchExecutionModel::AppendStep(
     BuildContext* ctx,
     TileExecutionStep step
 ) const {
-
-    // 记录 step 执行前的片上活跃缓存总量（仅统计 RF + SRAM，不含 HBM）。
-    // 这里用于给可视化/调试提供“进入该 step 前”的内存占用快照。
-    const uint64_t before_total = ctx->rf_live_bytes + ctx->sram_live_bytes;
-
-    // 分配单调递增的 step_id，作为 DAG 中依赖关系的唯一标识。
     step.step_id = ctx->next_step_id++;
-    step.before.total_live_bytes = before_total;
-
-    // 先计入输出占用：表示该 step 产物写入 output_storage 后，立刻占住对应缓存层级。
-    // 约定只有 RF/SRAM 会影响片上 live bytes；HBM/Host 不在此处计入。
-    if (step.output_storage == IntermediateStorageLevel::RF) {
-        ctx->rf_live_bytes += step.output_bytes;
-    } else if (step.output_storage == IntermediateStorageLevel::SRAM) {
-        ctx->sram_live_bytes += step.output_bytes;
+    if (step.fused_with_next) {
+        step.materialize_output = false;
     }
-
-    // 非融合路径才释放输入缓存：
-    // - fused_with_prev=true 表示与前一算子融合，前驱输出可直接旁路/寄存器传递，
-    //   不应在此处再做一次“消费释放”，否则会重复扣减 live bytes。
-    // - 非融合时，认为本 step 消费 input_storage 中的数据，执行后可回收该部分空间。
-    if (!step.fused_with_prev) {
-        if (step.input_storage == IntermediateStorageLevel::RF) {
-            // 做饱和减法，避免输入字节估计偏大时出现无符号下溢。
-            ctx->rf_live_bytes =
-                (step.input_bytes >= ctx->rf_live_bytes)
-                ? 0
-                : (ctx->rf_live_bytes - step.input_bytes);
-        } else if (step.input_storage == IntermediateStorageLevel::SRAM) {
-            // 同上：SRAM 侧也采用饱和减法，保证统计稳定。
-            ctx->sram_live_bytes =
-                (step.input_bytes >= ctx->sram_live_bytes)
-                ? 0
-                : (ctx->sram_live_bytes - step.input_bytes);
-        }
+    if (step.input_buffer_ids.empty()) {
+        step.input_buffer_ids = step.depends_on;
     }
-
-    // 更新构建期峰值，用于最终 predicted_rf_peak / predicted_sram_peak 汇总。
-    ctx->rf_peak_bytes = std::max<uint64_t>(ctx->rf_peak_bytes, ctx->rf_live_bytes);
-    ctx->sram_peak_bytes = std::max<uint64_t>(ctx->sram_peak_bytes, ctx->sram_live_bytes);
-
-    // 记录 step 执行后的总 live bytes 快照。
-    step.after.total_live_bytes = ctx->rf_live_bytes + ctx->sram_live_bytes;
+    step.output_buffer_id = step.step_id;
 
     // 若调用方未显式设置 step.bytes，则回退为 input/output 较大者，
     // 让通用统计字段始终有可用值（便于统一展示与后续估算）。
@@ -1202,10 +1502,10 @@ std::vector<uint64_t> KeySwitchExecutionModel::BuildModUpSubgraph(
     intt.work_items = work_items;
     intt.input_bytes = ct_chunk_bytes;
     intt.output_bytes = ct_chunk_bytes;
-    intt.input_storage = IntermediateStorageLevel::SRAM;
+    intt.input_storage = IntermediateStorageLevel::BRAM;
     intt.output_storage = policy.fuse_modup_chain
-        ? IntermediateStorageLevel::RF
-        : IntermediateStorageLevel::SRAM;
+        ? IntermediateStorageLevel::BRAM
+        : IntermediateStorageLevel::BRAM;
     intt.fused_with_next = policy.fuse_modup_chain;
     intt.depends_on = deps;
     ids.push_back(AppendStep(ctx, intt));
@@ -1225,8 +1525,8 @@ std::vector<uint64_t> KeySwitchExecutionModel::BuildModUpSubgraph(
     bconv.output_bytes = ct_chunk_bytes;
     bconv.input_storage = intt.output_storage;
     bconv.output_storage = policy.fuse_modup_chain
-        ? IntermediateStorageLevel::RF
-        : IntermediateStorageLevel::SRAM;
+        ? IntermediateStorageLevel::BRAM
+        : IntermediateStorageLevel::BRAM;
     bconv.fused_with_prev = policy.fuse_modup_chain;
     bconv.fused_with_next = policy.fuse_modup_chain;
     bconv.depends_on = {ids.back()};
@@ -1248,6 +1548,8 @@ std::vector<uint64_t> KeySwitchExecutionModel::BuildModUpSubgraph(
     ntt.input_storage = bconv.output_storage;
     ntt.output_storage = policy.modup_output_storage;
     ntt.fused_with_prev = policy.fuse_modup_chain;
+    ntt.fused_with_next =
+        (policy.modup_to_innerprod == StageConnectionMode::DirectForward);
     ntt.depends_on = {ids.back()};
     ids.push_back(AppendStep(ctx, ntt));
     ctx->execution->modup_step_ids.push_back(ids.back());
@@ -1329,6 +1631,9 @@ std::vector<uint64_t> KeySwitchExecutionModel::BuildModDownSubgraph(
     const uint64_t shortcut_bytes = policy.supports_moddown_shortcut
         ? std::max<uint64_t>(1, out_bytes / 2)
         : out_bytes;
+    const uint64_t shortcut_work = policy.supports_moddown_shortcut
+        ? std::max<uint64_t>(1, work_items / 2)
+        : work_items;
 
     std::vector<uint64_t> ids;
     TileExecutionStep intt;
@@ -1338,7 +1643,7 @@ std::vector<uint64_t> KeySwitchExecutionModel::BuildModDownSubgraph(
     intt.limb_tile_index = limb_idx;
     intt.tile_idx = ct_idx;
     intt.limb_idx = limb_idx;
-    intt.work_items = work_items;
+    intt.work_items = shortcut_work;
     intt.input_bytes = shortcut_bytes;
     intt.output_bytes = shortcut_bytes;
     intt.input_storage = StorageForConnection(
@@ -1346,7 +1651,7 @@ std::vector<uint64_t> KeySwitchExecutionModel::BuildModDownSubgraph(
         policy.reduction_output_storage);
     intt.output_storage = policy.fuse_moddown_chain
         ? policy.moddown_temp_storage
-        : IntermediateStorageLevel::SRAM;
+        : IntermediateStorageLevel::BRAM;
     intt.fused_with_next = policy.fuse_moddown_chain;
     intt.depends_on = deps;
     intt.is_shortcut_path = policy.supports_moddown_shortcut;
@@ -1360,13 +1665,13 @@ std::vector<uint64_t> KeySwitchExecutionModel::BuildModDownSubgraph(
     bconv.limb_tile_index = limb_idx;
     bconv.tile_idx = ct_idx;
     bconv.limb_idx = limb_idx;
-    bconv.work_items = work_items;
+    bconv.work_items = shortcut_work;
     bconv.input_bytes = shortcut_bytes;
     bconv.output_bytes = shortcut_bytes;
     bconv.input_storage = intt.output_storage;
     bconv.output_storage = policy.fuse_moddown_chain
         ? policy.moddown_temp_storage
-        : IntermediateStorageLevel::SRAM;
+        : IntermediateStorageLevel::BRAM;
     bconv.fused_with_prev = policy.fuse_moddown_chain;
     bconv.fused_with_next = policy.fuse_moddown_chain;
     bconv.depends_on = {ids.back()};
@@ -1381,12 +1686,14 @@ std::vector<uint64_t> KeySwitchExecutionModel::BuildModDownSubgraph(
     ntt.limb_tile_index = limb_idx;
     ntt.tile_idx = ct_idx;
     ntt.limb_idx = limb_idx;
-    ntt.work_items = work_items;
+    ntt.work_items = shortcut_work;
     ntt.input_bytes = shortcut_bytes;
     ntt.output_bytes = shortcut_bytes;
     ntt.input_storage = bconv.output_storage;
     ntt.output_storage = policy.moddown_temp_storage;
     ntt.fused_with_prev = policy.fuse_moddown_chain;
+    ntt.fused_with_next =
+        (policy.moddown_to_subtract == StageConnectionMode::DirectForward);
     ntt.depends_on = {ids.back()};
     ntt.is_shortcut_path = policy.supports_moddown_shortcut;
     ids.push_back(AppendStep(ctx, ntt));
@@ -1405,7 +1712,7 @@ std::vector<uint64_t> KeySwitchExecutionModel::BuildModDownSubgraph(
     sub.input_storage = StorageForConnection(
         policy.moddown_to_subtract,
         policy.moddown_temp_storage);
-    sub.output_storage = IntermediateStorageLevel::SRAM;
+    sub.output_storage = IntermediateStorageLevel::BRAM;
     sub.fused_with_prev =
         (policy.moddown_to_subtract == StageConnectionMode::DirectForward);
     sub.depends_on = {ids.back()};
@@ -1428,9 +1735,7 @@ std::vector<uint64_t> KeySwitchExecutionModel::ConnectSubgraphsWithPolicy(
     switch(mode){
         case StageConnectionMode::DirectForward:
             return deps;
-        case StageConnectionMode::BufferInRF:
-            return deps;
-        case StageConnectionMode::BufferInSRAM:
+        case StageConnectionMode::BufferInBRAM:
             return deps;
         case StageConnectionMode::SpillToHBM:
             break;
@@ -1448,7 +1753,7 @@ std::vector<uint64_t> KeySwitchExecutionModel::ConnectSubgraphsWithPolicy(
     spill.bytes = bytes;
     spill.input_bytes = bytes;
     spill.output_bytes = bytes;
-    spill.input_storage = IntermediateStorageLevel::SRAM;
+    spill.input_storage = IntermediateStorageLevel::BRAM;
     spill.output_storage = IntermediateStorageLevel::HBM;
     spill.depends_on = deps;
     const uint64_t spill_id = AppendStep(ctx, spill);
@@ -1466,7 +1771,7 @@ std::vector<uint64_t> KeySwitchExecutionModel::ConnectSubgraphsWithPolicy(
     reload.input_bytes = bytes;
     reload.output_bytes = bytes;
     reload.input_storage = IntermediateStorageLevel::HBM;
-    reload.output_storage = IntermediateStorageLevel::SRAM;
+    reload.output_storage = IntermediateStorageLevel::BRAM;
     reload.depends_on = {spill_id};
     const uint64_t reload_id = AppendStep(ctx, reload);
 
@@ -1483,9 +1788,6 @@ void KeySwitchExecutionModel::FinalizeExecution(
     BuildContext* ctx) const {
 
     KeySwitchExecution& execution = *ctx->execution;
-    execution.predicted_rf_peak = ctx->rf_peak_bytes;
-    execution.predicted_sram_peak = ctx->sram_peak_bytes;
-    execution.peak_bram_bytes = std::max<uint64_t>(execution.peak_bram_bytes, ctx->sram_peak_bytes);
     execution.predicted_hbm_bytes =
         execution.key_host_to_hbm_bytes
         + execution.key_hbm_to_bram_bytes
@@ -1541,7 +1843,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildWithMode(
     execution.tile_count = execution.tile_plan.total_tile_count;
     execution.tile_cost = execution.tile_plan.cost;
 
-    // BuildContext 在构建期间维护 step_id 递增与 RF/SRAM live/peak 统计。
+    // BuildContext 在构建期间维护 step_id 递增。
     BuildContext ctx;
     ctx.execution = &execution;
 
@@ -1572,7 +1874,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildWithMode(
         persistent_key.input_bytes = execution.problem.key_bytes;
         persistent_key.output_bytes = execution.problem.key_bytes;
         persistent_key.input_storage = IntermediateStorageLevel::HBM;
-        persistent_key.output_storage = IntermediateStorageLevel::SRAM;
+        persistent_key.output_storage = IntermediateStorageLevel::BRAM;
         persistent_key.key_hit = true;
         persistent_key.key_persistent = true;
         if (host_key_step_id != 0) {
@@ -1624,7 +1926,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildWithMode(
             input_step.input_bytes = ct_chunk_bytes;
             input_step.output_bytes = ct_chunk_bytes;
             input_step.input_storage = IntermediateStorageLevel::HBM;
-            input_step.output_storage = IntermediateStorageLevel::SRAM;
+            input_step.output_storage = IntermediateStorageLevel::BRAM;
             input_step.key_hit = execution.problem.key_resident_hit;
             input_step.key_persistent = execution.tile_plan.key_persistent;
             input_step_by_limb[limb_idx] = AppendStep(&ctx, input_step);
@@ -1694,7 +1996,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildWithMode(
                 key_step.input_bytes = key_chunk_bytes;
                 key_step.output_bytes = key_chunk_bytes;
                 key_step.input_storage = IntermediateStorageLevel::HBM;
-                key_step.output_storage = IntermediateStorageLevel::SRAM;
+                key_step.output_storage = IntermediateStorageLevel::BRAM;
                 key_step.key_hit = true;
                 key_step.key_persistent = false;
                 if (host_key_step_id != 0) {
@@ -1745,6 +2047,9 @@ KeySwitchExecution KeySwitchExecutionModel::BuildWithMode(
             const uint32_t limb_now = std::min<uint32_t>(execution.tile_plan.limb_tile, limb_remain);
             const uint64_t out_bytes =
                 static_cast<uint64_t>(ct_now) * limb_now * execution.problem.out_limb_bytes;
+            const uint64_t moddown_input_bytes = execution.policy.supports_moddown_shortcut
+                ? std::max<uint64_t>(1, out_bytes / 2)
+                : out_bytes;
             const uint64_t reduction_work =
                 static_cast<uint64_t>(ct_now)
                 * static_cast<uint64_t>(limb_now)
@@ -1806,7 +2111,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildWithMode(
                 limb_idx,
                 /*digit_idx=*/0,
                 execution.policy.reduction_to_moddown,
-                out_bytes,
+                moddown_input_bytes,
                 {reduction_terminal});
             const uint64_t moddown_work =
                 static_cast<uint64_t>(ct_now)
@@ -1833,7 +2138,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildWithMode(
             output.bytes = out_bytes;
             output.input_bytes = out_bytes;
             output.output_bytes = out_bytes;
-            output.input_storage = IntermediateStorageLevel::SRAM;
+            output.input_storage = IntermediateStorageLevel::BRAM;
             output.output_storage = IntermediateStorageLevel::HBM;
             output.depends_on = {moddown_ids.back()};
             output.key_hit = execution.problem.key_resident_hit;
@@ -1925,6 +2230,7 @@ KeySwitchExecution KeySwitchExecutionModel::Build(
 
     // 按解析后的方法分发到对应构建路径，得到完整 execution（含 fallback 信息）。
     KeySwitchExecution execution = BuildByMethod(req, plan, state, resolved_method);
+
     // 对“明确不支持的方法”直接透传返回，避免后续字段二次改写掩盖真实原因。
     if (!execution.valid && execution.fallback_used
         && execution.fallback_reason == KeySwitchFallbackReason::UnsupportedMethod) {
@@ -2010,7 +2316,6 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
     execution.method_degraded = false;
     execution.degraded_reason = KeySwitchFallbackReason::None;
 
-    // Build problem directly for this method
     Request method_req = req;
     method_req.ks_profile.method = method;
     method_req.ks_profile.partition = PartitionStrategy::None;
@@ -2022,7 +2327,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
 
     ExecutionPlan single_plan;
     single_plan.request_id = plan.request_id;
-    if(!plan.assigned_cards.empty()){
+    if (!plan.assigned_cards.empty()) {
         single_plan.assigned_cards.push_back(plan.assigned_cards.front());
     }
 
@@ -2039,20 +2344,96 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
     }
 
     execution.policy = ResolveMethodPolicy(method);
+    execution.logical_graph = BuildSharedSingleBoardLogicalGraph(execution.policy);
+    execution.valid = execution.logical_graph.valid && !execution.logical_graph.nodes.empty();
+    return execution;
+}
+
+KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardPhysical(
+    const Request& req,
+    const ExecutionPlan& plan,
+    const SystemState& state,
+    KeySwitchMethod method
+) const {
+
+    // 仅允许进入“共享单板路径”的方法（Poseidon/OLA/FAB/FAST/HERA）。
+    // 若调用方传入了不支持的方法，直接返回 UnsupportedMethod，避免后续构图污染。
+    if (!IsSharedSingleBoardMethod(method)) {
+        return BuildUnsupportedMethod(req.ks_profile.method, method);
+    }
+
+    // 初始化执行结果骨架：
+    // 1) valid 先置 false，只有完整构图结束后再判定；
+    // 2) 该路径默认是 tile 化执行；
+    // 3) requested/effective/method 三个字段分别用于“用户请求/解析后方法/当前构建方法”。
+    KeySwitchExecution execution;
+    execution.valid = false;
+    execution.tiled_execution = true;
+    execution.fallback_used = false;
+    execution.fallback_reason = KeySwitchFallbackReason::None;
+    execution.method = method;
+    execution.requested_method = req.ks_profile.method;
+    execution.effective_method = method;
+    execution.method_degraded = false;
+    execution.degraded_reason = KeySwitchFallbackReason::None;
+
+    // 基于目标方法构造“单板语义”的请求副本：
+    // - 强制单卡（scale_out_cards=1）；
+    // - 禁用跨卡 merge/reduce；
+    // - key 放置策略固定为从 HBM 流式加载；
+    // 这样 BuildProblem 的输入约束与本函数路径保持一致。
+    Request method_req = req;
+    method_req.ks_profile.method = method;
+    method_req.ks_profile.partition = PartitionStrategy::None;
+    method_req.ks_profile.collective = CollectiveStrategy::None;
+    method_req.ks_profile.key_placement = KeyPlacement::StreamFromHBM;
+    method_req.ks_profile.scale_out_cards = 1;
+    method_req.ks_profile.enable_inter_card_merge = false;
+    method_req.ks_profile.allow_cross_card_reduce = false;
+
+    // 组装一个“单卡执行计划”：
+    // 如果上游分配了多卡，这里只取第一张卡作为本路径落点。
+    ExecutionPlan single_plan;
+    single_plan.request_id = plan.request_id;
+    if(!plan.assigned_cards.empty()){
+        single_plan.assigned_cards.push_back(plan.assigned_cards.front());
+    }
+
+    // 构建标准化问题规模（多项式规模、输入输出字节、工作集、驻留命中等）。
+    execution.problem = BuildProblem(method_req, single_plan, state);
+    execution.problem.method = method;
+    execution.problem.cards = 1;
+    execution.working_set_bytes = execution.problem.working_set_bytes;
+    execution.key_resident_hit = execution.problem.key_resident_hit;
+
+    // 没有可用卡等场景会导致 problem 无效，直接走 fallback。
+    if (!execution.problem.valid) {
+        execution.fallback_used = true;
+        execution.fallback_reason = KeySwitchFallbackReason::NoAssignedCard;
+        return execution;
+    }
+
+    // 解析该方法对应的调度/连接策略，并基于问题规模生成 tile 计划。
+    execution.policy = ResolveMethodPolicy(method);
     execution.tile_plan = planner_.Plan(execution.problem);
+    // tile 计划失败通常表示资源/粒度约束冲突，直接上抛 fallback。
     if (!execution.tile_plan.valid) {
         execution.fallback_used = true;
         execution.fallback_reason = KeySwitchFallbackReason::TilePlanInvalid;
         return execution;
     }
 
+    // 记录 tile 计划输出的核心元信息，供后续结果汇总/诊断使用。
     execution.key_persistent_bram = execution.tile_plan.key_persistent;
     execution.tile_count = execution.tile_plan.total_tile_count;
     execution.tile_cost = execution.tile_plan.cost;
 
+    // BuildContext 维护 step_id 分配、live/peak 字节统计，以及 HBM 读写累计。
     BuildContext ctx;
     ctx.execution = &execution;
 
+    // 可选阶段 A：若 key 没有驻留命中，先建一个 Host->HBM 的整块 key 预加载步骤。
+    // 后续按 tile 加载 key 时，会依赖该步骤，保证数据来源有序。
     uint64_t host_key_step_id = 0;
     if (!execution.problem.key_resident_hit) {
         TileExecutionStep host_key = MakeStep(
@@ -2073,6 +2454,8 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
         execution.key_host_to_hbm_bytes += execution.problem.key_bytes;
     }
 
+    // 可选阶段 B：若策略允许 key 常驻，则一次性把整块 key 从 HBM 放到片上存储。
+    // 后续所有 inner-product 只依赖这个常驻步骤，不再重复按 tile 拉 key。
     uint64_t persistent_key_step_id = 0;
     if (execution.tile_plan.key_persistent) {
         TileExecutionStep persistent_key = MakeStep(
@@ -2096,11 +2479,16 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
         execution.key_hbm_to_bram_bytes += execution.problem.key_bytes;
     }
 
+    // 三维 tile 空间大小（至少为 1，避免出现 0 维导致循环不进入）。
     const uint32_t ct_tiles = std::max<uint32_t>(1, execution.tile_plan.ct_tiles);
     const uint32_t limb_tiles = std::max<uint32_t>(1, execution.tile_plan.limb_tiles);
     const uint32_t digit_tiles = std::max<uint32_t>(1, execution.tile_plan.digit_tiles);
 
-     auto run_pair = [&](uint32_t ct_idx, uint32_t limb_idx, uint32_t digit_idx) -> uint64_t {
+    // 构建一个 (ct_tile, limb_tile, digit_tile) 组合的完整子图：
+    // InputLoad -> ModUp -> (KeyLoad/KeyReuse) -> InnerProduct
+    // 返回该组合 inner-product 子图的 terminal step_id，供后续 reduction 使用。
+    auto run_pair = [&](uint32_t ct_idx, uint32_t limb_idx, uint32_t digit_idx) -> uint64_t {
+        // 计算本 tile 在边界处的真实大小（最后一块可能小于标准 tile）。
         const uint32_t ct_remain =
             execution.problem.ciphertexts - ct_idx * execution.tile_plan.ct_tile;
         const uint32_t ct_now = std::min<uint32_t>(execution.tile_plan.ct_tile, ct_remain);
@@ -2113,11 +2501,17 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
             execution.problem.digits - digit_idx * execution.tile_plan.digit_tile;
         const uint32_t digit_now = std::min<uint32_t>(execution.tile_plan.digit_tile, digit_remain);
 
+        // 估算该组合对应的数据量：
+        // - ct_chunk_bytes: 输入密文分块字节
+        // - key_chunk_bytes: key 分块字节（由 limb/digit 决定）
         const uint64_t ct_chunk_bytes =
             static_cast<uint64_t>(ct_now) * limb_now * execution.problem.ct_limb_bytes;
         const uint64_t key_chunk_bytes =
             static_cast<uint64_t>(limb_now) * digit_now * execution.problem.key_digit_limb_bytes;
 
+        // 估算工作量：
+        // - decompose_work: mod-up/decompose 主工作量
+        // - inner_work: inner-product 额外乘上多项式数量
         const uint64_t decompose_work =
             static_cast<uint64_t>(ct_now)
             * static_cast<uint64_t>(limb_now)
@@ -2127,7 +2521,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
         const uint64_t inner_work =
             decompose_work * static_cast<uint64_t>(execution.problem.polys);
 
-        // Input load
+        // 1) Input load: 把本 tile 的输入密文从 HBM 拉到片上。
         TileExecutionStep input = MakeStep(
             TileExecutionStepType::InputHBMToBRAM,
             StageType::Dispatch,
@@ -2141,6 +2535,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
         uint64_t input_id = AppendStep(&ctx, input);
         execution.ct_hbm_to_bram_bytes += ct_chunk_bytes;
 
+        // 2) ModUp 子图：以 input 为依赖起点，生成分解/基变换步骤。
         std::vector<uint64_t> modup_deps = {input_id};
         auto modup_ids = BuildModUpSubgraph(
             &ctx,
@@ -2152,6 +2547,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
             execution.policy,
             modup_deps);
 
+        // 3) 按策略连接 ModUp -> InnerProduct 的边（可能插入同步/过渡节点）。
         auto inner_deps = ConnectSubgraphsWithPolicy(
             &ctx,
             ct_idx,
@@ -2161,6 +2557,9 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
             ct_chunk_bytes,
             {modup_ids.back()});
 
+        // 4) Key 依赖注入：
+        // - key 常驻：直接依赖 persistent_key_step_id；
+        // - 非常驻：为当前组合新建一次 KeyHBMToBRAM 步骤并挂到 inner_deps。
         if (execution.tile_plan.key_persistent && persistent_key_step_id != 0) {
             AddDependencyId(&inner_deps, persistent_key_step_id);
         } else {
@@ -2182,6 +2581,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
             AddDependencyId(&inner_deps, key_load_id);
         }
 
+        // 5) InnerProduct 子图：完成本组合的核心乘加计算，返回 terminal id。
         auto inner_ids = BuildInnerProdSubgraph(
             &ctx,
             ct_idx,
@@ -2195,7 +2595,10 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
         return inner_ids.back();
     };
 
-    // Pair ordering
+    // 遍历顺序由策略决定：
+    // - Digit 优先：先 digit 后 limb（提高 digit 局部性）；
+    // - 否则：先 limb 后 digit（更贴近常规块处理顺序）。
+    // all_inner_terminals 收集所有 inner 子图终点，供 reduction 统一消费。
     std::vector<uint64_t> all_inner_terminals;
     if (execution.policy.granularity == KeySwitchProcessingGranularity::Digit
         || execution.policy.prefer_digit_locality) {
@@ -2216,10 +2619,12 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
         }
     }
 
-    // Reduction
+    // Reduction 阶段：把多个 inner-term 合并为可进入 ModDown 的结果。
+    // 三种模式分别适配不同的并行度/延迟权衡。
     std::vector<uint64_t> reduction_terminals;
     switch (execution.policy.reduction_mode) {
     case ReductionMode::Centralized: {
+        // 集中式：一次性把全部 inner 结果送入一个 reduction 子图。
         auto reduce_ids = BuildReductionSubgraph(
             &ctx,
             /*ct_idx=*/0,
@@ -2231,6 +2636,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
         break;
     }
     case ReductionMode::Streaming: {
+        // 流式：按序滚动归并，每次把“当前 inner + 上一轮归并结果”继续合并。
         uint64_t rolling_reduce = 0;
         for (uint64_t inner_id : all_inner_terminals) {
             std::vector<uint64_t> deps = {inner_id};
@@ -2252,7 +2658,8 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
         break;
     }
     case ReductionMode::Hierarchical: {
-        // First pass: per-digit local reduction
+        // 分层：先按 digit 分组做局部归并，再做一次全局归并。
+        // 这样可以降低单次归并扇入，提升大规模场景可扩展性。
         std::vector<uint64_t> local_reduces;
         const uint32_t groups = std::max<uint32_t>(1, digit_tiles);
         for (uint32_t g = 0; g < groups; ++g) {
@@ -2283,14 +2690,18 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
     }
     }
 
-    // ModDown
+    // ModDown 阶段：
+    // 先根据策略连接 Reduction -> ModDown，再构建 ModDown 子图。
+    const uint64_t moddown_input_bytes = execution.policy.supports_moddown_shortcut
+        ? std::max<uint64_t>(1, execution.problem.output_bytes / 2)
+        : execution.problem.output_bytes;
     auto moddown_deps = ConnectSubgraphsWithPolicy(
         &ctx,
         /*ct_idx=*/0,
         /*limb_idx=*/0,
         /*digit_idx=*/0,
         execution.policy.reduction_to_moddown,
-        execution.problem.output_bytes,
+        moddown_input_bytes,
         reduction_terminals);
 
     auto moddown_ids = BuildModDownSubgraph(
@@ -2302,6 +2713,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
         execution.policy,
         moddown_deps);
 
+    // 输出落盘（片上 -> HBM），依赖最后一个 moddown step。
     TileExecutionStep output = MakeStep(
         TileExecutionStepType::OutputBRAMToHBM,
         StageType::Dispatch,
@@ -2311,16 +2723,17 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardMethod(
         execution.problem.output_bytes,
         execution.problem.output_bytes,
         /*work_items=*/1,
-        IntermediateStorageLevel::SRAM,
+        IntermediateStorageLevel::BRAM,
         IntermediateStorageLevel::HBM);
     output.bytes = execution.problem.output_bytes;
     output.depends_on = {moddown_ids.back()};
     AppendStep(&ctx, output);
     execution.out_bram_to_hbm_bytes += execution.problem.output_bytes;
 
+    // 收尾：回填峰值/流量统计与步骤汇总。
     FinalizeExecution(&ctx);
+    // 只要成功构建出步骤序列，即认为 execution 有效。
     execution.valid = !execution.steps.empty();
-    execution.peak_bram_bytes = std::max<uint64_t>(execution.peak_bram_bytes, execution.predicted_sram_peak);
 
     return execution;
 }
@@ -2373,21 +2786,11 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSingleBoard(
         single_plan.assigned_cards.push_back(plan.assigned_cards.front());
     }
 
-    KeySwitchExecution execution = BuildWithMode(
+    KeySwitchExecution execution = BuildSharedSingleBoardMethod(
         single_req,
         single_plan,
         state,
-        /*allow_inter_card_steps=*/false
-    );
-
-    if (ContainsInterCardSteps(execution.steps)) {
-        execution.steps.clear();
-        execution.valid = false;
-        execution.tiled_execution = false;
-        execution.fallback_used = true;
-        execution.fallback_reason = KeySwitchFallbackReason::UnsupportedConfig;
-        execution.tile_count = 1;
-    }
+        single_method);
 
     execution.method = single_method;
     execution.requested_method = req.ks_profile.method;
@@ -2427,7 +2830,11 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
         single_req.ks_profile.partition = PartitionStrategy::None;
         single_req.ks_profile.collective = CollectiveStrategy::None;
         single_req.ks_profile.key_placement = KeyPlacement::StreamFromHBM;
-        KeySwitchExecution degraded = BuildSingleBoard(single_req, plan, state);
+        KeySwitchExecution degraded = BuildSharedSingleBoardPhysical(
+            single_req,
+            plan,
+            state,
+            kSingleBoardBaseMethod);
         if (!degraded.fallback_used) {
             degraded.method_degraded = true;
             degraded.degraded_reason = KeySwitchFallbackReason::DegradedToSingleBoard;
@@ -2534,7 +2941,11 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
         local_plan.request_id = plan.request_id;
         local_plan.assigned_cards.push_back(scale_plan.assigned_cards[card_idx]);
 
-        const KeySwitchExecution local = BuildSingleBoard(local_req, local_plan, state);
+        const KeySwitchExecution local = BuildSharedSingleBoardPhysical(
+            local_req,
+            local_plan,
+            state,
+            kSingleBoardBaseMethod);
         if (!local.valid) {
             // Do not fallback to generic BuildWithMode() path.
             // Keep Cinnamon semantics explicit and explainable.

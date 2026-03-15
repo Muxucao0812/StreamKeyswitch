@@ -8,6 +8,14 @@
 #include <iosfwd>
 #include <string>
 
+#ifndef KEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH
+#define KEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH 0
+#endif
+
+#ifndef KEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN
+#define KEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN 0
+#endif
+
 enum class SchedulerKind {
     FIFO,
     Affinity,
@@ -75,6 +83,8 @@ struct ExperimentConfig {
     uint32_t tree_search_steps = 30;
     uint32_t tree_search_neighbors = 8;
     std::string tree_search_output_path;
+    bool dump_logical_graph = (KEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH != 0);
+    bool dump_runtime_plan = (KEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN != 0);
 
     // Keyswitch execution method selection.
     KeySwitchMethod keyswitch_method = KeySwitchMethod::Poseidon;

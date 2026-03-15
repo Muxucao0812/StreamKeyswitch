@@ -1,6 +1,8 @@
 #include "backend/cycle_backend.h"
 #include "backend/cycle_sim/driver.h"
 #include "backend/cycle_sim/lowering.h"
+#include "backend/runtime_planner.h"
+#include "backend/step_graph_runtime.h"
 
 #include <algorithm>
 #include <array>
@@ -54,6 +56,19 @@ Time TotalLatency(const ExecutionBreakdown& breakdown) {
 }
 
 constexpr std::size_t kStageTypeCount = 6;
+
+bool IsSharedSingleBoardMethod(KeySwitchMethod method) {
+    switch (method) {
+    case KeySwitchMethod::Poseidon:
+    case KeySwitchMethod::FAB:
+    case KeySwitchMethod::FAST:
+    case KeySwitchMethod::OLA:
+    case KeySwitchMethod::HERA:
+        return true;
+    default:
+        return false;
+    }
+}
 
 std::size_t StageIndex(StageType stage_type) {
     switch (stage_type) {
@@ -230,6 +245,8 @@ void PopulateResultMetadataFromExecution(
 
     result->requested_method = req.ks_profile.method;
     result->effective_method = effective_method;
+    result->method_degraded = execution.method_degraded;
+    result->degraded_reason = execution.degraded_reason;
     result->primitive_breakdown_primary = true;
     result->stage_breakdown_compat_only = true;
     result->tiled_execution = execution.tiled_execution;
@@ -262,8 +279,6 @@ void PopulateResultMetadataFromExecution(
         result->peak_bram_bytes = execution.peak_bram_bytes;
         CopyPeakBuffers(&result->peak_buffers, execution.peak_buffers);
     }
-    result->peak_rf_bytes = execution.predicted_rf_peak;
-    result->peak_sram_bytes = execution.predicted_sram_peak;
 
     const uint64_t hbm_candidate = std::max<uint64_t>(
         result->working_set_bytes,
@@ -273,6 +288,27 @@ void PopulateResultMetadataFromExecution(
     result->primitive_peak_memory_bytes = result->peak_total_bytes;
     result->peak_memory_bytes = result->peak_total_bytes;
 
+    result->hbm_read_bytes =
+        result->key_host_to_hbm_bytes
+        + result->key_hbm_to_bram_bytes
+        + result->ct_hbm_to_bram_bytes;
+    result->hbm_write_bytes = result->out_bram_to_hbm_bytes;
+}
+
+void PopulateResultMetadataFromRuntimePlan(
+    const RuntimePlan& plan,
+    ExecutionResult* result) {
+
+    result->tiled_execution = true;
+    result->tile_count = plan.tile_count;
+    result->working_set_bytes = plan.working_set_bytes;
+    result->key_resident_reuse = plan.key_resident_hit;
+    result->key_resident_hit = plan.key_resident_hit;
+    result->key_persistent_bram = plan.key_persistent_bram;
+    result->key_host_to_hbm_bytes = plan.key_host_to_hbm_bytes;
+    result->key_hbm_to_bram_bytes = plan.key_hbm_to_bram_bytes;
+    result->ct_hbm_to_bram_bytes = plan.ct_hbm_to_bram_bytes;
+    result->out_bram_to_hbm_bytes = plan.out_bram_to_hbm_bytes;
     result->hbm_read_bytes =
         result->key_host_to_hbm_bytes
         + result->key_hbm_to_bram_bytes
@@ -451,19 +487,136 @@ ExecutionResult CycleBackend::EstimateMethod(
     const Request& req,
     const ExecutionPlan& plan,
     const SystemState& state,
-    KeySwitchMethod method) const {
+    KeySwitchMethod method
+) const {
 
+    // 固定本次估算方法，构建可执行的 KeySwitch 执行描述。
     Request method_req = req;
     method_req.ks_profile.method = method;
     const KeySwitchExecution execution = execution_model_.Build(method_req, plan, state);
     
+    // 执行模型不可用时，返回带原因的统一兜底结果。
     if (!execution.valid) {
         return MakeExecutionFallbackResult(req, execution, method);
     }
 
+    if (IsSharedSingleBoardMethod(method) && execution.problem.cards <= 1) {
+        RuntimePlanner runtime_planner(hw_model_, execution_model_.TilePlannerParams());
+        const RuntimePlan runtime_plan = runtime_planner.Plan(execution);
+        if (!runtime_plan.valid) {
+            ExecutionResult result = MakeFallbackResult(
+                req,
+                (execution.effective_method == KeySwitchMethod::Auto)
+                    ? method
+                    : execution.effective_method,
+                KeySwitchFallbackReason::TilePlanInvalid);
+            PopulateResultMetadataFromExecution(
+                req,
+                execution,
+                (execution.effective_method == KeySwitchMethod::Auto)
+                    ? method
+                    : execution.effective_method,
+                &result);
+            result.fallback_reason_message =
+                std::string(ToString(result.fallback_reason))
+                + ": runtime_planner_failed";
+            NormalizeStatusFlags(&result);
+            return result;
+        }
+
+        StepGraphRuntimeExecutor runtime_executor(hw_model_);
+        const RuntimeState runtime = runtime_executor.ExecuteStepGraph(runtime_plan);
+        if (!runtime.valid) {
+            ExecutionResult result = MakeFallbackResult(
+                req,
+                (execution.effective_method == KeySwitchMethod::Auto)
+                    ? method
+                    : execution.effective_method,
+                KeySwitchFallbackReason::UnsupportedConfig);
+            PopulateResultMetadataFromExecution(
+                req,
+                execution,
+                (execution.effective_method == KeySwitchMethod::Auto)
+                    ? method
+                    : execution.effective_method,
+                &result);
+            PopulateResultMetadataFromRuntimePlan(runtime_plan, &result);
+            result.fallback_reason_message =
+                std::string(ToString(result.fallback_reason))
+                + ": dynamic_step_graph_runtime_failed";
+            NormalizeStatusFlags(&result);
+            return result;
+        }
+
+        ExecutionResult result{};
+        PopulateResultMetadataFromExecution(
+            req,
+            execution,
+            (execution.effective_method == KeySwitchMethod::Auto)
+                ? method
+                : execution.effective_method,
+            &result);
+        PopulateResultMetadataFromRuntimePlan(runtime_plan, &result);
+
+        std::array<uint64_t, kStageTypeCount> stage_cycles{};
+        TransferBreakdown transfer_cycles;
+        PrimitiveComputeBreakdown compute_cycles;
+        for (const StepRuntimeRecord& record : runtime.step_records) {
+            SaturatingAdd(
+                &stage_cycles[StageIndex(record.stage_type)],
+                record.total_cycles);
+            AddTransferTime(
+                &transfer_cycles,
+                record.step_type,
+                record.transfer_cycles);
+            AddComputeTime(
+                &compute_cycles,
+                record.step_type,
+                record.compute_cycles);
+        }
+
+        const Time total_latency_ns = hw_model_.CyclesToNs(runtime.total_cycles);
+        result.breakdown = StageBreakdownFromCycles(
+            hw_model_,
+            stage_cycles,
+            total_latency_ns);
+        result.transfer_breakdown = TransferBreakdownFromCycles(hw_model_, transfer_cycles);
+        result.compute_breakdown = ComputeBreakdownFromCycles(hw_model_, compute_cycles);
+
+        result.total_latency = TotalLatency(result.breakdown);
+        result.compute_cycles = runtime.compute_cycles;
+        result.transfer_cycles = runtime.transfer_cycles;
+        result.hbm_read_bytes = runtime.hbm_read_bytes;
+        result.hbm_write_bytes = runtime.hbm_write_bytes;
+        result.bram_read_bytes = runtime.bram_read_bytes;
+        result.bram_write_bytes = runtime.bram_write_bytes;
+        result.hbm_round_trips = std::min(runtime.spill_count, runtime.reload_count);
+        result.direct_forward_count = runtime.direct_forward_count;
+        result.direct_forward_bytes = runtime.direct_forward_bytes;
+        result.spill_count = runtime.spill_count;
+        result.reload_count = runtime.reload_count;
+        result.spill_bytes = runtime.spill_bytes;
+        result.reload_bytes = runtime.reload_bytes;
+        result.peak_hbm_bytes = std::max(result.peak_hbm_bytes, runtime.peak_hbm_bytes);
+        result.peak_bram_bytes = std::max(result.peak_bram_bytes, runtime.peak_bram_bytes);
+        result.peak_total_bytes = std::max(result.peak_bram_bytes, result.peak_hbm_bytes);
+        result.primitive_peak_memory_bytes = result.peak_total_bytes;
+        result.peak_memory_bytes = result.peak_total_bytes;
+        result.energy_nj = hw_model_.EstimateTransferEnergyByBytes(
+            runtime.hbm_read_bytes + runtime.hbm_write_bytes);
+        result.fine_step_cycles.assign(kTileExecutionStepTypeCount, 0);
+        for (std::size_t idx = 0; idx < kTileExecutionStepTypeCount; ++idx) {
+            result.fine_step_cycles[idx] = hw_model_.CyclesToNs(runtime.fine_step_cycles[idx]);
+        }
+        return result;
+    }
+
+    // 将高层执行步骤 lower 到 cycle simulator 可运行的程序表示。
     CycleLowererSelector lowerer(hw_model_);
     const CycleLoweringResult lowering = lowerer.Lower(execution);
+    
     if (!lowering.valid) {
+        // lowering 失败时保留上下文元信息，并补齐可读的失败原因。
         ExecutionResult result = MakeFallbackResult(
             req,
             (execution.effective_method == KeySwitchMethod::Auto)
@@ -488,10 +641,12 @@ ExecutionResult CycleBackend::EstimateMethod(
         return result;
     }
 
+    // 运行 cycle 级仿真，拿到分组时序与资源统计。
     CycleDriver driver(hw_model_);
     const CycleSimStats sim_stats = driver.Run(lowering.program);
 
     ExecutionResult result{};
+    // 先写入请求/方法等元信息，再填充各类统计字段。
     PopulateResultMetadataFromExecution(
         req,
         execution,
@@ -504,6 +659,7 @@ ExecutionResult CycleBackend::EstimateMethod(
     TransferBreakdown transfer_cycles;
     PrimitiveComputeBreakdown compute_cycles;
 
+    // 汇总每个阶段的周期、传输时间和算子时间，并累计传输能耗。
     for (const CycleGroupTiming& timing : sim_stats.group_timings) {
         const uint64_t duration_cycles = timing.DurationCycles();
         SaturatingAdd(
@@ -522,33 +678,28 @@ ExecutionResult CycleBackend::EstimateMethod(
         }
     }
 
+    // 将仿真统计统一换算成结果结构体中的时延/带宽/峰值内存等指标。
     const Time total_latency_ns = hw_model_.CyclesToNs(sim_stats.total_cycles);
-    result.breakdown = StageBreakdownFromCycles(
-        hw_model_,
-        stage_cycles,
-        total_latency_ns);
-    result.transfer_breakdown = TransferBreakdownFromCycles(
-        hw_model_,
-        transfer_cycles);
-    result.compute_breakdown = ComputeBreakdownFromCycles(
-        hw_model_,
-        compute_cycles);
+    result.breakdown = StageBreakdownFromCycles(hw_model_, stage_cycles, total_latency_ns);
+
+    result.transfer_breakdown = TransferBreakdownFromCycles(hw_model_, transfer_cycles);
+
+    result.compute_breakdown = ComputeBreakdownFromCycles(hw_model_, compute_cycles);
+
     result.total_latency = total_latency_ns;
     result.hbm_read_bytes = sim_stats.hbm_read_bytes;
     result.hbm_write_bytes = sim_stats.hbm_write_bytes;
     result.hbm_round_trips = sim_stats.hbm_round_trips;
     result.spill_bytes = sim_stats.spill_bytes;
     result.reload_bytes = sim_stats.reload_bytes;
-    result.peak_rf_bytes = sim_stats.peak_rf_live_bytes;
-    result.peak_sram_bytes = sim_stats.peak_sram_live_bytes;
     result.dependency_stall_cycles = sim_stats.dependency_stall_cycles;
     result.resource_stall_cycles = sim_stats.resource_stall_cycles;
     result.fine_step_cycles.assign(kTileExecutionStepTypeCount, 0);
     for (std::size_t idx = 0; idx < kTileExecutionStepTypeCount; ++idx) {
         result.fine_step_cycles[idx] = hw_model_.CyclesToNs(sim_stats.fine_step_cycles[idx]);
     }
-    if (sim_stats.peak_on_chip_live_bytes > 0) {
-        result.peak_bram_bytes = sim_stats.peak_on_chip_live_bytes;
+    if (sim_stats.peak_bram_live_bytes > 0) {
+        result.peak_bram_bytes = sim_stats.peak_bram_live_bytes;
     }
     result.peak_total_bytes = std::max(result.peak_bram_bytes, result.peak_hbm_bytes);
     result.primitive_peak_memory_bytes = result.peak_total_bytes;

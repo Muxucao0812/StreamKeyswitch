@@ -9,6 +9,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iosfwd>
+#include <string>
 #include <vector>
 
 // KeySwitch 问题描述：由请求 + 执行计划 + 系统状态归一化后的规模信息。
@@ -165,13 +167,60 @@ struct TilePlan {
     std::vector<TileBufferUsage> per_tile_buffer_usage;
 };
 
+enum class LogicalNodeKind : uint8_t {
+    Input,
+    KeySource,
+    ModUp,
+    InnerProd,
+    Reduction,
+    ModDown,
+    Output
+};
+
+enum class LogicalTensorRole : uint8_t {
+    None,
+    CiphertextTile,
+    KeyTile,
+    AccumTile,
+    TempTile
+};
+
+struct LogicalEdgePolicy {
+    StageConnectionMode preferred_connection = StageConnectionMode::BufferInBRAM;
+    std::vector<StageConnectionMode> fallback_order;
+    bool allow_shortcut = false;
+    bool allow_key_persistent = false;
+};
+
+struct LogicalNode {
+    uint64_t node_id = 0;
+    LogicalNodeKind kind = LogicalNodeKind::Input;
+    StageType stage_type = StageType::Dispatch;
+    std::vector<uint64_t> depends_on;
+    std::vector<LogicalTensorRole> required_inputs;
+    LogicalTensorRole produced_output = LogicalTensorRole::None;
+    LogicalEdgePolicy edge_policy;
+};
+
+struct LogicalGraph {
+    bool valid = false;
+    std::vector<LogicalNode> nodes;
+};
+
+const char* ToString(LogicalNodeKind kind);
+const char* ToString(LogicalTensorRole role);
+const char* ToString(StageConnectionMode mode);
+const char* ToString(StageType stage_type);
+void DumpLogicalGraph(const LogicalGraph& graph, std::ostream& os);
+std::string FormatLogicalGraph(const LogicalGraph& graph);
+
 // Tile 规划器：在容量约束下搜索并选择低成本 tile 方案。
 class TilePlanner {
 public:
     // 规划器参数：容量约束、带宽/吞吐、固定开销、加权系数。
     struct Params {
         // BRAM 可用比例（用于从物理容量折算可规划预算）。
-        double bram_usable_ratio = 0.85;
+        double bram_usable_ratio = 0.95;
         // BRAM 保护区，避免预算用满导致不可调度。
         uint64_t bram_guard_bytes = 512ULL * 1024ULL;
         // temp 缓冲估算比例。
@@ -335,8 +384,8 @@ struct TileExecutionStep {
     bool key_hit = false;                                      // 此步是否命中驻留 key
     bool key_persistent = false;                               // key 是否按常驻策略处理
 
-    IntermediateStorageLevel input_storage = IntermediateStorageLevel::SRAM;   // 输入所在层级
-    IntermediateStorageLevel output_storage = IntermediateStorageLevel::SRAM;  // 输出所在层级
+    IntermediateStorageLevel input_storage = IntermediateStorageLevel::BRAM;   // 输入所在层级
+    IntermediateStorageLevel output_storage = IntermediateStorageLevel::BRAM;  // 输出所在层级
 
     bool fused_with_prev = false;                              // 是否与前一步融合
     bool fused_with_next = false;                              // 是否与后一步融合
@@ -344,14 +393,17 @@ struct TileExecutionStep {
   
     std::vector<uint64_t> depends_on;                          // 依赖 step_id 列表
 
-    BufferUsage before;                                        // 执行前缓冲快照
-    BufferUsage after;                                         // 执行后缓冲快照
+    uint64_t output_buffer_id = 0;
+    std::vector<uint64_t> input_buffer_ids;
+    bool output_can_spill = true;
+    bool materialize_output = true;
 };
 
 // KeySwitchExecutionModel 的构造参数。
 struct KeySwitchExecutionModelParams {
     TilePlanner::Params tile_planner;                      // tile 规划参数
-    uint64_t default_bram_capacity_bytes = 32ULL * 1024ULL * 1024ULL;  // 缺省 BRAM 容量
+    // 与 U280 片上存储预算保持一致（BRAM36 + URAM288）。
+    uint64_t default_bram_capacity_bytes = 44679168ULL;  // 缺省 BRAM 容量
 };
 
 // 一次 keyswitch 构建/评估的完整输出。
@@ -383,6 +435,7 @@ struct KeySwitchExecution {
     PeakBufferUsage peak_buffers;
     TileCostBreakdown tile_cost;
     KeySwitchMethodPolicy policy;
+    LogicalGraph logical_graph;
 
     // 构建细节与步骤轨迹。
     KeySwitchProblem problem;
@@ -396,8 +449,6 @@ struct KeySwitchExecution {
 
     // 汇总预测指标。
     uint64_t predicted_hbm_bytes = 0;
-    uint64_t predicted_rf_peak = 0;
-    uint64_t predicted_sram_peak = 0;
 };
 
 // Keyswitch 执行模型：负责问题建模、tile 规划、步骤 DAG 构建与结果汇总。
@@ -430,16 +481,13 @@ public:
         const ExecutionPlan& plan,
         const SystemState& state) const;
 
+    TilePlanner::Params TilePlannerParams() const;
+
 private:
-    // 构建过程上下文：维护 step_id 和 RF/SRAM live/peak 状态。
+    // 构建过程上下文：维护 step_id 与 HBM 传输累计。
     struct BuildContext {
         KeySwitchExecution* execution = nullptr;
         uint64_t next_step_id = 1;
-
-        uint64_t rf_live_bytes = 0;
-        uint64_t sram_live_bytes = 0;
-        uint64_t rf_peak_bytes = 0;
-        uint64_t sram_peak_bytes = 0;
 
         uint64_t hbm_read_bytes = 0;
         uint64_t hbm_write_bytes = 0;
@@ -577,6 +625,15 @@ private:
         const ExecutionPlan& plan,
         const SystemState& state,
         KeySwitchMethod method) const;
+
+    KeySwitchExecution BuildSharedSingleBoardPhysical(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state,
+        KeySwitchMethod method) const;
+
+    LogicalGraph BuildSharedSingleBoardLogicalGraph(
+        const KeySwitchMethodPolicy& policy) const;
 
     // Cinnamon 专用构建入口。
     KeySwitchExecution BuildCinnamon(

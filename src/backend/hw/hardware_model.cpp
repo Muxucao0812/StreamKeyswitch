@@ -78,10 +78,31 @@ uint64_t HardwareModel::EstimateTransferCycles(
             + EstimateTransferBodyCycles(bytes, config_.pcie_write_bytes_per_ns);
     case HardwareTransferPath::HBMToSPM:
     case HardwareTransferPath::SPMToHBM:
-        return TransferSetupCycles(config_.dma_setup_ns)
-            + EstimateTransferBodyCycles(bytes, config_.hbm_bytes_per_ns);
+        return TransferSetupCycles(config_.dma_setup_ns) + EstimateTransferBodyCycles(bytes, config_.hbm_bytes_per_ns);
     }
 
+    return 0;
+}
+
+uint64_t HardwareModel::EstimateBRAMReadCycles(uint64_t bytes) const {
+    if (bytes == 0) {
+        return 0;
+    }
+    return EstimateTransferBodyCycles(
+        bytes,
+        std::max(1.0, config_.hbm_bytes_per_ns * 4.0));
+}
+
+uint64_t HardwareModel::EstimateBRAMWriteCycles(uint64_t bytes) const {
+    if (bytes == 0) {
+        return 0;
+    }
+    return EstimateTransferBodyCycles(
+        bytes,
+        std::max(1.0, config_.hbm_bytes_per_ns * 4.0));
+}
+
+uint64_t HardwareModel::EstimateDirectForwardCycles(uint64_t /*bytes*/) const {
     return 0;
 }
 

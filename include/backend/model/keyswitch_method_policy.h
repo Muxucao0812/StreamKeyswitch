@@ -18,15 +18,13 @@ enum class KeySwitchProcessingGranularity : uint8_t {
 };
 
 enum class IntermediateStorageLevel : uint8_t {
-    RF = 0,
-    SRAM,
+    BRAM = 0,
     HBM
 };
 
 enum class StageConnectionMode : uint8_t {
     DirectForward = 0,
-    BufferInRF,
-    BufferInSRAM,
+    BufferInBRAM,
     SpillToHBM
 };
 
@@ -38,22 +36,22 @@ struct KeySwitchMethodPolicy {
     bool fuse_moddown_chain = false;
     bool fuse_cross_stage = false;
 
-    IntermediateStorageLevel input_pref_storage = IntermediateStorageLevel::SRAM;
-    IntermediateStorageLevel key_pref_storage   = IntermediateStorageLevel::SRAM;
+    IntermediateStorageLevel input_pref_storage = IntermediateStorageLevel::BRAM;
+    IntermediateStorageLevel key_pref_storage   = IntermediateStorageLevel::BRAM;
 
-    IntermediateStorageLevel modup_output_storage = IntermediateStorageLevel::SRAM;
-    IntermediateStorageLevel innerprod_output_storage = IntermediateStorageLevel::SRAM;
-    IntermediateStorageLevel reduction_output_storage = IntermediateStorageLevel::SRAM;
-    IntermediateStorageLevel moddown_temp_storage = IntermediateStorageLevel::SRAM;
+    IntermediateStorageLevel modup_output_storage = IntermediateStorageLevel::BRAM;
+    IntermediateStorageLevel innerprod_output_storage = IntermediateStorageLevel::BRAM;
+    IntermediateStorageLevel reduction_output_storage = IntermediateStorageLevel::BRAM;
+    IntermediateStorageLevel moddown_temp_storage = IntermediateStorageLevel::BRAM;
 
-    StageConnectionMode modup_to_innerprod = StageConnectionMode::BufferInSRAM;
-    StageConnectionMode innerprod_to_reduction = StageConnectionMode::BufferInSRAM;
-    StageConnectionMode reduction_to_moddown = StageConnectionMode::BufferInSRAM;
+    StageConnectionMode modup_to_innerprod = StageConnectionMode::BufferInBRAM;
+    StageConnectionMode innerprod_to_reduction = StageConnectionMode::BufferInBRAM;
+    StageConnectionMode reduction_to_moddown = StageConnectionMode::BufferInBRAM;
     StageConnectionMode moddown_to_subtract = StageConnectionMode::DirectForward;
 
     ReductionMode reduction_mode = ReductionMode::Centralized;
 
-    bool requires_large_rf = false;
+    bool requires_large_bram = false;
     bool supports_moddown_shortcut = false;
     bool supports_fused_final_subtract = false;
     bool supports_partial_reduction_overlap = false;
@@ -74,22 +72,22 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
         policy.fuse_moddown_chain = false;
         policy.fuse_cross_stage = false;
 
-        policy.input_pref_storage = IntermediateStorageLevel::SRAM;
+        policy.input_pref_storage = IntermediateStorageLevel::BRAM;
         policy.key_pref_storage = IntermediateStorageLevel::HBM;
 
         policy.modup_output_storage = IntermediateStorageLevel::HBM;
         policy.innerprod_output_storage = IntermediateStorageLevel::HBM;
         policy.reduction_output_storage = IntermediateStorageLevel::HBM;
-        policy.moddown_temp_storage = IntermediateStorageLevel::SRAM;
+        policy.moddown_temp_storage = IntermediateStorageLevel::BRAM;
 
         policy.modup_to_innerprod = StageConnectionMode::SpillToHBM;
         policy.innerprod_to_reduction = StageConnectionMode::SpillToHBM;
         policy.reduction_to_moddown = StageConnectionMode::SpillToHBM;
-        policy.moddown_to_subtract = StageConnectionMode::BufferInSRAM;
+        policy.moddown_to_subtract = StageConnectionMode::BufferInBRAM;
         
         policy.reduction_mode = ReductionMode::Centralized;
 
-        policy.requires_large_rf = false;
+        policy.requires_large_bram = false;
         policy.supports_moddown_shortcut = false;
         policy.supports_fused_final_subtract = false;
         policy.supports_partial_reduction_overlap = false;
@@ -106,22 +104,22 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
         policy.fuse_moddown_chain = false;
         policy.fuse_cross_stage = false;
 
-        policy.input_pref_storage = IntermediateStorageLevel::SRAM;
-        policy.key_pref_storage = IntermediateStorageLevel::SRAM;
+        policy.input_pref_storage = IntermediateStorageLevel::BRAM;
+        policy.key_pref_storage = IntermediateStorageLevel::BRAM;
 
-        policy.modup_output_storage = IntermediateStorageLevel::SRAM;
+        policy.modup_output_storage = IntermediateStorageLevel::BRAM;
         policy.innerprod_output_storage = IntermediateStorageLevel::HBM;
-        policy.reduction_output_storage = IntermediateStorageLevel::SRAM;
-        policy.moddown_temp_storage = IntermediateStorageLevel::SRAM;
+        policy.reduction_output_storage = IntermediateStorageLevel::BRAM;
+        policy.moddown_temp_storage = IntermediateStorageLevel::BRAM;
 
-        policy.modup_to_innerprod = StageConnectionMode::BufferInSRAM;
+        policy.modup_to_innerprod = StageConnectionMode::BufferInBRAM;
         policy.innerprod_to_reduction = StageConnectionMode::SpillToHBM;
-        policy.reduction_to_moddown = StageConnectionMode::BufferInSRAM;
+        policy.reduction_to_moddown = StageConnectionMode::BufferInBRAM;
         policy.moddown_to_subtract = StageConnectionMode::DirectForward;
 
         policy.reduction_mode = ReductionMode::Streaming;
 
-        policy.requires_large_rf = false;
+        policy.requires_large_bram = false;
         policy.supports_moddown_shortcut = false;
         policy.supports_fused_final_subtract = false;
         policy.supports_partial_reduction_overlap = true;
@@ -138,22 +136,22 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
         policy.fuse_moddown_chain = false;
         policy.fuse_cross_stage = true;
 
-        policy.input_pref_storage = IntermediateStorageLevel::SRAM;
-        policy.key_pref_storage = IntermediateStorageLevel::RF;
+        policy.input_pref_storage = IntermediateStorageLevel::BRAM;
+        policy.key_pref_storage = IntermediateStorageLevel::BRAM;
 
-        policy.modup_output_storage = IntermediateStorageLevel::RF;
-        policy.innerprod_output_storage = IntermediateStorageLevel::RF;
-        policy.reduction_output_storage = IntermediateStorageLevel::SRAM;
-        policy.moddown_temp_storage = IntermediateStorageLevel::SRAM;
+        policy.modup_output_storage = IntermediateStorageLevel::BRAM;
+        policy.innerprod_output_storage = IntermediateStorageLevel::BRAM;
+        policy.reduction_output_storage = IntermediateStorageLevel::BRAM;
+        policy.moddown_temp_storage = IntermediateStorageLevel::BRAM;
 
-        policy.modup_to_innerprod = StageConnectionMode::BufferInRF;
-        policy.innerprod_to_reduction = StageConnectionMode::BufferInRF;
-        policy.reduction_to_moddown = StageConnectionMode::BufferInSRAM;
-        policy.moddown_to_subtract = StageConnectionMode::BufferInSRAM;
+        policy.modup_to_innerprod = StageConnectionMode::BufferInBRAM;
+        policy.innerprod_to_reduction = StageConnectionMode::BufferInBRAM;
+        policy.reduction_to_moddown = StageConnectionMode::BufferInBRAM;
+        policy.moddown_to_subtract = StageConnectionMode::BufferInBRAM;
 
         policy.reduction_mode = ReductionMode::Streaming;
 
-        policy.requires_large_rf = true;
+        policy.requires_large_bram = true;
         policy.supports_moddown_shortcut = false;
         policy.supports_fused_final_subtract = false;
         policy.supports_partial_reduction_overlap = true;
@@ -169,22 +167,22 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
         policy.fuse_moddown_chain = false;
         policy.fuse_cross_stage = false;
 
-        policy.input_pref_storage = IntermediateStorageLevel::SRAM;
-        policy.key_pref_storage = IntermediateStorageLevel::SRAM;
+        policy.input_pref_storage = IntermediateStorageLevel::BRAM;
+        policy.key_pref_storage = IntermediateStorageLevel::BRAM;
 
-        policy.modup_output_storage = IntermediateStorageLevel::SRAM;
+        policy.modup_output_storage = IntermediateStorageLevel::BRAM;
         policy.innerprod_output_storage = IntermediateStorageLevel::HBM;
         policy.reduction_output_storage = IntermediateStorageLevel::HBM;
-        policy.moddown_temp_storage = IntermediateStorageLevel::SRAM;
+        policy.moddown_temp_storage = IntermediateStorageLevel::BRAM;
 
-        policy.modup_to_innerprod = StageConnectionMode::BufferInSRAM;
+        policy.modup_to_innerprod = StageConnectionMode::BufferInBRAM;
         policy.innerprod_to_reduction = StageConnectionMode::SpillToHBM;
         policy.reduction_to_moddown = StageConnectionMode::SpillToHBM;
-        policy.moddown_to_subtract = StageConnectionMode::BufferInSRAM;
+        policy.moddown_to_subtract = StageConnectionMode::BufferInBRAM;
 
         policy.reduction_mode = ReductionMode::Centralized;
 
-        policy.requires_large_rf = false;
+        policy.requires_large_bram = false;
         policy.supports_moddown_shortcut = false;
         policy.supports_fused_final_subtract = false;
         policy.supports_partial_reduction_overlap = false;
@@ -200,22 +198,22 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
         policy.fuse_moddown_chain = true;
         policy.fuse_cross_stage = true;
 
-        policy.input_pref_storage = IntermediateStorageLevel::SRAM;
-        policy.key_pref_storage = IntermediateStorageLevel::SRAM;
+        policy.input_pref_storage = IntermediateStorageLevel::BRAM;
+        policy.key_pref_storage = IntermediateStorageLevel::BRAM;
 
-        policy.modup_output_storage = IntermediateStorageLevel::RF;
-        policy.innerprod_output_storage = IntermediateStorageLevel::SRAM;
-        policy.reduction_output_storage = IntermediateStorageLevel::SRAM; 
-        policy.moddown_temp_storage = IntermediateStorageLevel::RF;
+        policy.modup_output_storage = IntermediateStorageLevel::BRAM;
+        policy.innerprod_output_storage = IntermediateStorageLevel::BRAM;
+        policy.reduction_output_storage = IntermediateStorageLevel::BRAM; 
+        policy.moddown_temp_storage = IntermediateStorageLevel::BRAM;
 
         policy.modup_to_innerprod = StageConnectionMode::DirectForward;
-        policy.innerprod_to_reduction = StageConnectionMode::BufferInSRAM;
-        policy.reduction_to_moddown = StageConnectionMode::BufferInSRAM;
+        policy.innerprod_to_reduction = StageConnectionMode::BufferInBRAM;
+        policy.reduction_to_moddown = StageConnectionMode::BufferInBRAM;
         policy.moddown_to_subtract = StageConnectionMode::DirectForward;
         
         policy.reduction_mode = ReductionMode::Streaming;
 
-        policy.requires_large_rf = false;
+        policy.requires_large_bram = false;
         policy.supports_moddown_shortcut = true;
         policy.supports_fused_final_subtract = false;
         policy.supports_partial_reduction_overlap = true;
@@ -233,22 +231,22 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
         policy.fuse_moddown_chain = false;
         policy.fuse_cross_stage = false;
 
-        policy.input_pref_storage = IntermediateStorageLevel::SRAM;
-        policy.key_pref_storage = IntermediateStorageLevel::SRAM;
+        policy.input_pref_storage = IntermediateStorageLevel::BRAM;
+        policy.key_pref_storage = IntermediateStorageLevel::BRAM;
 
-        policy.modup_output_storage = IntermediateStorageLevel::SRAM;
+        policy.modup_output_storage = IntermediateStorageLevel::BRAM;
         policy.innerprod_output_storage = IntermediateStorageLevel::HBM;
         policy.reduction_output_storage = IntermediateStorageLevel::HBM;
-        policy.moddown_temp_storage = IntermediateStorageLevel::SRAM;
+        policy.moddown_temp_storage = IntermediateStorageLevel::BRAM;
 
-        policy.modup_to_innerprod = StageConnectionMode::BufferInSRAM;
+        policy.modup_to_innerprod = StageConnectionMode::BufferInBRAM;
         policy.innerprod_to_reduction = StageConnectionMode::SpillToHBM;
         policy.reduction_to_moddown = StageConnectionMode::SpillToHBM;
-        policy.moddown_to_subtract = StageConnectionMode::BufferInSRAM;
+        policy.moddown_to_subtract = StageConnectionMode::BufferInBRAM;
 
         policy.reduction_mode = ReductionMode::Centralized;
 
-        policy.requires_large_rf = false;
+        policy.requires_large_bram = false;
         policy.supports_moddown_shortcut = false;
         policy.supports_fused_final_subtract = false;
         policy.supports_partial_reduction_overlap = false;
@@ -261,4 +259,3 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
         return ResolveMethodPolicy(KeySwitchMethod::Poseidon);
     }
 }
-

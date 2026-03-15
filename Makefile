@@ -12,9 +12,18 @@ RUN_SEED ?= 123
 RUN_NUM_CARDS ?= 1
 RUN_NUM_USERS ?= 1
 RUN_REQUESTS_PER_USER ?= 1
+ALWAYS_DUMP_LOGICAL_GRAPH ?= 1
+ALWAYS_DUMP_RUNTIME_PLAN ?= 1
 
 CPPFLAGS := -Iinclude
 CXXFLAGS := -std=c++17 -Wall -Wextra -Wpedantic -MMD -MP
+
+ifeq ($(ALWAYS_DUMP_LOGICAL_GRAPH),1)
+	CPPFLAGS += -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1
+endif
+ifeq ($(ALWAYS_DUMP_RUNTIME_PLAN),1)
+	CPPFLAGS += -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1
+endif
 
 ifeq ($(MODE),debug)
 	CXXFLAGS += -O0 -g
@@ -32,10 +41,10 @@ all: $(TARGET)
 
 make: all
 
-$(TARGET): $(OBJECTS)
+$(TARGET): $(OBJECTS) Makefile
 	$(CXX) $(OBJECTS) -o $@
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp Makefile
 	@mkdir -p $(dir $@)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
@@ -55,7 +64,7 @@ run: $(TARGET)
 			--ks-method "$$m" \
 			--seed $(RUN_SEED) \
 			--csv-output "$(RESULTS_DIR)/metrics_$$m.csv" \
-			> "$(RESULTS_DIR)/run_$$m.log" 2>&1; \
+			2>&1 | tee "$(RESULTS_DIR)/run_$$m.log"; \
 	done
 	@echo "Run completed. CSV/LOG files are under $(RESULTS_DIR)/"
 

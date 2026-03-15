@@ -23,17 +23,13 @@ struct CycleGroupTiming {
     uint64_t completed_instructions = 0;
     uint64_t dependency_wait_cycles = 0;
     uint64_t resource_wait_cycles = 0;
-    IntermediateStorageLevel input_storage = IntermediateStorageLevel::SRAM;
-    IntermediateStorageLevel output_storage = IntermediateStorageLevel::SRAM;
+    IntermediateStorageLevel input_storage = IntermediateStorageLevel::BRAM;
+    IntermediateStorageLevel output_storage = IntermediateStorageLevel::BRAM;
     bool fused_with_prev = false;
     bool fused_with_next = false;
     bool is_shortcut_path = false;
     uint64_t live_bytes_before = 0;
     uint64_t live_bytes_after = 0;
-    uint64_t rf_live_bytes_before = 0;
-    uint64_t rf_live_bytes_after = 0;
-    uint64_t sram_live_bytes_before = 0;
-    uint64_t sram_live_bytes_after = 0;
 
     uint64_t DurationCycles() const {
         return (finish_cycle > start_cycle) ? (finish_cycle - start_cycle) : 0;
@@ -56,9 +52,7 @@ struct CycleSimStats {
     uint64_t hbm_round_trips = 0;
     uint64_t spill_bytes = 0;
     uint64_t reload_bytes = 0;
-    uint64_t peak_on_chip_live_bytes = 0;
-    uint64_t peak_rf_live_bytes = 0;
-    uint64_t peak_sram_live_bytes = 0;
+    uint64_t peak_bram_live_bytes = 0;
     uint64_t dependency_stall_cycles = 0;
     uint64_t resource_stall_cycles = 0;
     std::array<uint64_t, kCycleInstructionKindCount> instruction_cycles{};

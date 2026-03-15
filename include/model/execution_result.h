@@ -69,7 +69,7 @@ struct ExecutionResult {
     double energy_nj = 0.0;
 
     // Peak memory metrics for primitive-cycle semantics.
-    // - peak_bram_bytes: BRAM occupancy peak from execution/tile model.
+    // - peak_bram_bytes: on-chip BRAM occupancy peak from execution/tile model.
     // - peak_hbm_bytes: coarse non-BRAM peak from primitive simulator memory model.
     // - peak_total_bytes: max(peak_bram_bytes, peak_hbm_bytes), the primary peak metric.
     uint64_t peak_bram_bytes = 0;
@@ -80,17 +80,23 @@ struct ExecutionResult {
 
     uint64_t hbm_read_bytes = 0;
     uint64_t hbm_write_bytes = 0;
+    uint64_t bram_read_bytes = 0;
+    uint64_t bram_write_bytes = 0;
     uint64_t key_host_to_hbm_bytes = 0;
     uint64_t key_hbm_to_bram_bytes = 0;
     uint64_t ct_hbm_to_bram_bytes = 0;
     uint64_t out_bram_to_hbm_bytes = 0;
     uint64_t hbm_round_trips = 0;
+    uint64_t compute_cycles = 0;
+    uint64_t transfer_cycles = 0;
+    uint64_t direct_forward_count = 0;
+    uint64_t direct_forward_bytes = 0;
+    uint64_t spill_count = 0;
+    uint64_t reload_count = 0;
     uint64_t spill_bytes = 0;
     uint64_t reload_bytes = 0;
     uint64_t working_set_bytes = 0;
     uint32_t tile_count = 0;
-    uint64_t peak_rf_bytes = 0;
-    uint64_t peak_sram_bytes = 0;
     uint64_t dependency_stall_cycles = 0;
     uint64_t resource_stall_cycles = 0;
     std::vector<Time> fine_step_cycles;

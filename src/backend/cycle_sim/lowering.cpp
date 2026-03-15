@@ -73,19 +73,6 @@ KeySwitchMethod ResolveLoweringMethod(const KeySwitchExecution& execution) {
     return execution.problem.method;
 }
 
-uint64_t PositiveDelta(uint64_t before, uint64_t after) {
-    return (after > before) ? (after - before) : 0;
-}
-
-int64_t NegativeTotalLiveDelta(
-    const BufferUsage& before,
-    const BufferUsage& after) {
-
-    return (before.total_live_bytes > after.total_live_bytes)
-        ? -static_cast<int64_t>(before.total_live_bytes - after.total_live_bytes)
-        : 0;
-}
-
 uint64_t InstructionCountForWorkItems(
     const KeySwitchProblem& problem,
     uint64_t work_items) {
@@ -173,10 +160,6 @@ uint32_t AppendGroup(
     uint64_t work_items,
     int64_t live_bytes_delta_on_issue,
     int64_t live_bytes_delta_on_complete,
-    int64_t rf_live_bytes_delta_on_issue,
-    int64_t rf_live_bytes_delta_on_complete,
-    int64_t sram_live_bytes_delta_on_issue,
-    int64_t sram_live_bytes_delta_on_complete,
     const std::vector<uint32_t>& dependencies,
     uint64_t* next_instruction_id,
     CycleProgram* program) {
@@ -202,14 +185,10 @@ uint32_t AppendGroup(
     group.is_shortcut_path = step.is_shortcut_path;
     group.bytes = bytes;
     group.work_items = work_items;
-    group.live_bytes_before = step.before.total_live_bytes;
-    group.live_bytes_after = step.after.total_live_bytes;
+    group.live_bytes_before = 0;
+    group.live_bytes_after = 0;
     group.live_bytes_delta_on_issue = live_bytes_delta_on_issue;
     group.live_bytes_delta_on_complete = live_bytes_delta_on_complete;
-    group.rf_live_bytes_delta_on_issue = rf_live_bytes_delta_on_issue;
-    group.rf_live_bytes_delta_on_complete = rf_live_bytes_delta_on_complete;
-    group.sram_live_bytes_delta_on_issue = sram_live_bytes_delta_on_issue;
-    group.sram_live_bytes_delta_on_complete = sram_live_bytes_delta_on_complete;
     group.dependencies = dependencies;
     group.instructions.reserve(static_cast<std::size_t>(instruction_count));
 
@@ -332,25 +311,19 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
     };
 
     auto storage_deltas = [](const TileExecutionStep& step) {
-        int64_t rf_issue = 0;
-        int64_t rf_complete = 0;
-        int64_t sram_issue = 0;
-        int64_t sram_complete = 0;
-        if (step.output_storage == IntermediateStorageLevel::RF) {
-            rf_issue += static_cast<int64_t>(step.output_bytes);
-        } else if (step.output_storage == IntermediateStorageLevel::SRAM) {
-            sram_issue += static_cast<int64_t>(step.output_bytes);
+        int64_t bram_issue = 0;
+        int64_t bram_complete = 0;
+        if (step.output_storage == IntermediateStorageLevel::BRAM) {
+            bram_issue += static_cast<int64_t>(step.output_bytes);
         }
 
         if (!step.fused_with_prev) {
-            if (step.input_storage == IntermediateStorageLevel::RF) {
-                rf_complete -= static_cast<int64_t>(step.input_bytes);
-            } else if (step.input_storage == IntermediateStorageLevel::SRAM) {
-                sram_complete -= static_cast<int64_t>(step.input_bytes);
+            if (step.input_storage == IntermediateStorageLevel::BRAM) {
+                bram_complete -= static_cast<int64_t>(step.input_bytes);
             }
         }
 
-        return std::array<int64_t, 4>{rf_issue, rf_complete, sram_issue, sram_complete};
+        return std::array<int64_t, 2>{bram_issue, bram_complete};
     };
 
     auto append_single_group = [&](const TileExecutionStep& step,
@@ -362,8 +335,6 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
                                    uint64_t work_items,
                                    const std::vector<uint32_t>& deps) {
         const auto deltas = storage_deltas(step);
-        const int64_t total_issue = deltas[0] + deltas[2];
-        const int64_t total_complete = deltas[1] + deltas[3];
         return AppendGroup(
             hardware_,
             execution.problem,
@@ -374,12 +345,8 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
             instruction_count,
             bytes,
             work_items,
-            total_issue,
-            total_complete,
             deltas[0],
             deltas[1],
-            deltas[2],
-            deltas[3],
             deps,
             &next_instruction_id,
             &result.program);
@@ -511,8 +478,6 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
 
         case TileExecutionStepType::KSInnerProdTile: {
             const auto deltas = storage_deltas(step);
-            const int64_t total_issue = deltas[0] + deltas[2];
-            const int64_t total_complete = deltas[1] + deltas[3];
             const uint64_t mul_instruction_count = std::max<uint64_t>(1, compute_instructions);
             const uint32_t mul_group = AppendGroup(
                 hardware_,
@@ -524,11 +489,7 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
                 mul_instruction_count,
                 /*bytes=*/0,
                 step.work_items,
-                total_issue,
-                0,
                 deltas[0],
-                0,
-                deltas[2],
                 0,
                 deps,
                 &next_instruction_id,
@@ -551,19 +512,13 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
                     /*bytes=*/0,
                     /*work_items=*/0,
                     0,
-                    total_complete,
-                    0,
                     deltas[1],
-                    0,
-                    deltas[3],
                     add_deps,
                     &next_instruction_id,
                     &result.program);
             } else {
                 // Release on the mul group when no follow-up add group exists.
-                result.program.groups[mul_group].live_bytes_delta_on_complete = total_complete;
-                result.program.groups[mul_group].rf_live_bytes_delta_on_complete = deltas[1];
-                result.program.groups[mul_group].sram_live_bytes_delta_on_complete = deltas[3];
+                result.program.groups[mul_group].live_bytes_delta_on_complete = deltas[1];
             }
             break;
         }
@@ -594,8 +549,6 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
 
         case TileExecutionStepType::AccumulateSubtractTile: {
             const auto deltas = storage_deltas(step);
-            const int64_t total_issue = deltas[0] + deltas[2];
-            const int64_t total_complete = deltas[1] + deltas[3];
             const uint64_t instruction_count = std::max<uint64_t>(1, compute_instructions);
             const uint32_t add_group = AppendGroup(
                 hardware_,
@@ -607,11 +560,7 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
                 instruction_count,
                 /*bytes=*/0,
                 step.work_items,
-                total_issue,
-                0,
                 deltas[0],
-                0,
-                deltas[2],
                 0,
                 deps,
                 &next_instruction_id,
@@ -629,11 +578,7 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
                 /*bytes=*/0,
                 step.work_items,
                 0,
-                total_complete,
-                0,
                 deltas[1],
-                0,
-                deltas[3],
                 sub_deps,
                 &next_instruction_id,
                 &result.program);
@@ -659,8 +604,7 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
         }
     }
 
-    result.program.estimated_peak_live_bytes =
-        std::max<uint64_t>(execution.predicted_rf_peak, execution.predicted_sram_peak);
+    result.program.estimated_peak_live_bytes = 0;
     result.valid = true;
     return result;
 }
@@ -678,7 +622,8 @@ CycleLowererSelector::CycleLowererSelector(const HardwareModel& hardware)
     : hardware_(hardware) {}
 
 CycleLoweringResult CycleLowererSelector::Lower(
-    const KeySwitchExecution& execution) const {
+    const KeySwitchExecution& execution
+) const {
 
     const KeySwitchMethod method = ResolveLoweringMethod(execution);
     switch (method) {
