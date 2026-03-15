@@ -84,8 +84,16 @@ struct ExecutionResult {
     uint64_t key_hbm_to_bram_bytes = 0;
     uint64_t ct_hbm_to_bram_bytes = 0;
     uint64_t out_bram_to_hbm_bytes = 0;
+    uint64_t hbm_round_trips = 0;
+    uint64_t spill_bytes = 0;
+    uint64_t reload_bytes = 0;
     uint64_t working_set_bytes = 0;
     uint32_t tile_count = 0;
+    uint64_t peak_rf_bytes = 0;
+    uint64_t peak_sram_bytes = 0;
+    uint64_t dependency_stall_cycles = 0;
+    uint64_t resource_stall_cycles = 0;
+    std::vector<Time> fine_step_cycles;
     bool key_resident_reuse = false;
     bool key_resident_hit = false;
     bool key_persistent_bram = false;
@@ -99,7 +107,7 @@ struct ExecutionResult {
     // - requested_method: method requested by input profile.
     // - effective_method: method actually used by execution model.
     // - method_degraded=true indicates successful execution with changed method.
-    //   Example: requested ScaleOutLimb but effective SingleBoardClassic.
+    //   Example: requested Cinnamon but effective Poseidon.
     // - degraded_reason explains why method_degraded happened.
     KeySwitchMethod requested_method = KeySwitchMethod::Auto;
     KeySwitchMethod effective_method = KeySwitchMethod::Auto;

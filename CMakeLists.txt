@@ -16,6 +16,10 @@ set(KEYAWARE_CORE_SOURCES
     src/common/he_params_loader.cpp
     src/model/workload.cpp
     src/search/tree_search.cpp
+    src/backend/hw/hardware_model.cpp
+    src/backend/cycle_sim/arch.cpp
+    src/backend/cycle_sim/driver.cpp
+    src/backend/cycle_sim/lowering.cpp
     src/backend/model/keyswitch_execution_model.cpp
     src/backend/primitive_simulator.cpp
     src/backend/cycle_backend.cpp
@@ -54,28 +58,52 @@ target_compile_options(keyaware_sim PRIVATE
 )
 
 if(BUILD_TESTING)
-    add_executable(keyaware_unit_tests
-        tests/unit_tests.cpp
+    add_executable(keyaware_cycle_tests
+        tests/cycle_sim_tests.cpp
     )
-    target_link_libraries(keyaware_unit_tests PRIVATE keyaware_core)
-    target_include_directories(keyaware_unit_tests PRIVATE tests)
-    target_compile_options(keyaware_unit_tests PRIVATE
+    target_link_libraries(keyaware_cycle_tests PRIVATE keyaware_core)
+    target_include_directories(keyaware_cycle_tests PRIVATE tests)
+    target_compile_options(keyaware_cycle_tests PRIVATE
         -Wall
         -Wextra
         -Wpedantic
     )
+    add_test(NAME keyaware_cycle_tests COMMAND keyaware_cycle_tests)
 
-    add_executable(keyaware_regression_tests
-        tests/regression_tests.cpp
-    )
-    target_link_libraries(keyaware_regression_tests PRIVATE keyaware_core)
-    target_include_directories(keyaware_regression_tests PRIVATE tests)
-    target_compile_options(keyaware_regression_tests PRIVATE
-        -Wall
-        -Wextra
-        -Wpedantic
-    )
+    set(KEYAWARE_HAS_LEGACY_TEST_BACKENDS TRUE)
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/backend/analytical_backend.h")
+        set(KEYAWARE_HAS_LEGACY_TEST_BACKENDS FALSE)
+    endif()
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/backend/table_backend.h")
+        set(KEYAWARE_HAS_LEGACY_TEST_BACKENDS FALSE)
+    endif()
 
-    add_test(NAME keyaware_unit_tests COMMAND keyaware_unit_tests)
-    add_test(NAME keyaware_regression_tests COMMAND keyaware_regression_tests)
+    if(KEYAWARE_HAS_LEGACY_TEST_BACKENDS)
+        add_executable(keyaware_unit_tests
+            tests/unit_tests.cpp
+        )
+        target_link_libraries(keyaware_unit_tests PRIVATE keyaware_core)
+        target_include_directories(keyaware_unit_tests PRIVATE tests)
+        target_compile_options(keyaware_unit_tests PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+        )
+
+        add_executable(keyaware_regression_tests
+            tests/regression_tests.cpp
+        )
+        target_link_libraries(keyaware_regression_tests PRIVATE keyaware_core)
+        target_include_directories(keyaware_regression_tests PRIVATE tests)
+        target_compile_options(keyaware_regression_tests PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+        )
+
+        add_test(NAME keyaware_unit_tests COMMAND keyaware_unit_tests)
+        add_test(NAME keyaware_regression_tests COMMAND keyaware_regression_tests)
+    else()
+        message(STATUS "Skipping legacy unit/regression tests: analytical/table backends are unavailable in this tree")
+    endif()
 endif()

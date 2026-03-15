@@ -1,11 +1,13 @@
 #pragma once
 
+#include "backend/model/keyswitch_method_policy.h"
 #include "model/execution_result.h"
 #include "model/keyswitch_reason.h"
 #include "model/request.h"
 #include "model/stage.h"
 #include "model/system_state.h"
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 
@@ -198,6 +200,18 @@ enum class TileExecutionStepType : uint8_t {
     KeyLoadHostToHBM,
     KeyLoadHBMToBRAM,
     InputHBMToBRAM,
+    KeyHBMToBRAM,
+    ModUpInttTile,
+    ModUpBConvTile,
+    ModUpNttTile,
+    CrossDigitReduceTile,
+    IntermediateBRAMToHBM,
+    IntermediateHBMToBRAM,
+    ModDownInttTile,
+    ModDownBConvTile,
+    ModDownNttTile,
+    FinalSubtractTile,
+    // Legacy single-board compatibility step types.
     DecomposeTile,
     NttTile,
     KSInnerProdTile,
@@ -211,15 +225,26 @@ enum class TileExecutionStepType : uint8_t {
     BarrierStep,
     // Legacy compatibility step types.
     // They are reserved for compatibility adapters only and must not be emitted
-    // by the method-aware main path (SingleBoardClassic / ScaleOutLimb).
+    // by the method-aware main path (single-board / Cinnamon).
     InterCardCommTile,
     InterCardBarrier,
     Merge
 };
 
+inline constexpr std::size_t kTileExecutionStepTypeCount =
+    static_cast<std::size_t>(TileExecutionStepType::Merge) + 1;
+
+inline constexpr std::size_t ToIndex(TileExecutionStepType type) {
+    return static_cast<std::size_t>(type);
+}
+
 struct TileExecutionStep {
+    uint64_t step_id = 0;
     TileExecutionStepType type = TileExecutionStepType::InputHBMToBRAM;
     StageType stage_type = StageType::Dispatch;
+    uint32_t tile_idx = 0;
+    uint32_t digit_idx = 0;
+    uint32_t limb_idx = 0;
     uint32_t ct_tile_index = 0;
     uint32_t limb_tile_index = 0;
     uint32_t digit_tile_index = 0;
@@ -230,8 +255,16 @@ struct TileExecutionStep {
     uint32_t barrier_group = 0;
     uint64_t bytes = 0;
     uint64_t work_items = 0;
+    uint64_t input_bytes = 0;
+    uint64_t output_bytes = 0;
+    IntermediateStorageLevel input_storage = IntermediateStorageLevel::SRAM;
+    IntermediateStorageLevel output_storage = IntermediateStorageLevel::SRAM;
+    bool fused_with_prev = false;
+    bool fused_with_next = false;
+    bool is_shortcut_path = false;
     bool key_hit = false;
     bool key_persistent = false;
+    std::vector<uint64_t> depends_on;
     BufferUsage before;
     BufferUsage after;
 };
@@ -266,10 +299,18 @@ struct KeySwitchExecution {
     uint64_t peak_bram_bytes = 0;
     PeakBufferUsage peak_buffers;
     TileCostBreakdown tile_cost;
+    KeySwitchMethodPolicy policy;
 
     KeySwitchProblem problem;
     TilePlan tile_plan;
     std::vector<TileExecutionStep> steps;
+    std::vector<uint64_t> modup_step_ids;
+    std::vector<uint64_t> innerprod_step_ids;
+    std::vector<uint64_t> reduction_step_ids;
+    std::vector<uint64_t> moddown_step_ids;
+    uint64_t predicted_hbm_bytes = 0;
+    uint64_t predicted_rf_peak = 0;
+    uint64_t predicted_sram_peak = 0;
 };
 
 class KeySwitchExecutionModel {
@@ -285,27 +326,84 @@ public:
 
     // Method-aware dispatcher.
     // Supported methods:
-    // - SingleBoardClassic
-    // - ScaleOutLimb
-    // Other methods are returned as explicit UnsupportedMethod fallback.
+    // - Poseidon / OLA / FAB / FAST / HERA via the shared single-board builder
+    // - Cinnamon
+    // Unsupported methods are returned as explicit UnsupportedMethod fallback.
     KeySwitchExecution Build(
         const Request& req,
         const ExecutionPlan& plan,
         const SystemState& state) const;
 
     // Single-board keyswitch builder path.
+    // Used by Poseidon / OLA / FAB / FAST / HERA.
     KeySwitchExecution BuildSingleBoard(
         const Request& req,
         const ExecutionPlan& plan,
         const SystemState& state) const;
 
-    // Scale-out-by-limb keyswitch builder path.
-    KeySwitchExecution BuildScaleOutLimb(
-        const Request& req,
-        const ExecutionPlan& plan,
-        const SystemState& state) const;
-
 private:
+    struct BuildContext {
+        KeySwitchExecution* execution = nullptr;
+        uint64_t next_step_id = 1;
+        uint64_t rf_live_bytes = 0;
+        uint64_t sram_live_bytes = 0;
+        uint64_t rf_peak_bytes = 0;
+        uint64_t sram_peak_bytes = 0;
+    };
+
+    uint64_t AppendStep(
+        BuildContext* ctx,
+        TileExecutionStep step) const;
+
+    std::vector<uint64_t> BuildModUpSubgraph(
+        BuildContext* ctx,
+        uint32_t ct_idx,
+        uint32_t limb_idx,
+        uint32_t digit_idx,
+        uint64_t ct_chunk_bytes,
+        uint64_t work_items,
+        const KeySwitchMethodPolicy& policy,
+        const std::vector<uint64_t>& deps) const;
+
+    std::vector<uint64_t> BuildInnerProdSubgraph(
+        BuildContext* ctx,
+        uint32_t ct_idx,
+        uint32_t limb_idx,
+        uint32_t digit_idx,
+        uint64_t key_chunk_bytes,
+        uint64_t work_items,
+        const KeySwitchMethodPolicy& policy,
+        const std::vector<uint64_t>& deps) const;
+
+    std::vector<uint64_t> BuildReductionSubgraph(
+        BuildContext* ctx,
+        uint32_t ct_idx,
+        uint32_t limb_idx,
+        uint64_t work_items,
+        const KeySwitchMethodPolicy& policy,
+        const std::vector<uint64_t>& deps) const;
+
+    std::vector<uint64_t> BuildModDownSubgraph(
+        BuildContext* ctx,
+        uint32_t ct_idx,
+        uint32_t limb_idx,
+        uint64_t out_bytes,
+        uint64_t work_items,
+        const KeySwitchMethodPolicy& policy,
+        const std::vector<uint64_t>& deps) const;
+
+    std::vector<uint64_t> ConnectSubgraphsWithPolicy(
+        BuildContext* ctx,
+        uint32_t ct_idx,
+        uint32_t limb_idx,
+        uint32_t digit_idx,
+        StageConnectionMode mode,
+        uint64_t bytes,
+        const std::vector<uint64_t>& deps) const;
+
+    void FinalizeExecution(
+        BuildContext* ctx) const;
+
     // Method dispatcher helper.
     // Returns a fully formed execution for supported methods, or explicit
     // unsupported fallback for unimplemented methods.
@@ -330,6 +428,17 @@ private:
         KeySwitchMethod requested_method,
         KeySwitchMethod effective_method
     ) const;
+
+    KeySwitchExecution BuildSharedSingleBoardMethod(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state,
+        KeySwitchMethod method) const;
+
+    KeySwitchExecution BuildCinnamon(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state) const;
 
 private:
     KeySwitchExecutionModelParams params_;

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "backend/execution_backend.h"
+#include "backend/hw/hardware_model.h"
+#include "backend/model/keyswitch_execution_model.h"
 #include "backend/primitive_simulator.h"
 
 #include <cstdint>
@@ -57,7 +59,15 @@ private:
         const ExecutionPlan& plan,
         const SystemState& state) const;
 
+    ExecutionResult EstimateMethod(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state,
+        KeySwitchMethod method) const;
+
 private:
-    PrimitiveSimulatorStub primitive_simulator_;
+    KeySwitchExecutionModel execution_model_;
+    HardwareModel hw_model_;
+    [[maybe_unused]] PrimitiveSimulatorStub primitive_simulator_;
     mutable CycleBackendStats stats_;
 };

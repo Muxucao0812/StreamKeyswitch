@@ -9,10 +9,7 @@ inline KeySwitchMethod ResolveKeySwitchMethodForAssignedCards(
     size_t assigned_cards) {
 
     if (requested_method == KeySwitchMethod::Auto) {
-        return (assigned_cards > 1)
-            ? KeySwitchMethod::ScaleOutLimb
-            : KeySwitchMethod::SingleBoardClassic;
+        return (assigned_cards > 1) ? KeySwitchMethod::Cinnamon : KeySwitchMethod::Poseidon;
     }
     return requested_method;
 }
-
