@@ -1,4 +1,5 @@
 #include "backend/model/keyswitch_execution_model.h"
+#include "backend/runtime_planner.h"
 #include "model/keyswitch_method_resolver.h"
 
 #include <algorithm>
@@ -2355,386 +2356,40 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSharedSingleBoardPhysical(
     const SystemState& state,
     KeySwitchMethod method
 ) const {
-
-    // 仅允许进入“共享单板路径”的方法（Poseidon/OLA/FAB/FAST/HERA）。
-    // 若调用方传入了不支持的方法，直接返回 UnsupportedMethod，避免后续构图污染。
-    if (!IsSharedSingleBoardMethod(method)) {
-        return BuildUnsupportedMethod(req.ks_profile.method, method);
-    }
-
-    // 初始化执行结果骨架：
-    // 1) valid 先置 false，只有完整构图结束后再判定；
-    // 2) 该路径默认是 tile 化执行；
-    // 3) requested/effective/method 三个字段分别用于“用户请求/解析后方法/当前构建方法”。
-    KeySwitchExecution execution;
-    execution.valid = false;
-    execution.tiled_execution = true;
-    execution.fallback_used = false;
-    execution.fallback_reason = KeySwitchFallbackReason::None;
-    execution.method = method;
-    execution.requested_method = req.ks_profile.method;
-    execution.effective_method = method;
-    execution.method_degraded = false;
-    execution.degraded_reason = KeySwitchFallbackReason::None;
-
-    // 基于目标方法构造“单板语义”的请求副本：
-    // - 强制单卡（scale_out_cards=1）；
-    // - 禁用跨卡 merge/reduce；
-    // - key 放置策略固定为从 HBM 流式加载；
-    // 这样 BuildProblem 的输入约束与本函数路径保持一致。
-    Request method_req = req;
-    method_req.ks_profile.method = method;
-    method_req.ks_profile.partition = PartitionStrategy::None;
-    method_req.ks_profile.collective = CollectiveStrategy::None;
-    method_req.ks_profile.key_placement = KeyPlacement::StreamFromHBM;
-    method_req.ks_profile.scale_out_cards = 1;
-    method_req.ks_profile.enable_inter_card_merge = false;
-    method_req.ks_profile.allow_cross_card_reduce = false;
-
-    // 组装一个“单卡执行计划”：
-    // 如果上游分配了多卡，这里只取第一张卡作为本路径落点。
-    ExecutionPlan single_plan;
-    single_plan.request_id = plan.request_id;
-    if(!plan.assigned_cards.empty()){
-        single_plan.assigned_cards.push_back(plan.assigned_cards.front());
-    }
-
-    // 构建标准化问题规模（多项式规模、输入输出字节、工作集、驻留命中等）。
-    execution.problem = BuildProblem(method_req, single_plan, state);
-    execution.problem.method = method;
-    execution.problem.cards = 1;
-    execution.working_set_bytes = execution.problem.working_set_bytes;
-    execution.key_resident_hit = execution.problem.key_resident_hit;
-
-    // 没有可用卡等场景会导致 problem 无效，直接走 fallback。
-    if (!execution.problem.valid) {
-        execution.fallback_used = true;
-        execution.fallback_reason = KeySwitchFallbackReason::NoAssignedCard;
+    KeySwitchExecution execution = BuildSharedSingleBoardMethod(req, plan, state, method);
+    if (!execution.valid) {
         return execution;
     }
 
-    // 解析该方法对应的调度/连接策略，并基于问题规模生成 tile 计划。
-    execution.policy = ResolveMethodPolicy(method);
-    execution.tile_plan = planner_.Plan(execution.problem);
-    // tile 计划失败通常表示资源/粒度约束冲突，直接上抛 fallback。
-    if (!execution.tile_plan.valid) {
+    RuntimePlanner runtime_planner(params_.tile_planner);
+    const RuntimePlan runtime_plan = runtime_planner.Plan(execution);
+    if (!runtime_plan.valid) {
+        execution.valid = false;
         execution.fallback_used = true;
         execution.fallback_reason = KeySwitchFallbackReason::TilePlanInvalid;
         return execution;
     }
 
-    // 记录 tile 计划输出的核心元信息，供后续结果汇总/诊断使用。
-    execution.key_persistent_bram = execution.tile_plan.key_persistent;
-    execution.tile_count = execution.tile_plan.total_tile_count;
+    execution.tiled_execution = true;
+    execution.fallback_used = false;
+    execution.fallback_reason = KeySwitchFallbackReason::None;
+    execution.tile_plan = runtime_plan.tile_plan;
+    execution.steps = runtime_plan.steps;
+    execution.tile_count = runtime_plan.tile_count;
+    execution.key_persistent_bram = runtime_plan.key_persistent_bram;
+    execution.key_resident_hit = runtime_plan.key_resident_hit;
+    execution.working_set_bytes = runtime_plan.working_set_bytes;
+    execution.key_host_to_hbm_bytes = runtime_plan.key_host_to_hbm_bytes;
+    execution.key_hbm_to_bram_bytes = runtime_plan.key_hbm_to_bram_bytes;
+    execution.ct_hbm_to_bram_bytes = runtime_plan.ct_hbm_to_bram_bytes;
+    execution.out_bram_to_hbm_bytes = runtime_plan.out_bram_to_hbm_bytes;
     execution.tile_cost = execution.tile_plan.cost;
-
-    // BuildContext 维护 step_id 分配、live/peak 字节统计，以及 HBM 读写累计。
-    BuildContext ctx;
-    ctx.execution = &execution;
-
-    // 可选阶段 A：若 key 没有驻留命中，先建一个 Host->HBM 的整块 key 预加载步骤。
-    // 后续按 tile 加载 key 时，会依赖该步骤，保证数据来源有序。
-    uint64_t host_key_step_id = 0;
-    if (!execution.problem.key_resident_hit) {
-        TileExecutionStep host_key = MakeStep(
-            TileExecutionStepType::KeyLoadHostToHBM,
-            StageType::KeyLoad,
-            /*ct_idx=*/0,
-            /*limb_idx=*/0,
-            /*digit_idx=*/0,
-            execution.problem.key_bytes,
-            execution.problem.key_bytes,
-            /*work_items=*/1,
-            IntermediateStorageLevel::HBM,
-            IntermediateStorageLevel::HBM);
-        host_key.key_hit = false;
-        host_key.key_persistent = false;
-        host_key.bytes = execution.problem.key_bytes;
-        host_key_step_id = AppendStep(&ctx, host_key);
-        execution.key_host_to_hbm_bytes += execution.problem.key_bytes;
-    }
-
-    // 可选阶段 B：若策略允许 key 常驻，则一次性把整块 key 从 HBM 放到片上存储。
-    // 后续所有 inner-product 只依赖这个常驻步骤，不再重复按 tile 拉 key。
-    uint64_t persistent_key_step_id = 0;
-    if (execution.tile_plan.key_persistent) {
-        TileExecutionStep persistent_key = MakeStep(
-            TileExecutionStepType::KeyHBMToBRAM,
-            StageType::KeyLoad,
-            /*ct_idx=*/0,
-            /*limb_idx=*/0,
-            /*digit_idx=*/0,
-            execution.problem.key_bytes,
-            execution.problem.key_bytes,
-            /*work_items=*/1,
-            IntermediateStorageLevel::HBM,
-            execution.policy.key_pref_storage);
-        persistent_key.key_hit = true;
-        persistent_key.key_persistent = true;
-        if (host_key_step_id != 0) {
-            persistent_key.depends_on.push_back(host_key_step_id);
-        }
-        persistent_key.bytes = execution.problem.key_bytes;
-        persistent_key_step_id = AppendStep(&ctx, persistent_key);
-        execution.key_hbm_to_bram_bytes += execution.problem.key_bytes;
-    }
-
-    // 三维 tile 空间大小（至少为 1，避免出现 0 维导致循环不进入）。
-    const uint32_t ct_tiles = std::max<uint32_t>(1, execution.tile_plan.ct_tiles);
-    const uint32_t limb_tiles = std::max<uint32_t>(1, execution.tile_plan.limb_tiles);
-    const uint32_t digit_tiles = std::max<uint32_t>(1, execution.tile_plan.digit_tiles);
-
-    // 构建一个 (ct_tile, limb_tile, digit_tile) 组合的完整子图：
-    // InputLoad -> ModUp -> (KeyLoad/KeyReuse) -> InnerProduct
-    // 返回该组合 inner-product 子图的 terminal step_id，供后续 reduction 使用。
-    auto run_pair = [&](uint32_t ct_idx, uint32_t limb_idx, uint32_t digit_idx) -> uint64_t {
-        // 计算本 tile 在边界处的真实大小（最后一块可能小于标准 tile）。
-        const uint32_t ct_remain =
-            execution.problem.ciphertexts - ct_idx * execution.tile_plan.ct_tile;
-        const uint32_t ct_now = std::min<uint32_t>(execution.tile_plan.ct_tile, ct_remain);
-
-        const uint32_t limb_remain =
-            execution.problem.limbs - limb_idx * execution.tile_plan.limb_tile;
-        const uint32_t limb_now = std::min<uint32_t>(execution.tile_plan.limb_tile, limb_remain);
-
-        const uint32_t digit_remain =
-            execution.problem.digits - digit_idx * execution.tile_plan.digit_tile;
-        const uint32_t digit_now = std::min<uint32_t>(execution.tile_plan.digit_tile, digit_remain);
-
-        // 估算该组合对应的数据量：
-        // - ct_chunk_bytes: 输入密文分块字节
-        // - key_chunk_bytes: key 分块字节（由 limb/digit 决定）
-        const uint64_t ct_chunk_bytes =
-            static_cast<uint64_t>(ct_now) * limb_now * execution.problem.ct_limb_bytes;
-        const uint64_t key_chunk_bytes =
-            static_cast<uint64_t>(limb_now) * digit_now * execution.problem.key_digit_limb_bytes;
-
-        // 估算工作量：
-        // - decompose_work: mod-up/decompose 主工作量
-        // - inner_work: inner-product 额外乘上多项式数量
-        const uint64_t decompose_work =
-            static_cast<uint64_t>(ct_now)
-            * static_cast<uint64_t>(limb_now)
-            * static_cast<uint64_t>(digit_now)
-            * static_cast<uint64_t>(execution.problem.poly_modulus_degree);
-
-        const uint64_t inner_work =
-            decompose_work * static_cast<uint64_t>(execution.problem.polys);
-
-        // 1) Input load: 把本 tile 的输入密文从 HBM 拉到片上。
-        TileExecutionStep input = MakeStep(
-            TileExecutionStepType::InputHBMToBRAM,
-            StageType::Dispatch,
-            ct_idx, limb_idx, digit_idx,
-            ct_chunk_bytes,
-            ct_chunk_bytes,
-            /*work_items=*/1,
-            IntermediateStorageLevel::HBM,
-            execution.policy.input_pref_storage);
-        input.bytes = ct_chunk_bytes;
-        uint64_t input_id = AppendStep(&ctx, input);
-        execution.ct_hbm_to_bram_bytes += ct_chunk_bytes;
-
-        // 2) ModUp 子图：以 input 为依赖起点，生成分解/基变换步骤。
-        std::vector<uint64_t> modup_deps = {input_id};
-        auto modup_ids = BuildModUpSubgraph(
-            &ctx,
-            ct_idx,
-            limb_idx,
-            digit_idx,
-            ct_chunk_bytes,
-            decompose_work,
-            execution.policy,
-            modup_deps);
-
-        // 3) 按策略连接 ModUp -> InnerProduct 的边（可能插入同步/过渡节点）。
-        auto inner_deps = ConnectSubgraphsWithPolicy(
-            &ctx,
-            ct_idx,
-            limb_idx,
-            digit_idx,
-            execution.policy.modup_to_innerprod,
-            ct_chunk_bytes,
-            {modup_ids.back()});
-
-        // 4) Key 依赖注入：
-        // - key 常驻：直接依赖 persistent_key_step_id；
-        // - 非常驻：为当前组合新建一次 KeyHBMToBRAM 步骤并挂到 inner_deps。
-        if (execution.tile_plan.key_persistent && persistent_key_step_id != 0) {
-            AddDependencyId(&inner_deps, persistent_key_step_id);
-        } else {
-            TileExecutionStep key_load = MakeStep(
-                TileExecutionStepType::KeyHBMToBRAM,
-                StageType::KeyLoad,
-                ct_idx, limb_idx, digit_idx,
-                key_chunk_bytes,
-                key_chunk_bytes,
-                /*work_items=*/1,
-                IntermediateStorageLevel::HBM,
-                execution.policy.key_pref_storage);
-            key_load.bytes = key_chunk_bytes;
-            if (host_key_step_id != 0) {
-                key_load.depends_on.push_back(host_key_step_id);
-            }
-            uint64_t key_load_id = AppendStep(&ctx, key_load);
-            execution.key_hbm_to_bram_bytes += key_chunk_bytes;
-            AddDependencyId(&inner_deps, key_load_id);
-        }
-
-        // 5) InnerProduct 子图：完成本组合的核心乘加计算，返回 terminal id。
-        auto inner_ids = BuildInnerProdSubgraph(
-            &ctx,
-            ct_idx,
-            limb_idx,
-            digit_idx,
-            key_chunk_bytes,
-            inner_work,
-            execution.policy,
-            inner_deps);
-
-        return inner_ids.back();
-    };
-
-    // 遍历顺序由策略决定：
-    // - Digit 优先：先 digit 后 limb（提高 digit 局部性）；
-    // - 否则：先 limb 后 digit（更贴近常规块处理顺序）。
-    // all_inner_terminals 收集所有 inner 子图终点，供 reduction 统一消费。
-    std::vector<uint64_t> all_inner_terminals;
-    if (execution.policy.granularity == KeySwitchProcessingGranularity::Digit
-        || execution.policy.prefer_digit_locality) {
-        for (uint32_t ct_idx = 0; ct_idx < ct_tiles; ++ct_idx) {
-            for (uint32_t digit_idx = 0; digit_idx < digit_tiles; ++digit_idx) {
-                for (uint32_t limb_idx = 0; limb_idx < limb_tiles; ++limb_idx) {
-                    all_inner_terminals.push_back(run_pair(ct_idx, limb_idx, digit_idx));
-                }
-            }
-        }
-    } else {
-        for (uint32_t ct_idx = 0; ct_idx < ct_tiles; ++ct_idx) {
-            for (uint32_t limb_idx = 0; limb_idx < limb_tiles; ++limb_idx) {
-                for (uint32_t digit_idx = 0; digit_idx < digit_tiles; ++digit_idx) {
-                    all_inner_terminals.push_back(run_pair(ct_idx, limb_idx, digit_idx));
-                }
-            }
-        }
-    }
-
-    // Reduction 阶段：把多个 inner-term 合并为可进入 ModDown 的结果。
-    // 三种模式分别适配不同的并行度/延迟权衡。
-    std::vector<uint64_t> reduction_terminals;
-    switch (execution.policy.reduction_mode) {
-    case ReductionMode::Centralized: {
-        // 集中式：一次性把全部 inner 结果送入一个 reduction 子图。
-        auto reduce_ids = BuildReductionSubgraph(
-            &ctx,
-            /*ct_idx=*/0,
-            /*limb_idx=*/0,
-            execution.problem.poly_modulus_degree,
-            execution.policy,
-            all_inner_terminals);
-        reduction_terminals = reduce_ids;
-        break;
-    }
-    case ReductionMode::Streaming: {
-        // 流式：按序滚动归并，每次把“当前 inner + 上一轮归并结果”继续合并。
-        uint64_t rolling_reduce = 0;
-        for (uint64_t inner_id : all_inner_terminals) {
-            std::vector<uint64_t> deps = {inner_id};
-            if (rolling_reduce != 0) {
-                deps.push_back(rolling_reduce);
-            }
-            auto reduce_ids = BuildReductionSubgraph(
-                &ctx,
-                /*ct_idx=*/0,
-                /*limb_idx=*/0,
-                execution.problem.poly_modulus_degree,
-                execution.policy,
-                deps);
-            rolling_reduce = reduce_ids.back();
-        }
-        if (rolling_reduce != 0) {
-            reduction_terminals = {rolling_reduce};
-        }
-        break;
-    }
-    case ReductionMode::Hierarchical: {
-        // 分层：先按 digit 分组做局部归并，再做一次全局归并。
-        // 这样可以降低单次归并扇入，提升大规模场景可扩展性。
-        std::vector<uint64_t> local_reduces;
-        const uint32_t groups = std::max<uint32_t>(1, digit_tiles);
-        for (uint32_t g = 0; g < groups; ++g) {
-            std::vector<uint64_t> group_ids;
-            for (std::size_t idx = g; idx < all_inner_terminals.size(); idx += groups) {
-                group_ids.push_back(all_inner_terminals[idx]);
-            }
-            if (!group_ids.empty()) {
-                auto local_ids = BuildReductionSubgraph(
-                    &ctx,
-                    /*ct_idx=*/0,
-                    /*limb_idx=*/g,
-                    execution.problem.poly_modulus_degree,
-                    execution.policy,
-                    group_ids);
-                local_reduces.push_back(local_ids.back());
-            }
-        }
-        auto final_ids = BuildReductionSubgraph(
-            &ctx,
-            /*ct_idx=*/0,
-            /*limb_idx=*/0,
-            execution.problem.poly_modulus_degree,
-            execution.policy,
-            local_reduces);
-        reduction_terminals = final_ids;
-        break;
-    }
-    }
-
-    // ModDown 阶段：
-    // 先根据策略连接 Reduction -> ModDown，再构建 ModDown 子图。
-    const uint64_t moddown_input_bytes = execution.policy.supports_moddown_shortcut
-        ? std::max<uint64_t>(1, execution.problem.output_bytes / 2)
-        : execution.problem.output_bytes;
-    auto moddown_deps = ConnectSubgraphsWithPolicy(
-        &ctx,
-        /*ct_idx=*/0,
-        /*limb_idx=*/0,
-        /*digit_idx=*/0,
-        execution.policy.reduction_to_moddown,
-        moddown_input_bytes,
-        reduction_terminals);
-
-    auto moddown_ids = BuildModDownSubgraph(
-        &ctx,
-        /*ct_idx=*/0,
-        /*limb_idx=*/0,
-        execution.problem.output_bytes,
-        static_cast<uint64_t>(execution.problem.polys) * execution.problem.poly_modulus_degree,
-        execution.policy,
-        moddown_deps);
-
-    // 输出落盘（片上 -> HBM），依赖最后一个 moddown step。
-    TileExecutionStep output = MakeStep(
-        TileExecutionStepType::OutputBRAMToHBM,
-        StageType::Dispatch,
-        /*ct_idx=*/0,
-        /*limb_idx=*/0,
-        /*digit_idx=*/0,
-        execution.problem.output_bytes,
-        execution.problem.output_bytes,
-        /*work_items=*/1,
-        IntermediateStorageLevel::BRAM,
-        IntermediateStorageLevel::HBM);
-    output.bytes = execution.problem.output_bytes;
-    output.depends_on = {moddown_ids.back()};
-    AppendStep(&ctx, output);
-    execution.out_bram_to_hbm_bytes += execution.problem.output_bytes;
-
-    // 收尾：回填峰值/流量统计与步骤汇总。
-    FinalizeExecution(&ctx);
-    // 只要成功构建出步骤序列，即认为 execution 有效。
+    execution.predicted_hbm_bytes =
+        execution.key_host_to_hbm_bytes
+        + execution.key_hbm_to_bram_bytes
+        + execution.ct_hbm_to_bram_bytes
+        + execution.out_bram_to_hbm_bytes;
     execution.valid = !execution.steps.empty();
-
     return execution;
 }
 

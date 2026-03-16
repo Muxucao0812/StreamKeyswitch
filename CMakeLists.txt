@@ -88,6 +88,18 @@ if(BUILD_TESTING)
     )
     add_test(NAME keyaware_cycle_tests COMMAND keyaware_cycle_tests)
 
+    add_executable(keyaware_runtime_plan_tests
+        tests/runtime_plan_observability_tests.cpp
+    )
+    target_link_libraries(keyaware_runtime_plan_tests PRIVATE keyaware_core)
+    target_include_directories(keyaware_runtime_plan_tests PRIVATE tests)
+    target_compile_options(keyaware_runtime_plan_tests PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+    )
+    add_test(NAME keyaware_runtime_plan_tests COMMAND keyaware_runtime_plan_tests)
+
     set(KEYAWARE_HAS_LEGACY_TEST_BACKENDS TRUE)
     if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/backend/analytical_backend.h")
         set(KEYAWARE_HAS_LEGACY_TEST_BACKENDS FALSE)

@@ -1,8 +1,11 @@
 #include "backend/runtime_planner.h"
 
 #include <algorithm>
+#include <cstdint>
+#include <limits>
 #include <ostream>
 #include <sstream>
+#include <unordered_map>
 
 namespace {
 
@@ -67,6 +70,71 @@ void AppendCommaSeparatedU64(
         }
         os << values[idx];
     }
+}
+
+std::size_t StageIndex(StageType stage_type) {
+    return static_cast<std::size_t>(stage_type);
+}
+
+uint32_t ComputeCriticalChainDepth(
+    const RuntimePlan& plan) {
+
+    std::unordered_map<uint64_t, uint32_t> depth_by_step_id;
+    depth_by_step_id.reserve(plan.steps.size());
+
+    uint32_t max_depth = 0;
+    for (const TileExecutionStep& step : plan.steps) {
+        uint32_t depth = 1;
+        for (uint64_t dep_step_id : step.depends_on) {
+            const auto dep_it = depth_by_step_id.find(dep_step_id);
+            if (dep_it == depth_by_step_id.end()) {
+                continue;
+            }
+            depth = std::max<uint32_t>(depth, static_cast<uint32_t>(dep_it->second + 1));
+        }
+        depth_by_step_id[step.step_id] = depth;
+        max_depth = std::max<uint32_t>(max_depth, depth);
+    }
+    return max_depth;
+}
+
+int64_t SignedDelta(uint64_t previous, uint64_t current) {
+    if (current >= previous) {
+        const uint64_t diff = current - previous;
+        return (diff > static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
+            ? std::numeric_limits<int64_t>::max()
+            : static_cast<int64_t>(diff);
+    }
+    const uint64_t diff = previous - current;
+    const uint64_t min_abs = static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1ULL;
+    if (diff >= min_abs) {
+        return std::numeric_limits<int64_t>::min();
+    }
+    return -static_cast<int64_t>(diff);
+}
+
+double PercentDelta(uint64_t previous, int64_t delta) {
+    if (previous == 0) {
+        return (delta == 0) ? 0.0 : 100.0;
+    }
+    return (static_cast<double>(delta) * 100.0) / static_cast<double>(previous);
+}
+
+void AppendDeltaLine(
+    std::ostringstream* os,
+    const char* label,
+    uint64_t previous,
+    uint64_t current,
+    int64_t delta) {
+
+    *os << "  " << label
+        << ": prev=" << previous
+        << " curr=" << current
+        << " delta=" << delta;
+    if (delta != 0) {
+        *os << " (" << PercentDelta(previous, delta) << "%)";
+    }
+    *os << "\n";
 }
 
 } // namespace
@@ -179,12 +247,289 @@ std::string FormatRuntimePlan(const RuntimePlan& plan) {
     return os.str();
 }
 
+RuntimePlanSummary SummarizeRuntimePlan(const RuntimePlan& plan) {
+    RuntimePlanSummary summary;
+    summary.valid = plan.valid;
+    summary.total_steps = static_cast<uint64_t>(plan.steps.size());
+    summary.critical_chain_depth = ComputeCriticalChainDepth(plan);
+
+    std::unordered_map<uint64_t, const TileExecutionStep*> step_by_id;
+    step_by_id.reserve(plan.steps.size());
+    for (const TileExecutionStep& step : plan.steps) {
+        step_by_id.emplace(step.step_id, &step);
+    }
+
+    for (const TileExecutionStep& step : plan.steps) {
+        summary.dependency_edges += static_cast<uint64_t>(step.depends_on.size());
+        const std::size_t stage_index = StageIndex(step.stage_type);
+        if (stage_index < summary.stage_step_counts.size()) {
+            summary.stage_step_counts[stage_index] += 1;
+        }
+
+        for (uint64_t dep_step_id : step.depends_on) {
+            const auto dep_it = step_by_id.find(dep_step_id);
+            if (dep_it == step_by_id.end() || dep_it->second == nullptr) {
+                continue;
+            }
+            const TileExecutionStep& dep = *dep_it->second;
+            const IntermediateStorageLevel dep_storage =
+                (dep.materialize_output ? dep.output_storage : step.input_storage);
+            const uint64_t transfer_bytes = dep.output_bytes;
+            if (dep_storage == IntermediateStorageLevel::HBM) {
+                summary.hbm_read_bytes += transfer_bytes;
+            } else {
+                summary.bram_read_bytes += transfer_bytes;
+            }
+        }
+
+        if (step.materialize_output) {
+            if (step.output_storage == IntermediateStorageLevel::HBM) {
+                summary.hbm_write_bytes += step.output_bytes;
+            } else {
+                summary.bram_write_bytes += step.output_bytes;
+            }
+        }
+
+        if (step.type == TileExecutionStepType::KeyLoadHostToHBM
+            || step.type == TileExecutionStepType::InputHBMToBRAM
+            || step.type == TileExecutionStepType::KeyLoadHBMToBRAM
+            || step.type == TileExecutionStepType::KeyHBMToBRAM
+            || step.type == TileExecutionStepType::IntermediateHBMToBRAM) {
+            summary.hbm_read_bytes += step.input_bytes;
+        }
+        if (step.type == TileExecutionStepType::KeyLoadHostToHBM) {
+            summary.hbm_write_bytes += step.output_bytes;
+        }
+
+        if (step.type == TileExecutionStepType::IntermediateBRAMToHBM) {
+            summary.spill_count += 1;
+            summary.spill_bytes += step.output_bytes;
+        }
+        if (step.type == TileExecutionStepType::IntermediateHBMToBRAM) {
+            summary.reload_count += 1;
+            summary.reload_bytes += step.output_bytes;
+        }
+    }
+
+    return summary;
+}
+
+RuntimePlanDelta DiffRuntimePlanSummary(
+    const RuntimePlanSummary& previous,
+    const RuntimePlanSummary& current) {
+
+    RuntimePlanDelta delta;
+    delta.total_steps = SignedDelta(previous.total_steps, current.total_steps);
+    delta.dependency_edges = SignedDelta(previous.dependency_edges, current.dependency_edges);
+
+    for (std::size_t idx = 0; idx < delta.stage_step_counts.size(); ++idx) {
+        delta.stage_step_counts[idx] = SignedDelta(
+            previous.stage_step_counts[idx],
+            current.stage_step_counts[idx]);
+    }
+
+    delta.hbm_read_bytes = SignedDelta(previous.hbm_read_bytes, current.hbm_read_bytes);
+    delta.hbm_write_bytes = SignedDelta(previous.hbm_write_bytes, current.hbm_write_bytes);
+    delta.bram_read_bytes = SignedDelta(previous.bram_read_bytes, current.bram_read_bytes);
+    delta.bram_write_bytes = SignedDelta(previous.bram_write_bytes, current.bram_write_bytes);
+
+    delta.spill_count = SignedDelta(previous.spill_count, current.spill_count);
+    delta.spill_bytes = SignedDelta(previous.spill_bytes, current.spill_bytes);
+    delta.reload_count = SignedDelta(previous.reload_count, current.reload_count);
+    delta.reload_bytes = SignedDelta(previous.reload_bytes, current.reload_bytes);
+
+    delta.critical_chain_depth = SignedDelta(
+        previous.critical_chain_depth,
+        current.critical_chain_depth);
+
+    delta.changed =
+        delta.total_steps != 0
+        || delta.dependency_edges != 0
+        || std::any_of(
+            delta.stage_step_counts.begin(),
+            delta.stage_step_counts.end(),
+            [](int64_t value) { return value != 0; })
+        || delta.hbm_read_bytes != 0
+        || delta.hbm_write_bytes != 0
+        || delta.bram_read_bytes != 0
+        || delta.bram_write_bytes != 0
+        || delta.spill_count != 0
+        || delta.spill_bytes != 0
+        || delta.reload_count != 0
+        || delta.reload_bytes != 0
+        || delta.critical_chain_depth != 0;
+
+    return delta;
+}
+
+std::string FormatRuntimePlanDelta(
+    const RuntimePlanSummary& previous,
+    const RuntimePlanSummary& current,
+    const RuntimePlanDelta& delta) {
+
+    std::ostringstream os;
+    os << "RuntimePlanDelta(changed="
+       << (delta.changed ? "true" : "false") << ")\n";
+    AppendDeltaLine(&os, "total_steps", previous.total_steps, current.total_steps, delta.total_steps);
+    AppendDeltaLine(&os, "dependency_edges", previous.dependency_edges, current.dependency_edges, delta.dependency_edges);
+    for (std::size_t idx = 0; idx < delta.stage_step_counts.size(); ++idx) {
+        const StageType stage_type = static_cast<StageType>(idx);
+        AppendDeltaLine(
+            &os,
+            ToString(stage_type),
+            previous.stage_step_counts[idx],
+            current.stage_step_counts[idx],
+            delta.stage_step_counts[idx]);
+    }
+    AppendDeltaLine(&os, "hbm_read_bytes", previous.hbm_read_bytes, current.hbm_read_bytes, delta.hbm_read_bytes);
+    AppendDeltaLine(&os, "hbm_write_bytes", previous.hbm_write_bytes, current.hbm_write_bytes, delta.hbm_write_bytes);
+    AppendDeltaLine(&os, "bram_read_bytes", previous.bram_read_bytes, current.bram_read_bytes, delta.bram_read_bytes);
+    AppendDeltaLine(&os, "bram_write_bytes", previous.bram_write_bytes, current.bram_write_bytes, delta.bram_write_bytes);
+    AppendDeltaLine(&os, "spill_count", previous.spill_count, current.spill_count, delta.spill_count);
+    AppendDeltaLine(&os, "spill_bytes", previous.spill_bytes, current.spill_bytes, delta.spill_bytes);
+    AppendDeltaLine(&os, "reload_count", previous.reload_count, current.reload_count, delta.reload_count);
+    AppendDeltaLine(&os, "reload_bytes", previous.reload_bytes, current.reload_bytes, delta.reload_bytes);
+    AppendDeltaLine(
+        &os,
+        "critical_chain_depth",
+        previous.critical_chain_depth,
+        current.critical_chain_depth,
+        delta.critical_chain_depth);
+    return os.str();
+}
+
+RuntimePlanValidationResult ValidateRuntimePlanDataflow(const RuntimePlan& plan) {
+    RuntimePlanValidationResult result;
+    if (!plan.valid) {
+        result.valid = false;
+        result.reason = "runtime_plan_invalid";
+        return result;
+    }
+
+    std::unordered_map<uint64_t, std::size_t> index_by_step_id;
+    index_by_step_id.reserve(plan.steps.size());
+    for (std::size_t idx = 0; idx < plan.steps.size(); ++idx) {
+        const uint64_t step_id = plan.steps[idx].step_id;
+        if (step_id == 0) {
+            result.valid = false;
+            result.reason = "step_id_zero";
+            return result;
+        }
+        const auto [it, inserted] = index_by_step_id.emplace(step_id, idx);
+        if (!inserted) {
+            result.valid = false;
+            result.reason = "duplicate_step_id:" + std::to_string(step_id);
+            return result;
+        }
+    }
+
+    std::unordered_map<uint64_t, uint32_t> consumer_count;
+    consumer_count.reserve(plan.steps.size());
+    for (const TileExecutionStep& step : plan.steps) {
+        for (const uint64_t dep_step_id : step.depends_on) {
+            ++consumer_count[dep_step_id];
+        }
+    }
+
+    for (std::size_t idx = 0; idx < plan.steps.size(); ++idx) {
+        const TileExecutionStep& step = plan.steps[idx];
+        for (const uint64_t dep_step_id : step.depends_on) {
+            if (dep_step_id == step.step_id) {
+                result.valid = false;
+                result.reason = "self_dependency:step=" + std::to_string(step.step_id);
+                return result;
+            }
+            const auto dep_it = index_by_step_id.find(dep_step_id);
+            if (dep_it == index_by_step_id.end()) {
+                result.valid = false;
+                result.reason =
+                    "unresolved_dependency:step=" + std::to_string(step.step_id)
+                    + ",dep=" + std::to_string(dep_step_id);
+                return result;
+            }
+            if (dep_it->second >= idx) {
+                result.valid = false;
+                result.reason =
+                    "dependency_out_of_order:step=" + std::to_string(step.step_id)
+                    + ",dep=" + std::to_string(dep_step_id);
+                return result;
+            }
+        }
+
+        if (step.type == TileExecutionStepType::IntermediateBRAMToHBM) {
+            if (step.input_storage != IntermediateStorageLevel::BRAM
+                || step.output_storage != IntermediateStorageLevel::HBM) {
+                result.valid = false;
+                result.reason =
+                    "invalid_spill_storage:step=" + std::to_string(step.step_id);
+                return result;
+            }
+            if (consumer_count[step.step_id] != 1) {
+                result.valid = false;
+                result.reason =
+                    "spill_consumer_mismatch:step=" + std::to_string(step.step_id);
+                return result;
+            }
+        }
+
+        if (step.type == TileExecutionStepType::IntermediateHBMToBRAM) {
+            if (step.input_storage != IntermediateStorageLevel::HBM
+                || step.output_storage != IntermediateStorageLevel::BRAM) {
+                result.valid = false;
+                result.reason =
+                    "invalid_reload_storage:step=" + std::to_string(step.step_id);
+                return result;
+            }
+            if (step.depends_on.size() != 1) {
+                result.valid = false;
+                result.reason =
+                    "reload_dep_count_mismatch:step=" + std::to_string(step.step_id);
+                return result;
+            }
+            const uint64_t dep_id = step.depends_on.front();
+            const auto dep_it = index_by_step_id.find(dep_id);
+            if (dep_it == index_by_step_id.end()) {
+                result.valid = false;
+                result.reason =
+                    "reload_dep_unresolved:step=" + std::to_string(step.step_id);
+                return result;
+            }
+            const TileExecutionStep& dep_step = plan.steps[dep_it->second];
+            if (dep_step.type != TileExecutionStepType::IntermediateBRAMToHBM) {
+                result.valid = false;
+                result.reason =
+                    "reload_dep_not_spill:step=" + std::to_string(step.step_id);
+                return result;
+            }
+        }
+    }
+
+    const RuntimePlanSummary summary = SummarizeRuntimePlan(plan);
+    if (summary.spill_count != summary.reload_count) {
+        result.valid = false;
+        result.reason = "spill_reload_count_mismatch";
+        return result;
+    }
+    if (summary.spill_bytes != summary.reload_bytes) {
+        result.valid = false;
+        result.reason = "spill_reload_bytes_mismatch";
+        return result;
+    }
+
+    result.valid = true;
+    result.reason = "ok";
+    return result;
+}
+
 RuntimePlanner::RuntimePlanner(
     const HardwareModel& hardware,
     const TilePlanner::Params& tile_params)
     : planner_(tile_params) {
     (void)hardware;
 }
+
+RuntimePlanner::RuntimePlanner(const TilePlanner::Params& tile_params)
+    : planner_(tile_params) {}
 
 TileExecutionStep RuntimePlanner::MakeStep(
     TileExecutionStepType type,
@@ -499,18 +844,24 @@ RuntimePlan RuntimePlanner::Plan(const KeySwitchExecution& execution) const {
     plan.key_resident_hit = execution.key_resident_hit;
     plan.working_set_bytes = execution.working_set_bytes;
 
-    if (!execution.valid || !execution.logical_graph.valid || execution.problem.cards > 1) {
+    auto fail = [&](const char* reason) {
+        plan.valid = false;
+        plan.failure_reason = reason;
         return plan;
+    };
+
+    if (!execution.valid || !execution.logical_graph.valid || execution.problem.cards > 1) {
+        return fail("unsupported_execution_shape");
     }
     if (!HasLogicalNode(execution.logical_graph, LogicalNodeKind::ModUp)
         || !HasLogicalNode(execution.logical_graph, LogicalNodeKind::InnerProd)
         || !HasLogicalNode(execution.logical_graph, LogicalNodeKind::ModDown)) {
-        return plan;
+        return fail("logical_graph_missing_required_nodes");
     }
 
     plan.tile_plan = planner_.Plan(execution.problem);
     if (!plan.tile_plan.valid) {
-        return plan;
+        return fail("tile_plan_invalid");
     }
 
     plan.valid = true;
@@ -797,5 +1148,17 @@ RuntimePlan RuntimePlanner::Plan(const KeySwitchExecution& execution) const {
     }
 
     plan.valid = !plan.steps.empty();
+    if (!plan.valid) {
+        return fail("empty_runtime_steps");
+    }
+
+    const RuntimePlanValidationResult validation = ValidateRuntimePlanDataflow(plan);
+    if (!validation.valid) {
+        plan.valid = false;
+        plan.failure_reason = "dataflow_invalid:" + validation.reason;
+        return plan;
+    }
+
+    plan.failure_reason.clear();
     return plan;
 }
