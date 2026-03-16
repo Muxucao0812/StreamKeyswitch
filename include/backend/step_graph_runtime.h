@@ -27,6 +27,8 @@ struct StepRuntimeRecord {
     uint64_t input_bytes = 0;
     uint64_t output_bytes = 0;
     uint64_t transfer_bytes = 0;
+    uint64_t bram_transfer_cycles = 0;
+    uint64_t hbm_transfer_cycles = 0;
     uint64_t compute_cycles = 0;
     uint64_t transfer_cycles = 0;
     uint64_t total_cycles = 0;
@@ -42,6 +44,8 @@ struct StepRuntimeRecord {
 struct MoveResult {
     uint64_t bytes = 0;
     uint64_t cycles = 0;
+    uint64_t bram_cycles = 0;
+    uint64_t hbm_cycles = 0;
     bool direct_forward = false;
 };
 

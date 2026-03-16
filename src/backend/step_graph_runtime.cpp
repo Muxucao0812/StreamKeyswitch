@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <unordered_map>
 
 namespace {
 
@@ -171,6 +172,12 @@ bool IsComputeStepType(TileExecutionStepType type) {
     }
 }
 
+uint64_t StepDurationCycles(const StepRuntimeRecord& record) {
+    return std::max(
+        record.compute_cycles,
+        std::max(record.bram_transfer_cycles, record.hbm_transfer_cycles));
+}
+
 uint64_t BaseCyclesIfActive(uint64_t base_cycles, uint64_t work_items) {
     return (work_items == 0) ? 0 : base_cycles;
 }
@@ -230,12 +237,21 @@ void CreateOutputHandle(
     }
 
     record->transfer_bytes += step.output_bytes;
-    record->transfer_cycles += AccountWrite(
+    const uint64_t write_cycles = AccountWrite(
         hardware,
         storage,
         step.output_bytes,
         keep_handle,
         state);
+    record->transfer_cycles += write_cycles;
+    switch (storage) {
+    case IntermediateStorageLevel::BRAM:
+        record->bram_transfer_cycles += write_cycles;
+        break;
+    case IntermediateStorageLevel::HBM:
+        record->hbm_transfer_cycles += write_cycles;
+        break;
+    }
 
     if (!keep_handle || step.output_bytes == 0) {
         return;
@@ -296,17 +312,79 @@ void FinalizeRecord(
     StepRuntimeRecord* record,
     RuntimeState* state) {
 
-    record->total_cycles = record->compute_cycles + record->transfer_cycles;
+    record->total_cycles = StepDurationCycles(*record);
     record->live_bram_bytes_after = state->live_bram_bytes;
     record->live_hbm_bytes_after = state->live_hbm_bytes;
 
     SaturatingAdd(&state->compute_cycles, record->compute_cycles);
     SaturatingAdd(&state->transfer_cycles, record->transfer_cycles);
-    SaturatingAdd(&state->total_cycles, record->total_cycles);
     SaturatingAdd(
         &state->fine_step_cycles[ToIndex(record->step_type)],
         record->total_cycles);
     state->step_records.push_back(*record);
+}
+
+uint64_t EstimatePipelinedTotalCycles(
+    const RuntimePlan& plan,
+    const RuntimeState& state) {
+
+    std::unordered_map<uint64_t, const StepRuntimeRecord*> records_by_step_id;
+    records_by_step_id.reserve(state.step_records.size());
+    for (const StepRuntimeRecord& record : state.step_records) {
+        records_by_step_id.emplace(record.step_id, &record);
+    }
+
+    std::unordered_map<uint64_t, uint64_t> done_cycles_by_step_id;
+    done_cycles_by_step_id.reserve(state.step_records.size());
+
+    uint64_t bram_ready_cycle = 0;
+    uint64_t hbm_ready_cycle = 0;
+    uint64_t compute_ready_cycle = 0;
+    uint64_t total_cycles = 0;
+
+    for (const TileExecutionStep& step : plan.steps) {
+        const auto record_it = records_by_step_id.find(step.step_id);
+        if (record_it == records_by_step_id.end()) {
+            continue;
+        }
+
+        const StepRuntimeRecord& record = *record_it->second;
+        uint64_t deps_ready_cycle = 0;
+        for (const uint64_t dep_step_id : step.depends_on) {
+            const auto done_it = done_cycles_by_step_id.find(dep_step_id);
+            if (done_it == done_cycles_by_step_id.end()) {
+                continue;
+            }
+            deps_ready_cycle = std::max(deps_ready_cycle, done_it->second);
+        }
+
+        uint64_t start_cycle = deps_ready_cycle;
+        if (record.bram_transfer_cycles > 0) {
+            start_cycle = std::max(start_cycle, bram_ready_cycle);
+        }
+        if (record.hbm_transfer_cycles > 0) {
+            start_cycle = std::max(start_cycle, hbm_ready_cycle);
+        }
+        if (record.compute_cycles > 0) {
+            start_cycle = std::max(start_cycle, compute_ready_cycle);
+        }
+
+        if (record.bram_transfer_cycles > 0) {
+            bram_ready_cycle = start_cycle + record.bram_transfer_cycles;
+        }
+        if (record.hbm_transfer_cycles > 0) {
+            hbm_ready_cycle = start_cycle + record.hbm_transfer_cycles;
+        }
+        if (record.compute_cycles > 0) {
+            compute_ready_cycle = start_cycle + record.compute_cycles;
+        }
+
+        const uint64_t done_cycle = start_cycle + StepDurationCycles(record);
+        done_cycles_by_step_id.emplace(step.step_id, done_cycle);
+        total_cycles = std::max(total_cycles, done_cycle);
+    }
+
+    return total_cycles;
 }
 
 void ExecTransferOrLoad(
@@ -322,11 +400,12 @@ void ExecTransferOrLoad(
         switch (step.type) {
         case TileExecutionStepType::KeyLoadHostToHBM:
             record->transfer_bytes += step.output_bytes;
-            record->transfer_cycles += AccountHostToHBMWrite(
+            record->hbm_transfer_cycles += AccountHostToHBMWrite(
                 hardware,
                 step.output_bytes,
                 ConsumerCount(plan, step.step_id) > 0,
                 state);
+            record->transfer_cycles += record->hbm_transfer_cycles;
             if (ConsumerCount(plan, step.step_id) > 0) {
                 TensorHandle handle;
                 handle.id = step.step_id;
@@ -344,9 +423,10 @@ void ExecTransferOrLoad(
         case TileExecutionStepType::KeyHBMToBRAM:
         case TileExecutionStepType::IntermediateHBMToBRAM:
             record->transfer_bytes += step.input_bytes;
-            record->transfer_cycles += hardware.EstimateTransferCycles(
+            record->hbm_transfer_cycles += hardware.EstimateTransferCycles(
                 HardwareTransferPath::HBMToSPM,
                 step.input_bytes);
+            record->transfer_cycles += record->hbm_transfer_cycles;
             SaturatingAdd(&state->hbm_read_bytes, step.input_bytes);
             CreateOutputHandle(hardware, plan, step, record, state);
             if (step.type == TileExecutionStepType::IntermediateHBMToBRAM) {
@@ -368,6 +448,8 @@ void ExecTransferOrLoad(
         const MoveResult move = executor->MoveOrForward(step, *input, state);
         record->transfer_bytes += move.bytes;
         record->transfer_cycles += move.cycles;
+        record->bram_transfer_cycles += move.bram_cycles;
+        record->hbm_transfer_cycles += move.hbm_cycles;
         record->used_direct_forward = record->used_direct_forward || move.direct_forward;
     }
 
@@ -459,6 +541,10 @@ RuntimeState StepGraphRuntimeExecutor::ExecuteStepGraph(
         FinalizeRecord(&record, &state);
     }
 
+    if (state.valid) {
+        state.total_cycles = EstimatePipelinedTotalCycles(plan, state);
+    }
+
     return state;
 }
 
@@ -491,18 +577,26 @@ MoveResult StepGraphRuntimeExecutor::MoveOrForward(
     result.bytes = input.bytes;
     if (!input.materialized) {
         result.direct_forward = true;
-        result.cycles = hardware_.EstimateDirectForwardCycles(input.bytes);
+        result.bram_cycles = hardware_.EstimateDirectForwardCycles(input.bytes);
+        result.cycles = result.bram_cycles;
         ++state->direct_forward_count;
         SaturatingAdd(&state->direct_forward_bytes, input.bytes);
         return result;
     }
 
     result.cycles = AccountRead(
-            hardware_,
-            input.storage,
-            input.bytes,
-            state
-        );
+        hardware_,
+        input.storage,
+        input.bytes,
+        state);
+    switch (CanonicalizeStorage(input.storage)) {
+    case IntermediateStorageLevel::BRAM:
+        result.bram_cycles = result.cycles;
+        break;
+    case IntermediateStorageLevel::HBM:
+        result.hbm_cycles = result.cycles;
+        break;
+    }
     return result;
 }
 
@@ -517,6 +611,8 @@ void StepGraphRuntimeExecutor::ExecINTT(
         const MoveResult move = MoveOrForward(step, *input, state);
         record->transfer_bytes += move.bytes;
         record->transfer_cycles += move.cycles;
+        record->bram_transfer_cycles += move.bram_cycles;
+        record->hbm_transfer_cycles += move.hbm_cycles;
         record->used_direct_forward = record->used_direct_forward || move.direct_forward;
     }
 
@@ -537,6 +633,8 @@ void StepGraphRuntimeExecutor::ExecBConv(
         const MoveResult move = MoveOrForward(step, *input, state);
         record->transfer_bytes += move.bytes;
         record->transfer_cycles += move.cycles;
+        record->bram_transfer_cycles += move.bram_cycles;
+        record->hbm_transfer_cycles += move.hbm_cycles;
         record->used_direct_forward = record->used_direct_forward || move.direct_forward;
     }
 
@@ -557,6 +655,8 @@ void StepGraphRuntimeExecutor::ExecNTT(
         const MoveResult move = MoveOrForward(step, *input, state);
         record->transfer_bytes += move.bytes;
         record->transfer_cycles += move.cycles;
+        record->bram_transfer_cycles += move.bram_cycles;
+        record->hbm_transfer_cycles += move.hbm_cycles;
         record->used_direct_forward = record->used_direct_forward || move.direct_forward;
     }
 
@@ -577,6 +677,8 @@ void StepGraphRuntimeExecutor::ExecInnerProd(
         const MoveResult move = MoveOrForward(step, *input, state);
         record->transfer_bytes += move.bytes;
         record->transfer_cycles += move.cycles;
+        record->bram_transfer_cycles += move.bram_cycles;
+        record->hbm_transfer_cycles += move.hbm_cycles;
         record->used_direct_forward = record->used_direct_forward || move.direct_forward;
     }
 
@@ -603,6 +705,8 @@ void StepGraphRuntimeExecutor::ExecReduce(
         const MoveResult move = MoveOrForward(step, *input, state);
         record->transfer_bytes += move.bytes;
         record->transfer_cycles += move.cycles;
+        record->bram_transfer_cycles += move.bram_cycles;
+        record->hbm_transfer_cycles += move.hbm_cycles;
         record->used_direct_forward = record->used_direct_forward || move.direct_forward;
     }
 
@@ -623,6 +727,8 @@ void StepGraphRuntimeExecutor::ExecSubtract(
         const MoveResult move = MoveOrForward(step, *input, state);
         record->transfer_bytes += move.bytes;
         record->transfer_cycles += move.cycles;
+        record->bram_transfer_cycles += move.bram_cycles;
+        record->hbm_transfer_cycles += move.hbm_cycles;
         record->used_direct_forward = record->used_direct_forward || move.direct_forward;
     }
 

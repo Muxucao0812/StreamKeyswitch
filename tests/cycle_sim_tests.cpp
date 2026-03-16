@@ -302,6 +302,14 @@ const StepRuntimeRecord* FindFirstRecord(
     return nullptr;
 }
 
+uint64_t SumStepCycles(const RuntimeState& state) {
+    uint64_t total = 0;
+    for (const StepRuntimeRecord& record : state.step_records) {
+        total += record.total_cycles;
+    }
+    return total;
+}
+
 void TestPoseidonLoweringSequence(testfw::TestContext& ctx) {
     const Request req = MakePoseidonRequest(
         /*request_id=*/1,
@@ -891,6 +899,72 @@ void TestDynamicRuntimeLifetimeAccounting(testfw::TestContext& ctx) {
     EXPECT_TRUE(ctx, !has_live_non_persistent);
 }
 
+void TestDynamicRuntimePipelineOverlap(testfw::TestContext& ctx) {
+    const SystemState state = MakeState(/*num_cards=*/1);
+    const HardwareModel hardware;
+
+    Request req = MakePoseidonRequest(
+        /*request_id=*/48,
+        /*user_id=*/24,
+        /*ciphertexts=*/2,
+        /*digits=*/3,
+        /*limbs=*/4,
+        /*polys=*/2,
+        /*poly_degree=*/65536,
+        /*input_bytes=*/4096,
+        /*output_bytes=*/4096,
+        /*key_bytes=*/8192);
+    req.ks_profile.method = KeySwitchMethod::Poseidon;
+
+    RuntimePlan runtime_plan = BuildRuntimePlan(req, state, hardware);
+    runtime_plan.steps.clear();
+
+    TileExecutionStep load0;
+    load0.step_id = 1;
+    load0.type = TileExecutionStepType::InputHBMToBRAM;
+    load0.stage_type = StageType::Dispatch;
+    load0.input_bytes = 4096;
+    load0.output_bytes = 4096;
+    load0.input_storage = IntermediateStorageLevel::HBM;
+    load0.output_storage = IntermediateStorageLevel::BRAM;
+
+    TileExecutionStep modup0;
+    modup0.step_id = 2;
+    modup0.type = TileExecutionStepType::ModUpInttTile;
+    modup0.stage_type = StageType::BasisConvert;
+    modup0.input_bytes = 4096;
+    modup0.output_bytes = 4096;
+    modup0.work_items = 1;
+    modup0.input_storage = IntermediateStorageLevel::BRAM;
+    modup0.output_storage = IntermediateStorageLevel::BRAM;
+    modup0.depends_on = {1};
+
+    TileExecutionStep load1 = load0;
+    load1.step_id = 3;
+
+    TileExecutionStep modup1 = modup0;
+    modup1.step_id = 4;
+    modup1.depends_on = {3};
+
+    runtime_plan.steps.push_back(load0);
+    runtime_plan.steps.push_back(modup0);
+    runtime_plan.steps.push_back(load1);
+    runtime_plan.steps.push_back(modup1);
+
+    StepGraphRuntimeExecutor executor(hardware);
+    const RuntimeState runtime = executor.ExecuteStepGraph(runtime_plan);
+    const uint64_t serial_step_cycles = SumStepCycles(runtime);
+
+    EXPECT_TRUE(ctx, runtime_plan.valid);
+    EXPECT_TRUE(ctx, runtime.valid);
+    EXPECT_TRUE(ctx, !runtime.step_records.empty());
+    EXPECT_TRUE(ctx, runtime.total_cycles > 0);
+    EXPECT_TRUE(ctx, serial_step_cycles >= runtime.total_cycles);
+    EXPECT_TRUE(ctx, runtime.compute_cycles + runtime.transfer_cycles >= runtime.total_cycles);
+    EXPECT_TRUE(ctx, runtime.compute_cycles + runtime.transfer_cycles >= serial_step_cycles);
+    EXPECT_TRUE(ctx, serial_step_cycles > runtime.total_cycles);
+}
+
 void TestAutoSingleCardStillMapsToPoseidon(testfw::TestContext& ctx) {
     const SystemState state = MakeState(/*num_cards=*/1);
     const ExecutionPlan plan = MakePlan(/*request_id=*/25, /*num_cards=*/1);
@@ -1099,6 +1173,7 @@ int main() {
     TestDynamicRuntimeShortcutAffectsBytesAndWork(ctx);
     TestDynamicRuntimeStoragePathsDifferByMethod(ctx);
     TestDynamicRuntimeLifetimeAccounting(ctx);
+    TestDynamicRuntimePipelineOverlap(ctx);
     TestAutoSingleCardStillMapsToPoseidon(ctx);
     TestCinnamonRemainsUnsupported(ctx);
     TestBuiltInScaleSingleBoardNoLongerFallsBack(ctx);
