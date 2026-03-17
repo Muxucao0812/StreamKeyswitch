@@ -75,6 +75,7 @@ Request WorkloadBuilder::BuildRequest(
     const UserProfile& user_profile,
     Time arrival_time,
     uint32_t sequence_idx) {
+    (void)sequence_idx;
 
     Request req;
     req.request_id = request_id;
@@ -86,23 +87,14 @@ Request WorkloadBuilder::BuildRequest(
     req.priority = user_profile.latency_sensitive ? 0 : 1;
     req.sla_class = user_profile.latency_sensitive ? 0 : 1;
 
-    // Generate FHE Parameters
-    req.ks_profile.num_ciphertexts = NextRange(1, 4);
+    // Generate FHE parameters directly from configured HE params
+    // (no per-request perturbation).
+    req.ks_profile.num_ciphertexts = 1;
     req.ks_profile.num_polys = he_params_.num_polys;
     req.ks_profile.poly_modulus_degree = he_params_.poly_modulus_degree;
     req.ks_profile.bytes_per_coeff = he_params_.bytes_per_coeff;
-
-    // Use HE params as the center of the distribution while keeping
-    // some request-to-request variation for synthetic workloads.
-    const int32_t digit_offset = static_cast<int32_t>(NextRange(0, 2)) - 1;
-    const int32_t digits = static_cast<int32_t>(he_params_.num_digits) + digit_offset;
-    req.ks_profile.num_digits = static_cast<uint32_t>(std::max<int32_t>(1, digits));
-    req.ks_profile.num_rns_limbs =
-        he_params_.num_rns_limbs + (NextBernoulli(0.3) ? 2U : 0U);
-
-    const uint32_t sequence_ciphertext_bonus = 1U + (sequence_idx % 2U);
-    req.ks_profile.num_ciphertexts =
-        std::max(req.ks_profile.num_ciphertexts, sequence_ciphertext_bonus);
+    req.ks_profile.num_digits = he_params_.num_digits;
+    req.ks_profile.num_rns_limbs = he_params_.num_rns_limbs;
 
     req.ks_profile.input_bytes = he_params_.ComputeCiphertextBytes(
         req.ks_profile.num_ciphertexts,
@@ -112,7 +104,9 @@ Request WorkloadBuilder::BuildRequest(
         req.ks_profile.num_ciphertexts,
         req.ks_profile.num_polys,
         req.ks_profile.num_rns_limbs);
-    req.ks_profile.key_bytes = user_profile.key_bytes;
+    req.ks_profile.key_bytes = he_params_.ComputeKeyBytes(
+        req.ks_profile.num_digits,
+        req.ks_profile.num_rns_limbs);
     req.ks_profile.method = keyswitch_method_;
 
     const uint32_t cards_by_working_set = RecommendCardCountForRequest(req);

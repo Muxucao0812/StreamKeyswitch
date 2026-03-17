@@ -11,42 +11,33 @@ namespace {
 struct CompletionEntry {
     uint64_t instruction_id = 0;
     uint64_t completion_cycle = 0;
+    CycleInstructionKind kind = CycleInstructionKind::LoadHBM;
 };
 
-HardwareUnitConfig SelectConfig(
+HardwareUnitConfig SelectResourceConfig(
     const HardwareModel& hardware,
-    CycleInstructionKind kind) {
+    ResourceClass rc) {
 
-    switch (kind) {
-    case CycleInstructionKind::LoadHBM:
-    case CycleInstructionKind::StoreHBM:
+    switch (rc) {
+    case ResourceClass::ComputeArray:
+        return hardware.ComputeArrayConfig();
+    case ResourceClass::SPU:
+        return hardware.SpuConfig();
+    case ResourceClass::HBM:
         return hardware.MemoryConfig();
-    case CycleInstructionKind::Decompose:
-        return hardware.DecomposeConfig();
-    case CycleInstructionKind::NTT:
-    case CycleInstructionKind::INTT:
-        return hardware.NttConfig();
-    case CycleInstructionKind::EweMul:
-        return hardware.EweMulConfig();
-    case CycleInstructionKind::EweAdd:
-        return hardware.EweAddConfig();
-    case CycleInstructionKind::EweSub:
-        return hardware.EweSubConfig();
-    case CycleInstructionKind::BConv:
-        return hardware.BconvConfig();
+    case ResourceClass::Interconnect:
+        return hardware.InterconnectConfig();
     }
-
     return HardwareUnitConfig{};
 }
 
-class ComponentState {
+class ResourceState {
 public:
-    ComponentState(
-        CycleInstructionKind kind,
+    ResourceState(
+        ResourceClass rc,
         const HardwareUnitConfig& config)
-        : config_(config) {
+        : rc_(rc), config_(config) {
 
-        stats_.kind = kind;
         const uint32_t safe_units = std::max<uint32_t>(1, config_.unit_count);
         next_issue_cycle_.assign(safe_units, 0);
         inflight_by_unit_.resize(safe_units);
@@ -54,16 +45,15 @@ public:
 
     void BeginCycle(
         uint64_t cycle,
-        std::vector<uint64_t>* completed_instruction_ids) {
+        std::vector<CompletionEntry>* completed) {
 
         issued_this_cycle_ = false;
         stalled_this_cycle_ = false;
 
         for (auto& queue : inflight_by_unit_) {
             while (!queue.empty() && queue.front().completion_cycle <= cycle) {
-                completed_instruction_ids->push_back(queue.front().instruction_id);
+                completed->push_back(queue.front());
                 queue.pop_front();
-                ++stats_.completed_instructions;
             }
         }
     }
@@ -84,16 +74,15 @@ public:
         const std::size_t unit_index = SelectIssueUnit(cycle);
         CompletionEntry entry;
         entry.instruction_id = instruction.id;
+        entry.kind = instruction.kind;
         entry.completion_cycle =
             cycle + std::max<uint64_t>(1, instruction.latency_cycles);
         inflight_by_unit_[unit_index].push_back(entry);
         next_issue_cycle_[unit_index] =
             cycle + (config_.full_pipeline ? 1 : std::max<uint64_t>(1, instruction.latency_cycles));
         issued_this_cycle_ = true;
-        ++stats_.issued_instructions;
-        stats_.max_inflight = std::max<uint64_t>(
-            stats_.max_inflight,
-            TotalInflight());
+        ++total_issued_;
+        max_inflight_ = std::max<uint64_t>(max_inflight_, TotalInflight());
         next_unit_cursor_ = static_cast<uint32_t>(
             (unit_index + 1) % next_issue_cycle_.size());
     }
@@ -104,10 +93,10 @@ public:
 
     void EndCycle() {
         if (HasInflight() || issued_this_cycle_) {
-            ++stats_.busy_cycles;
+            ++busy_cycles_;
         }
         if (stalled_this_cycle_) {
-            ++stats_.stall_cycles;
+            ++stall_cycles_;
         }
     }
 
@@ -120,9 +109,11 @@ public:
         return false;
     }
 
-    const CycleComponentStats& stats() const {
-        return stats_;
-    }
+    ResourceClass rc() const { return rc_; }
+    uint64_t busy_cycles() const { return busy_cycles_; }
+    uint64_t stall_cycles() const { return stall_cycles_; }
+    uint64_t total_issued() const { return total_issued_; }
+    uint64_t max_inflight() const { return max_inflight_; }
 
 private:
     bool CanIssueOnUnit(
@@ -149,7 +140,7 @@ private:
                 return idx;
             }
         }
-        throw std::runtime_error("CycleArch issued without capacity");
+        throw std::runtime_error("ResourceState issued without capacity");
     }
 
     uint64_t TotalInflight() const {
@@ -161,28 +152,35 @@ private:
     }
 
 private:
+    ResourceClass rc_;
     HardwareUnitConfig config_;
-    CycleComponentStats stats_;
     std::vector<uint64_t> next_issue_cycle_;
     std::vector<std::deque<CompletionEntry>> inflight_by_unit_;
     uint32_t next_unit_cursor_ = 0;
     bool issued_this_cycle_ = false;
     bool stalled_this_cycle_ = false;
+    uint64_t busy_cycles_ = 0;
+    uint64_t stall_cycles_ = 0;
+    uint64_t total_issued_ = 0;
+    uint64_t max_inflight_ = 0;
 };
 
-std::array<ComponentState, kCycleInstructionKindCount> BuildComponents(
+struct KindStats {
+    CycleInstructionKind kind = CycleInstructionKind::LoadHBM;
+    uint64_t issued = 0;
+    uint64_t completed = 0;
+    uint64_t busy_cycles = 0;
+    uint64_t stall_cycles = 0;
+};
+
+std::array<ResourceState, kResourceClassCount> BuildResources(
     const HardwareModel& hardware) {
 
     return {
-        ComponentState(CycleInstructionKind::LoadHBM, SelectConfig(hardware, CycleInstructionKind::LoadHBM)),
-        ComponentState(CycleInstructionKind::StoreHBM, SelectConfig(hardware, CycleInstructionKind::StoreHBM)),
-        ComponentState(CycleInstructionKind::Decompose, SelectConfig(hardware, CycleInstructionKind::Decompose)),
-        ComponentState(CycleInstructionKind::NTT, SelectConfig(hardware, CycleInstructionKind::NTT)),
-        ComponentState(CycleInstructionKind::INTT, SelectConfig(hardware, CycleInstructionKind::INTT)),
-        ComponentState(CycleInstructionKind::EweMul, SelectConfig(hardware, CycleInstructionKind::EweMul)),
-        ComponentState(CycleInstructionKind::EweAdd, SelectConfig(hardware, CycleInstructionKind::EweAdd)),
-        ComponentState(CycleInstructionKind::EweSub, SelectConfig(hardware, CycleInstructionKind::EweSub)),
-        ComponentState(CycleInstructionKind::BConv, SelectConfig(hardware, CycleInstructionKind::BConv)),
+        ResourceState(ResourceClass::ComputeArray, SelectResourceConfig(hardware, ResourceClass::ComputeArray)),
+        ResourceState(ResourceClass::SPU, SelectResourceConfig(hardware, ResourceClass::SPU)),
+        ResourceState(ResourceClass::HBM, SelectResourceConfig(hardware, ResourceClass::HBM)),
+        ResourceState(ResourceClass::Interconnect, SelectResourceConfig(hardware, ResourceClass::Interconnect)),
     };
 }
 
@@ -191,19 +189,32 @@ std::array<ComponentState, kCycleInstructionKindCount> BuildComponents(
 struct CycleArch::Impl {
     explicit Impl(const HardwareModel& hw)
         : hardware(hw),
-          components(BuildComponents(hw)) {}
+          resources(BuildResources(hw)) {
 
-    ComponentState& ForKind(CycleInstructionKind kind) {
-        return components[ToIndex(kind)];
+        for (std::size_t idx = 0; idx < kCycleInstructionKindCount; ++idx) {
+            kind_stats[idx].kind = static_cast<CycleInstructionKind>(idx);
+        }
     }
 
-    const ComponentState& ForKind(CycleInstructionKind kind) const {
-        return components[ToIndex(kind)];
+    ResourceState& ForResource(ResourceClass rc) {
+        return resources[ToIndex(rc)];
+    }
+
+    const ResourceState& ForResource(ResourceClass rc) const {
+        return resources[ToIndex(rc)];
+    }
+
+    ResourceState& ForKind(CycleInstructionKind kind) {
+        return ForResource(ResourceClassOf(kind));
+    }
+
+    const ResourceState& ForKind(CycleInstructionKind kind) const {
+        return ForResource(ResourceClassOf(kind));
     }
 
     bool HasInflight() const {
-        for (const ComponentState& component : components) {
-            if (component.HasInflight()) {
+        for (const ResourceState& rs : resources) {
+            if (rs.HasInflight()) {
                 return true;
             }
         }
@@ -212,15 +223,25 @@ struct CycleArch::Impl {
 
     std::vector<CycleComponentStats> ExportStats() const {
         std::vector<CycleComponentStats> stats;
-        stats.reserve(components.size());
-        for (const ComponentState& component : components) {
-            stats.push_back(component.stats());
+        stats.reserve(kCycleInstructionKindCount);
+        for (std::size_t idx = 0; idx < kCycleInstructionKindCount; ++idx) {
+            const KindStats& ks = kind_stats[idx];
+            CycleComponentStats cs;
+            cs.kind = ks.kind;
+            cs.issued_instructions = ks.issued;
+            cs.completed_instructions = ks.completed;
+            cs.busy_cycles = ks.busy_cycles;
+            cs.stall_cycles = ks.stall_cycles;
+            const ResourceState& rs = ForKind(ks.kind);
+            cs.max_inflight = rs.max_inflight();
+            stats.push_back(cs);
         }
         return stats;
     }
 
     const HardwareModel& hardware;
-    std::array<ComponentState, kCycleInstructionKindCount> components;
+    std::array<ResourceState, kResourceClassCount> resources;
+    std::array<KindStats, kCycleInstructionKindCount> kind_stats{};
 };
 
 CycleArch::CycleArch(const HardwareModel& hardware)
@@ -236,8 +257,13 @@ void CycleArch::BeginCycle(
     uint64_t cycle,
     std::vector<uint64_t>* completed_instruction_ids) {
 
-    for (std::size_t idx = 0; idx < kCycleInstructionKindCount; ++idx) {
-        impl_->components[idx].BeginCycle(cycle, completed_instruction_ids);
+    std::vector<CompletionEntry> completed;
+    for (std::size_t idx = 0; idx < kResourceClassCount; ++idx) {
+        impl_->resources[idx].BeginCycle(cycle, &completed);
+    }
+    for (const CompletionEntry& entry : completed) {
+        completed_instruction_ids->push_back(entry.instruction_id);
+        ++impl_->kind_stats[ToIndex(entry.kind)].completed;
     }
 }
 
@@ -253,15 +279,24 @@ void CycleArch::Issue(
     uint64_t cycle) {
 
     impl_->ForKind(instruction.kind).Issue(instruction, cycle);
+    ++impl_->kind_stats[ToIndex(instruction.kind)].issued;
 }
 
 void CycleArch::RecordStall(CycleInstructionKind kind) {
     impl_->ForKind(kind).RecordStall();
+    ++impl_->kind_stats[ToIndex(kind)].stall_cycles;
 }
 
 void CycleArch::EndCycle() {
+    for (std::size_t idx = 0; idx < kResourceClassCount; ++idx) {
+        impl_->resources[idx].EndCycle();
+    }
     for (std::size_t idx = 0; idx < kCycleInstructionKindCount; ++idx) {
-        impl_->components[idx].EndCycle();
+        const CycleInstructionKind kind = static_cast<CycleInstructionKind>(idx);
+        const ResourceState& rs = impl_->ForKind(kind);
+        if (rs.HasInflight()) {
+            ++impl_->kind_stats[idx].busy_cycles;
+        }
     }
 }
 

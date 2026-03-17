@@ -28,6 +28,9 @@ struct KeySwitchProblem {
     uint32_t ciphertexts = 1;
     uint32_t digits = 1;
     uint32_t limbs = 1;
+    // 扩展模数维度：k = ceil((l + 1) / a), key_limbs = l + k。
+    uint32_t num_k = 1;
+    uint32_t key_limbs = 2;
     uint32_t polys = 1;
     uint32_t poly_modulus_degree = 1;
 
@@ -447,6 +450,13 @@ struct KeySwitchExecution {
     std::vector<uint64_t> reduction_step_ids;
     std::vector<uint64_t> moddown_step_ids;
 
+    // Multi-board metadata.
+    MultiBoardMode multi_board_mode = MultiBoardMode::Auto;
+    PartitionStrategy partition_strategy = PartitionStrategy::None;
+    KeyPlacement key_placement = KeyPlacement::StreamFromHBM;
+    CollectiveStrategy collective_strategy = CollectiveStrategy::None;
+    uint32_t active_cards = 1;
+
     // 汇总预测指标。
     uint64_t predicted_hbm_bytes = 0;
 };
@@ -640,6 +650,30 @@ private:
         const Request& req,
         const ExecutionPlan& plan,
         const SystemState& state) const;
+
+    KeySwitchExecution BuildSequential(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state,
+        KeySwitchMethod per_card_method) const;
+
+    KeySwitchExecution BuildInputBroadcast(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state,
+        KeySwitchMethod per_card_method) const;
+
+    KeySwitchExecution BuildOutputAggregation(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state,
+        KeySwitchMethod per_card_method) const;
+
+    KeySwitchExecution BuildMultiBoard(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state,
+        KeySwitchMethod per_card_method) const;
 
 private:
     KeySwitchExecutionModelParams params_;

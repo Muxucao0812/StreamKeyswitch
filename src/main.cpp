@@ -1,8 +1,6 @@
 #include "backend/cycle_backend.h"
 #include "backend/execution_backend.h"
 #include "backend/hw/hardware_model.h"
-#include "backend/model/keyswitch_execution_model.h"
-#include "backend/runtime_planner.h"
 #include "common/config_loader.h"
 #include "common/experiment_config.h"
 #include "common/he_params_loader.h"
@@ -17,7 +15,6 @@
 #include "scheduler/score_scheduler.h"
 #include "scheduler/scheduler.h"
 #include "scheduler/static_partition_scheduler.h"
-#include "search/tree_search.h"
 #include "sim/simulator.h"
 
 #include <fstream>
@@ -160,7 +157,8 @@ SystemState BuildInitialState(const ExperimentConfig& config) {
 
 std::vector<Request> BuildWorkload(
     WorkloadBuilder& builder,
-    const ExperimentConfig& config) {
+    const ExperimentConfig& config
+) {
     builder.SetDefaultKeySwitchMethod(config.keyswitch_method);
     if (config.workload == WorkloadKind::Burst) {
         const uint32_t reqs_per_user_per_burst =
@@ -203,92 +201,6 @@ void ApplyMultiCardConfig(
         req.ks_profile.preferred_cards = 1;
         req.ks_profile.max_cards = 1;
     }
-}
-
-void DumpFirstLogicalGraphIfRequested(
-    const ExperimentConfig& config,
-    const std::vector<Request>& requests,
-    const SystemState& initial_state) {
-
-    if (!config.dump_logical_graph) {
-        return;
-    }
-
-    if (requests.empty()) {
-        std::cout << "LogicalGraph: no requests generated\n";
-        return;
-    }
-
-    ExecutionPlan plan;
-    plan.request_id = requests.front().request_id;
-    if (!initial_state.cards.empty()) {
-        plan.assigned_cards.push_back(initial_state.cards.front().card_id);
-    }
-
-    KeySwitchExecutionModel model;
-    const KeySwitchExecution execution = model.Build(requests.front(), plan, initial_state);
-    if (!execution.valid) {
-        std::cout << "LogicalGraph: execution build failed";
-        if (execution.fallback_reason != KeySwitchFallbackReason::None) {
-            std::cout << " reason=" << ToString(execution.fallback_reason);
-        }
-        std::cout << "\n";
-        return;
-    }
-
-    if (!execution.logical_graph.valid || execution.logical_graph.nodes.empty()) {
-        std::cout << "LogicalGraph: unavailable for method="
-                  << static_cast<int>(execution.method) << "\n";
-        return;
-    }
-
-    std::cout << "=== Logical Graph ===\n";
-    DumpLogicalGraph(execution.logical_graph, std::cout);
-    std::cout << "=====================\n";
-}
-
-void DumpFirstRuntimePlanIfRequested(
-    const ExperimentConfig& config,
-    const std::vector<Request>& requests,
-    const SystemState& initial_state) {
-
-    if (!config.dump_runtime_plan) {
-        return;
-    }
-
-    if (requests.empty()) {
-        std::cout << "RuntimePlan: no requests generated\n";
-        return;
-    }
-
-    ExecutionPlan plan;
-    plan.request_id = requests.front().request_id;
-    if (!initial_state.cards.empty()) {
-        plan.assigned_cards.push_back(initial_state.cards.front().card_id);
-    }
-
-    KeySwitchExecutionModel model;
-    const KeySwitchExecution execution = model.Build(requests.front(), plan, initial_state);
-    if (!execution.valid) {
-        std::cout << "RuntimePlan: execution build failed";
-        if (execution.fallback_reason != KeySwitchFallbackReason::None) {
-            std::cout << " reason=" << ToString(execution.fallback_reason);
-        }
-        std::cout << "\n";
-        return;
-    }
-
-    HardwareModel hardware;
-    RuntimePlanner planner(hardware, model.TilePlannerParams());
-    const RuntimePlan runtime_plan = planner.Plan(execution);
-    if (!runtime_plan.valid) {
-        std::cout << "RuntimePlan: unavailable\n";
-        return;
-    }
-
-    std::cout << "=== Runtime Plan ===\n";
-    DumpRuntimePlan(runtime_plan, std::cout);
-    std::cout << "====================\n";
 }
 
 std::string CsvEscape(const std::string& value) {
@@ -381,19 +293,6 @@ void AppendMetricsCsvRow(
         << "\n";
 }
 
-TreeSearchOptions BuildTreeSearchOptions(const ExperimentConfig& config) {
-    TreeSearchOptions options;
-    options.steps = config.tree_search_steps;
-    options.neighbors_per_step = config.tree_search_neighbors;
-    options.seed = config.seed;
-    options.weights.mean_latency = config.objective_w_mean_latency;
-    options.weights.p99_latency = config.objective_w_p99_latency;
-    options.weights.fairness_penalty = config.objective_w_fairness_penalty;
-    options.weights.reload_penalty = config.objective_w_reload_penalty;
-    options.weights.incomplete_penalty = config.objective_w_incomplete_penalty;
-    return options;
-}
-
 } // namespace
 
 int main(int argc, char** argv) {
@@ -431,73 +330,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    bool tree_search_executed = false;
-    std::string tree_search_initial_source;
-    std::string tree_search_output_path;
-    double tree_search_best_objective = 0.0;
-    uint32_t tree_search_steps = 0;
-
-    if (config.enable_tree_search) {
-        if (!HierarchicalTreeSearcher::IsHierarchicalSchedulerKind(config.scheduler)) {
-            std::cerr << "Tree search requires a hierarchical scheduler "
-                      << "(hierarchical_a/b/c/d).\n";
-            return 1;
-        }
-
-        tree_search_initial_source = config.tree_config_path.empty()
-            ? "built-in default"
-            : config.tree_config_path;
-
-        std::vector<ResourceTreeNode> initial_tree = initial_state.resource_tree;
-        uint32_t initial_root_id = initial_state.resource_tree_root;
-        if (initial_tree.empty()) {
-            initial_tree = HierarchicalTreeSearcher::BuildDefaultInitialTree(
-                initial_state,
-                requests,
-                &initial_root_id);
-        }
-
-        const TreeSearchOptions options = BuildTreeSearchOptions(config);
-        HierarchicalTreeSearcher searcher(options);
-
-        const TreeSearchResult search_result = searcher.Search(
-            config,
-            initial_state,
-            requests,
-            initial_tree,
-            initial_root_id,
-            std::cout);
-        if (!search_result.ok) {
-            std::cerr << search_result.error_message << "\n";
-            return 1;
-        }
-
-        tree_search_output_path = config.tree_search_output_path.empty()
-            ? "optimized_tree_generated.cfg"
-            : config.tree_search_output_path;
-        const TreeConfigSaveResult saved = SaveTreeToFile(
-            tree_search_output_path,
-            search_result.best_tree,
-            search_result.best_root_id);
-        if (!saved.ok) {
-            std::cerr << saved.error_message << "\n";
-            return 1;
-        }
-
-        initial_state.resource_tree = search_result.best_tree;
-        initial_state.resource_tree_root = search_result.best_root_id;
-
-        tree_search_executed = true;
-        tree_search_best_objective = search_result.best_objective;
-        tree_search_steps = search_result.executed_steps;
-
-        // Use optimized tree as the runtime tree source metadata.
-        config.tree_config_path = tree_search_output_path;
-    }
-
     PrintExperimentConfig(std::cout, config);
-    DumpFirstLogicalGraphIfRequested(config, requests, initial_state);
-    DumpFirstRuntimePlanIfRequested(config, requests, initial_state);
 
     std::unique_ptr<Scheduler> scheduler;
     std::unique_ptr<ExecutionBackend> backend;
@@ -510,6 +343,11 @@ int main(int argc, char** argv) {
     }
 
     CycleBackend* cycle_backend = dynamic_cast<CycleBackend*>(backend.get());
+    if (cycle_backend != nullptr) {
+        cycle_backend->SetDebugDumpOptions(
+            config.dump_logical_graph,
+            config.dump_runtime_plan);
+    }
 
     Simulator sim(std::move(initial_state), std::move(scheduler), std::move(backend));
 
@@ -535,12 +373,6 @@ int main(int argc, char** argv) {
               << "\n";
     if (cycle_backend != nullptr) {
         cycle_backend->PrintStats(std::cout);
-    }
-    if (tree_search_executed) {
-        std::cout << "TreeSearchInitialSource=" << tree_search_initial_source << "\n";
-        std::cout << "TreeSearchSteps=" << tree_search_steps << "\n";
-        std::cout << "TreeSearchBestObjective=" << tree_search_best_objective << "\n";
-        std::cout << "TreeSearchBestTreePath=" << tree_search_output_path << "\n";
     }
     if (!config.csv_output_path.empty()) {
         try {

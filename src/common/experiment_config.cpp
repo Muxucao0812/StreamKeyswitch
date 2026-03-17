@@ -2,7 +2,6 @@
 
 #include <climits>
 #include <cctype>
-#include <cstdlib>
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -41,21 +40,6 @@ bool ParseUint32(const std::string& text, uint32_t* value) {
         return false;
     }
     *value = static_cast<uint32_t>(wide);
-    return true;
-}
-
-bool ParseDouble(const std::string& text, double* value) {
-    if (text.empty()) {
-        return false;
-    }
-
-    char* end = nullptr;
-    const double out = std::strtod(text.c_str(), &end);
-    if (end == text.c_str() || *end != '\0') {
-        return false;
-    }
-
-    *value = out;
     return true;
 }
 
@@ -244,17 +228,8 @@ std::string BuildUsageText(const std::string& program_name) {
         << "  --ks-method <poseidon|fab|fast|ola|hera|cinnamon>\n"
         << "                                        Keyswitch execution method for generated requests.\n"
         << "  --csv-output <path>                   Append run metrics to CSV file.\n"
-        << "  --search-tree                         Enable tree search before simulation.\n"
-        << "  --search-steps <uint32>               Tree search optimization steps.\n"
-        << "  --search-neighbors <uint32>           Tree neighbors sampled per step.\n"
-        << "  --search-output-tree <path>           Output path of optimized tree.\n"
         << "  --dump-logical-graph                  Print the shared single-board logical graph for the first request.\n"
         << "  --dump-runtime-plan                   Print the runtime-planned physical step graph for the first request.\n"
-        << "  --obj-w-mean-latency <double>         Objective weight: mean latency.\n"
-        << "  --obj-w-p99-latency <double>          Objective weight: p99 latency.\n"
-        << "  --obj-w-fairness-penalty <double>     Objective weight: fairness penalty.\n"
-        << "  --obj-w-reload-penalty <double>       Objective weight: reload penalty.\n"
-        << "  --obj-w-incomplete-penalty <double>   Objective weight: incomplete penalty.\n"
         << "  --help | -h                           Show help and exit.\n";
     return oss.str();
 }
@@ -593,52 +568,6 @@ ParseExperimentConfigResult ParseExperimentConfig(int argc, char** argv) {
                 continue;
             }
 
-            if (arg == "--search-tree") {
-                config.enable_tree_search = true;
-                continue;
-            }
-
-            if (arg == "--search-steps") {
-                std::string value_text;
-                if (!require_value("--search-steps", &value_text)) {
-                    return result;
-                }
-                uint32_t value = 0;
-                if (!ParseUint32(value_text, &value) || value == 0) {
-                    result.error_message = "Invalid --search-steps: " + value_text;
-                    return result;
-                }
-                config.tree_search_steps = value;
-                continue;
-            }
-
-            if (arg == "--search-neighbors") {
-                std::string value_text;
-                if (!require_value("--search-neighbors", &value_text)) {
-                    return result;
-                }
-                uint32_t value = 0;
-                if (!ParseUint32(value_text, &value) || value == 0) {
-                    result.error_message = "Invalid --search-neighbors: " + value_text;
-                    return result;
-                }
-                config.tree_search_neighbors = value;
-                continue;
-            }
-
-            if (arg == "--search-output-tree") {
-                std::string value_text;
-                if (!require_value("--search-output-tree", &value_text)) {
-                    return result;
-                }
-                if (value_text.empty()) {
-                    result.error_message = "Invalid --search-output-tree: empty path";
-                    return result;
-                }
-                config.tree_search_output_path = value_text;
-                continue;
-            }
-
             if (arg == "--dump-logical-graph") {
                 config.dump_logical_graph = true;
                 continue;
@@ -646,76 +575,6 @@ ParseExperimentConfigResult ParseExperimentConfig(int argc, char** argv) {
 
             if (arg == "--dump-runtime-plan") {
                 config.dump_runtime_plan = true;
-                continue;
-            }
-
-            if (arg == "--obj-w-mean-latency") {
-                std::string value_text;
-                if (!require_value("--obj-w-mean-latency", &value_text)) {
-                    return result;
-                }
-                double value = 0.0;
-                if (!ParseDouble(value_text, &value) || value < 0.0) {
-                    result.error_message = "Invalid --obj-w-mean-latency: " + value_text;
-                    return result;
-                }
-                config.objective_w_mean_latency = value;
-                continue;
-            }
-
-            if (arg == "--obj-w-p99-latency") {
-                std::string value_text;
-                if (!require_value("--obj-w-p99-latency", &value_text)) {
-                    return result;
-                }
-                double value = 0.0;
-                if (!ParseDouble(value_text, &value) || value < 0.0) {
-                    result.error_message = "Invalid --obj-w-p99-latency: " + value_text;
-                    return result;
-                }
-                config.objective_w_p99_latency = value;
-                continue;
-            }
-
-            if (arg == "--obj-w-fairness-penalty") {
-                std::string value_text;
-                if (!require_value("--obj-w-fairness-penalty", &value_text)) {
-                    return result;
-                }
-                double value = 0.0;
-                if (!ParseDouble(value_text, &value) || value < 0.0) {
-                    result.error_message = "Invalid --obj-w-fairness-penalty: " + value_text;
-                    return result;
-                }
-                config.objective_w_fairness_penalty = value;
-                continue;
-            }
-
-            if (arg == "--obj-w-reload-penalty") {
-                std::string value_text;
-                if (!require_value("--obj-w-reload-penalty", &value_text)) {
-                    return result;
-                }
-                double value = 0.0;
-                if (!ParseDouble(value_text, &value) || value < 0.0) {
-                    result.error_message = "Invalid --obj-w-reload-penalty: " + value_text;
-                    return result;
-                }
-                config.objective_w_reload_penalty = value;
-                continue;
-            }
-
-            if (arg == "--obj-w-incomplete-penalty") {
-                std::string value_text;
-                if (!require_value("--obj-w-incomplete-penalty", &value_text)) {
-                    return result;
-                }
-                double value = 0.0;
-                if (!ParseDouble(value_text, &value) || value < 0.0) {
-                    result.error_message = "Invalid --obj-w-incomplete-penalty: " + value_text;
-                    return result;
-                }
-                config.objective_w_incomplete_penalty = value;
                 continue;
             }
 
@@ -865,20 +724,7 @@ void PrintExperimentConfig(std::ostream& os, const ExperimentConfig& config) {
     os << "CSVOutput: "
        << (config.csv_output_path.empty() ? "disabled" : config.csv_output_path)
        << "\n";
-    os << "EnableTreeSearch: " << (config.enable_tree_search ? "true" : "false") << "\n";
-    os << "TreeSearchSteps: " << config.tree_search_steps << "\n";
-    os << "TreeSearchNeighbors: " << config.tree_search_neighbors << "\n";
-    os << "TreeSearchOutputPath: "
-       << (config.tree_search_output_path.empty() ? "auto" : config.tree_search_output_path)
-       << "\n";
     os << "DumpLogicalGraph: " << (config.dump_logical_graph ? "true" : "false") << "\n";
     os << "DumpRuntimePlan: " << (config.dump_runtime_plan ? "true" : "false") << "\n";
-    os << "ObjectiveWeights: "
-       << "mean_latency=" << config.objective_w_mean_latency
-       << ", p99_latency=" << config.objective_w_p99_latency
-       << ", fairness_penalty=" << config.objective_w_fairness_penalty
-       << ", reload_penalty=" << config.objective_w_reload_penalty
-       << ", incomplete_penalty=" << config.objective_w_incomplete_penalty
-       << "\n";
     os << "=========================\n";
 }

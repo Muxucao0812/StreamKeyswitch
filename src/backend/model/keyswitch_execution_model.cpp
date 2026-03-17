@@ -19,6 +19,23 @@ uint32_t CeilDivU32(uint32_t a, uint32_t b) {
     return (b == 0) ? 0 : (a + b - 1) / b;
 }
 
+uint32_t KeyExtraLimbsForTile(
+    uint32_t limb_idx,
+    uint32_t limb_tile_size,
+    uint32_t total_limbs,
+    uint32_t num_k) {
+    const uint32_t safe_limbs = std::max<uint32_t>(1, total_limbs);
+    const uint32_t begin = std::min<uint32_t>(
+        safe_limbs,
+        static_cast<uint32_t>(static_cast<uint64_t>(limb_idx) * limb_tile_size));
+    const uint32_t end = std::min<uint32_t>(safe_limbs, begin + limb_tile_size);
+    const uint32_t k_before = static_cast<uint32_t>(
+        (static_cast<uint64_t>(begin) * num_k) / safe_limbs);
+    const uint32_t k_after = static_cast<uint32_t>(
+        (static_cast<uint64_t>(end) * num_k) / safe_limbs);
+    return (k_after >= k_before) ? (k_after - k_before) : 0;
+}
+
 uint32_t SaturateU32(uint64_t value) {
     return static_cast<uint32_t>(std::min<uint64_t>(value, std::numeric_limits<uint32_t>::max()));
 }
@@ -625,8 +642,13 @@ CandidateEval EvaluateCandidate(
                 uint64_t key_chunk_bytes = 0;
                 if (!key_persistent) {
                     // 非常驻模式：每个 (limb, digit) 组合都需要一次 key 分块加载。
+                    const uint32_t key_limb_now = limb_now + KeyExtraLimbsForTile(
+                        limb_idx,
+                        limb_tile,
+                        problem.limbs,
+                        problem.num_k);
                     key_chunk_bytes =
-                        static_cast<uint64_t>(limb_now) * digit_now * problem.key_digit_limb_bytes;
+                        static_cast<uint64_t>(key_limb_now) * digit_now * problem.key_digit_limb_bytes;
                     tracker.AcquireDynamicKey(key_chunk_bytes);
                     key_bytes += key_chunk_bytes;
                     key_transfer_count += 1;
@@ -1033,9 +1055,14 @@ TilePlan TilePlanner::Plan(const KeySwitchProblem& problem) const {
                 // 若 key 常驻，则当前组合不再额外占用动态 key 块。
                 const uint32_t digit_remain = problem.digits - digit_idx * plan.digit_tile;
                 const uint32_t digit_now = std::min<uint32_t>(plan.digit_tile, digit_remain);
+                const uint32_t key_limb_now = limb_now + KeyExtraLimbsForTile(
+                    limb_idx,
+                    plan.limb_tile,
+                    problem.limbs,
+                    problem.num_k);
                 const uint64_t key_chunk_bytes = plan.key_persistent
                     ? 0
-                    : static_cast<uint64_t>(limb_now) * digit_now * problem.key_digit_limb_bytes;
+                    : static_cast<uint64_t>(key_limb_now) * digit_now * problem.key_digit_limb_bytes;
                 const uint64_t dyn_temp_bytes =
                     DynamicWorkingTempBytes(problem, ct_now, limb_now, digit_now);
 
@@ -1290,6 +1317,8 @@ KeySwitchProblem KeySwitchExecutionModel::BuildProblem(
     } else {
         problem.limbs = std::max<uint32_t>(1, req.ks_profile.num_rns_limbs);
     }
+    problem.num_k = CeilDivU32(problem.limbs + 1, problem.digits);
+    problem.key_limbs = problem.limbs + problem.num_k;
     problem.polys = std::max<uint32_t>(1, req.ks_profile.num_polys);
     problem.poly_modulus_degree = std::max<uint32_t>(1, req.ks_profile.poly_modulus_degree);
 
@@ -1313,7 +1342,7 @@ KeySwitchProblem KeySwitchExecutionModel::BuildProblem(
     // 这些字段是后续构图和周期估算的核心粒度参数。
     const uint64_t ct_limb_denom = static_cast<uint64_t>(problem.ciphertexts) * problem.limbs;
     const uint64_t out_limb_denom = static_cast<uint64_t>(problem.ciphertexts) * problem.limbs;
-    const uint64_t key_denom = static_cast<uint64_t>(problem.digits) * problem.limbs;
+    const uint64_t key_denom = static_cast<uint64_t>(problem.digits) * problem.key_limbs;
     problem.ct_limb_bytes = std::max<uint64_t>(1, CeilDivU64(problem.input_bytes, ct_limb_denom));
     problem.out_limb_bytes = std::max<uint64_t>(1, CeilDivU64(problem.output_bytes, out_limb_denom));
     problem.key_digit_limb_bytes = std::max<uint64_t>(1, CeilDivU64(problem.key_bytes, key_denom));
@@ -1341,6 +1370,7 @@ KeySwitchProblem KeySwitchExecutionModel::BuildProblem(
     }
     problem.min_card_bram_capacity_bytes = min_bram_capacity;
     // 可用预算 = 最小 BRAM * 可用比例，再做下界保护。
+
     problem.bram_budget_bytes = std::max<uint64_t>(
         1,
         static_cast<uint64_t>(
@@ -1944,12 +1974,17 @@ KeySwitchExecution KeySwitchExecutionModel::BuildWithMode(
             const uint32_t digit_remain =
                 execution.problem.digits - digit_idx * execution.tile_plan.digit_tile;
             const uint32_t digit_now = std::min<uint32_t>(execution.tile_plan.digit_tile, digit_remain);
+            const uint32_t key_limb_now = limb_now + KeyExtraLimbsForTile(
+                limb_idx,
+                execution.tile_plan.limb_tile,
+                execution.problem.limbs,
+                execution.problem.num_k);
 
             // 每个 pair 的数据规模与计算量估算，后续填入各子图 step 的 bytes/work_items。
             const uint64_t ct_chunk_bytes =
                 static_cast<uint64_t>(ct_now) * limb_now * execution.problem.ct_limb_bytes;
             const uint64_t key_chunk_bytes =
-                static_cast<uint64_t>(limb_now) * digit_now * execution.problem.key_digit_limb_bytes;
+                static_cast<uint64_t>(key_limb_now) * digit_now * execution.problem.key_digit_limb_bytes;
             const uint64_t decompose_work =
                 static_cast<uint64_t>(ct_now)
                 * static_cast<uint64_t>(digit_now)
@@ -2026,8 +2061,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildWithMode(
         // - Digit 粒度或偏好 digit 局部性：digit 外层、limb 内层；
         // - 否则 limb 外层、digit 内层。
         // 该顺序会影响 key/input 复用机会与中间缓冲峰值。
-        if (execution.policy.granularity == KeySwitchProcessingGranularity::Digit
-            || execution.policy.prefer_digit_locality) {
+        if (execution.policy.granularity == KeySwitchProcessingGranularity::Digit) {
             for (uint32_t digit_idx : digit_order) {
                 for (uint32_t limb_idx : limb_order) {
                     build_for_pair(limb_idx, digit_idx);

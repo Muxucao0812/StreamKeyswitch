@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <iosfwd>
+#include <unordered_set>
 
 struct CycleBackendStats {
     uint64_t estimate_calls = 0;
@@ -23,6 +24,7 @@ public:
 
     CycleBackendStats GetStats() const;
     void PrintStats(std::ostream& os) const;
+    void SetDebugDumpOptions(bool dump_logical_graph, bool dump_runtime_plan);
 
     
     ExecutionResult EstimateMethod(
@@ -31,6 +33,10 @@ public:
         const SystemState& state,
         KeySwitchMethod method
     ) const;
+
+private:
+    bool ShouldDumpLogicalGraph(KeySwitchMethod method) const;
+    bool ShouldDumpRuntimePlan(KeySwitchMethod method) const;
 
 private:
     KeySwitchMethod ResolveKeySwitchMethod(
@@ -44,4 +50,8 @@ private:
     HardwareModel hw_model_;
     PrimitiveSimulatorStub primitive_simulator_;
     mutable CycleBackendStats stats_;
+    bool dump_logical_graph_ = false;
+    bool dump_runtime_plan_ = false;
+    mutable std::unordered_set<uint8_t> dumped_logical_methods_;
+    mutable std::unordered_set<uint8_t> dumped_runtime_methods_;
 };

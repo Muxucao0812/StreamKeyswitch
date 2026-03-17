@@ -4,6 +4,25 @@
 
 #include <cstdint>
 
+enum class IterationAxis : uint8_t {
+    ByDigit = 0,
+    ByLimb,
+    ByOutput
+};
+
+enum class ModDownStrategy : uint8_t {
+    FullAfterReduce = 0,
+    LimbStreaming,
+    ShortcutStreaming
+};
+
+enum class TransferGranularity : uint8_t {
+    Tile = 0,
+    Limb,
+    Digit,
+    Output
+};
+
 
 enum class ReductionMode : uint8_t {
     Centralized = 0,      // 所有 partial 完成后统一 reduce
@@ -56,10 +75,18 @@ struct KeySwitchMethodPolicy {
     bool supports_fused_final_subtract = false;
     bool supports_partial_reduction_overlap = false;
 
-    bool prefer_digit_locality = false;
-    bool prefer_limb_streaming = false;
-};
+    IterationAxis modup_axis = IterationAxis::ByDigit;
+    IterationAxis innerprod_axis = IterationAxis::ByDigit;
+    IterationAxis moddown_axis = IterationAxis::ByDigit;
 
+    ModDownStrategy moddown_strategy = ModDownStrategy::FullAfterReduce;
+    TransferGranularity spill_granularity = TransferGranularity::Tile;
+
+    bool overlap_reduce_with_innerprod = false;
+    bool persist_partials_in_bram = false;
+    bool persist_modup_outputs_in_bram = false;
+    bool direct_forward_to_moddown = false;
+};
 inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
     KeySwitchMethodPolicy policy;
     policy.method = method;
@@ -67,6 +94,10 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
     switch (method) {
     case KeySwitchMethod::Poseidon:
         policy.granularity = KeySwitchProcessingGranularity::Tile;
+
+        policy.modup_axis = IterationAxis::ByDigit;
+        policy.innerprod_axis = IterationAxis::ByDigit;
+        policy.moddown_axis = IterationAxis::ByOutput;
 
         policy.fuse_modup_chain = false;
         policy.fuse_moddown_chain = false;
@@ -84,21 +115,28 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
         policy.innerprod_to_reduction = StageConnectionMode::SpillToHBM;
         policy.reduction_to_moddown = StageConnectionMode::SpillToHBM;
         policy.moddown_to_subtract = StageConnectionMode::BufferInBRAM;
-        
+
+        policy.spill_granularity = TransferGranularity::Tile;
         policy.reduction_mode = ReductionMode::Centralized;
+        policy.moddown_strategy = ModDownStrategy::FullAfterReduce;
 
         policy.requires_large_bram = false;
         policy.supports_moddown_shortcut = false;
         policy.supports_fused_final_subtract = false;
         policy.supports_partial_reduction_overlap = false;
 
-        policy.prefer_digit_locality = false;
-        policy.prefer_limb_streaming = false;
-
+        policy.overlap_reduce_with_innerprod = false;
+        policy.persist_partials_in_bram = false;
+        policy.persist_modup_outputs_in_bram = false;
+        policy.direct_forward_to_moddown = false;
         return policy;
 
     case KeySwitchMethod::OLA:
         policy.granularity = KeySwitchProcessingGranularity::Limb;
+
+        policy.modup_axis = IterationAxis::ByLimb;
+        policy.innerprod_axis = IterationAxis::ByLimb;
+        policy.moddown_axis = IterationAxis::ByLimb;
 
         policy.fuse_modup_chain = true;
         policy.fuse_moddown_chain = false;
@@ -117,20 +155,27 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
         policy.reduction_to_moddown = StageConnectionMode::BufferInBRAM;
         policy.moddown_to_subtract = StageConnectionMode::DirectForward;
 
+        policy.spill_granularity = TransferGranularity::Limb;
         policy.reduction_mode = ReductionMode::Streaming;
+        policy.moddown_strategy = ModDownStrategy::LimbStreaming;
 
         policy.requires_large_bram = false;
         policy.supports_moddown_shortcut = false;
         policy.supports_fused_final_subtract = false;
         policy.supports_partial_reduction_overlap = true;
 
-
-        policy.prefer_digit_locality = false;
-        policy.prefer_limb_streaming = true;
+        policy.overlap_reduce_with_innerprod = true;
+        policy.persist_partials_in_bram = false;
+        policy.persist_modup_outputs_in_bram = true;
+        policy.direct_forward_to_moddown = false;
         return policy;
 
     case KeySwitchMethod::FAB:
         policy.granularity = KeySwitchProcessingGranularity::Digit;
+
+        policy.modup_axis = IterationAxis::ByDigit;
+        policy.innerprod_axis = IterationAxis::ByDigit;
+        policy.moddown_axis = IterationAxis::ByOutput;
 
         policy.fuse_modup_chain = true;
         policy.fuse_moddown_chain = false;
@@ -149,19 +194,27 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
         policy.reduction_to_moddown = StageConnectionMode::BufferInBRAM;
         policy.moddown_to_subtract = StageConnectionMode::BufferInBRAM;
 
+        policy.spill_granularity = TransferGranularity::Digit;
         policy.reduction_mode = ReductionMode::Streaming;
+        policy.moddown_strategy = ModDownStrategy::FullAfterReduce;
 
         policy.requires_large_bram = true;
         policy.supports_moddown_shortcut = false;
         policy.supports_fused_final_subtract = false;
         policy.supports_partial_reduction_overlap = true;
 
-        policy.prefer_digit_locality = true;
-        policy.prefer_limb_streaming = false;
+        policy.overlap_reduce_with_innerprod = true;
+        policy.persist_partials_in_bram = true;
+        policy.persist_modup_outputs_in_bram = true;
+        policy.direct_forward_to_moddown = false;
         return policy;
 
     case KeySwitchMethod::FAST:
         policy.granularity = KeySwitchProcessingGranularity::Limb;
+
+        policy.modup_axis = IterationAxis::ByLimb;
+        policy.innerprod_axis = IterationAxis::ByLimb;
+        policy.moddown_axis = IterationAxis::ByLimb;
 
         policy.fuse_modup_chain = true;
         policy.fuse_moddown_chain = false;
@@ -180,19 +233,27 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
         policy.reduction_to_moddown = StageConnectionMode::SpillToHBM;
         policy.moddown_to_subtract = StageConnectionMode::BufferInBRAM;
 
+        policy.spill_granularity = TransferGranularity::Limb;
         policy.reduction_mode = ReductionMode::Centralized;
+        policy.moddown_strategy = ModDownStrategy::FullAfterReduce;
 
         policy.requires_large_bram = false;
         policy.supports_moddown_shortcut = false;
         policy.supports_fused_final_subtract = false;
         policy.supports_partial_reduction_overlap = false;
 
-        policy.prefer_digit_locality = false;
-        policy.prefer_limb_streaming = true;
+        policy.overlap_reduce_with_innerprod = false;
+        policy.persist_partials_in_bram = false;
+        policy.persist_modup_outputs_in_bram = true;
+        policy.direct_forward_to_moddown = false;
         return policy;
 
     case KeySwitchMethod::HERA:
         policy.granularity = KeySwitchProcessingGranularity::Limb;
+
+        policy.modup_axis = IterationAxis::ByLimb;
+        policy.innerprod_axis = IterationAxis::ByLimb;
+        policy.moddown_axis = IterationAxis::ByLimb;
 
         policy.fuse_modup_chain = true;
         policy.fuse_moddown_chain = true;
@@ -203,29 +264,35 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
 
         policy.modup_output_storage = IntermediateStorageLevel::BRAM;
         policy.innerprod_output_storage = IntermediateStorageLevel::BRAM;
-        policy.reduction_output_storage = IntermediateStorageLevel::BRAM; 
+        policy.reduction_output_storage = IntermediateStorageLevel::BRAM;
         policy.moddown_temp_storage = IntermediateStorageLevel::BRAM;
 
         policy.modup_to_innerprod = StageConnectionMode::DirectForward;
         policy.innerprod_to_reduction = StageConnectionMode::BufferInBRAM;
         policy.reduction_to_moddown = StageConnectionMode::BufferInBRAM;
         policy.moddown_to_subtract = StageConnectionMode::DirectForward;
-        
+
+        policy.spill_granularity = TransferGranularity::Limb;
         policy.reduction_mode = ReductionMode::Streaming;
+        policy.moddown_strategy = ModDownStrategy::ShortcutStreaming;
 
         policy.requires_large_bram = false;
         policy.supports_moddown_shortcut = true;
         policy.supports_fused_final_subtract = false;
         policy.supports_partial_reduction_overlap = true;
 
-        policy.prefer_digit_locality = false;
-        policy.prefer_limb_streaming = true;
+        policy.overlap_reduce_with_innerprod = true;
+        policy.persist_partials_in_bram = true;
+        policy.persist_modup_outputs_in_bram = true;
+        policy.direct_forward_to_moddown = true;
         return policy;
 
     case KeySwitchMethod::Cinnamon:
         policy.granularity = KeySwitchProcessingGranularity::Limb;
 
-        policy.granularity = KeySwitchProcessingGranularity::Limb;
+        policy.modup_axis = IterationAxis::ByLimb;
+        policy.innerprod_axis = IterationAxis::ByLimb;
+        policy.moddown_axis = IterationAxis::ByLimb;
 
         policy.fuse_modup_chain = true;
         policy.fuse_moddown_chain = false;
@@ -244,16 +311,21 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
         policy.reduction_to_moddown = StageConnectionMode::SpillToHBM;
         policy.moddown_to_subtract = StageConnectionMode::BufferInBRAM;
 
+        policy.spill_granularity = TransferGranularity::Limb;
         policy.reduction_mode = ReductionMode::Centralized;
+        policy.moddown_strategy = ModDownStrategy::FullAfterReduce;
 
         policy.requires_large_bram = false;
         policy.supports_moddown_shortcut = false;
         policy.supports_fused_final_subtract = false;
         policy.supports_partial_reduction_overlap = false;
 
-        policy.prefer_digit_locality = false;
-        policy.prefer_limb_streaming = true;
+        policy.overlap_reduce_with_innerprod = false;
+        policy.persist_partials_in_bram = false;
+        policy.persist_modup_outputs_in_bram = true;
+        policy.direct_forward_to_moddown = false;
         return policy;
+
     case KeySwitchMethod::Auto:
     default:
         return ResolveMethodPolicy(KeySwitchMethod::Poseidon);

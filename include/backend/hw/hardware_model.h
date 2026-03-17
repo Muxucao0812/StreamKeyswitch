@@ -33,6 +33,16 @@ struct HardwareConfig {
     uint32_t bconv_array_height = 2;
     uint32_t bconv_array_width = 6;
 
+    uint32_t compute_array_count = 1;
+    uint32_t compute_array_pipeline_depth = 4;
+    bool compute_array_full_pipeline = true;
+    uint32_t compute_array_latency_cycles = 4;
+
+    uint32_t spu_count = 1;
+    uint32_t spu_pipeline_depth = 2;
+    bool spu_full_pipeline = false;
+    uint32_t spu_latency_cycles = 2;
+
     uint32_t mem_controller_count = 1;
     uint32_t decompose_unit_count = 1;
     uint32_t ntt_unit_count = 1;
@@ -63,6 +73,13 @@ struct HardwareConfig {
     uint32_t inter_transpose_delay_cycles = 256;
     uint32_t bconv_mac_delay_cycles = 20;
     uint32_t bconv_fifo_delay_cycles = 4;
+
+    uint32_t interconnect_link_count = 1;
+    uint32_t interconnect_pipeline_depth = 2;
+    bool interconnect_full_pipeline = true;
+    uint32_t interconnect_latency_cycles = 8;
+    double interconnect_bytes_per_ns = 8.0;
+    Time interconnect_setup_ns = 100;
 
     double energy_hbm_byte_nj = 0.0012;
 };
@@ -109,6 +126,12 @@ public:
     HardwareUnitConfig EweAddConfig() const;
     HardwareUnitConfig EweSubConfig() const;
     HardwareUnitConfig BconvConfig() const;
+
+    HardwareUnitConfig ComputeArrayConfig() const;
+    HardwareUnitConfig SpuConfig() const;
+    HardwareUnitConfig InterconnectConfig() const;
+
+    uint64_t EstimateInterconnectTransferCycles(uint64_t bytes) const;
 
     double EstimateTransferEnergyByBytes(uint64_t bytes) const;
 

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <limits>
 #include <unordered_map>
@@ -98,6 +99,85 @@ uint64_t InstructionCountForMultiplyAdds(
     return 1;
 }
 
+uint64_t EstimateNttSubphaseCycles(
+    const HardwareModel& hardware,
+    const KeySwitchProblem& problem,
+    CycleInstructionKind kind) {
+
+    const uint32_t waves = hardware.WavesPerPoly(problem);
+    const HardwareConfig& cfg = hardware.config();
+    const uint32_t spu_delay = std::max<uint32_t>(1, cfg.spu_stream_delay_cycles);
+    const uint32_t bfly_delay = std::max<uint32_t>(1, cfg.butterfly_delay_cycles);
+
+    auto phase = [&](uint32_t startup, uint32_t per_wave, uint32_t drain, double passes) -> uint64_t {
+        const uint64_t phase_waves = static_cast<uint64_t>(
+            std::ceil(static_cast<double>(std::max<uint32_t>(1, waves)) * passes - 1e-12));
+        return static_cast<uint64_t>(startup)
+            + phase_waves * static_cast<uint64_t>(std::max<uint32_t>(1, per_wave))
+            + static_cast<uint64_t>(drain);
+    };
+
+    switch (kind) {
+    case CycleInstructionKind::NTTLoad:
+    case CycleInstructionKind::INTTStore:
+        return phase(0, 1, 0, 1.0);
+    case CycleInstructionKind::NTTButterflyLocal:
+    case CycleInstructionKind::INTTButterflyLocal:
+        return phase(1, spu_delay, 1, 1.0) + phase(0, bfly_delay, 0, 8.0);
+    case CycleInstructionKind::NTTTranspose1:
+    case CycleInstructionKind::INTTTranspose1:
+        return static_cast<uint64_t>(cfg.intra_transpose_delay_cycles);
+    case CycleInstructionKind::NTTButterflyGlobal:
+    case CycleInstructionKind::INTTButterflyGlobal:
+        return phase(0, 1, 0, 1.0) + phase(1, spu_delay, 1, 1.0) + phase(0, bfly_delay, 0, 8.0);
+    case CycleInstructionKind::NTTTranspose2:
+    case CycleInstructionKind::INTTTranspose2:
+        return static_cast<uint64_t>(cfg.inter_transpose_delay_cycles);
+    case CycleInstructionKind::NTTStore:
+    case CycleInstructionKind::INTTLoad:
+        return phase(1, spu_delay, 1, 1.0);
+    default:
+        return 0;
+    }
+}
+
+uint64_t EstimateBconvSubphaseCycles(
+    const HardwareModel& hardware,
+    const KeySwitchProblem& problem,
+    CycleInstructionKind kind) {
+
+    const uint32_t waves = hardware.WavesPerPoly(problem);
+    const HardwareConfig& cfg = hardware.config();
+
+    auto phase = [&](uint32_t startup, uint32_t per_wave, uint32_t drain, double p) -> uint64_t {
+        const uint64_t phase_waves = static_cast<uint64_t>(
+            std::ceil(static_cast<double>(std::max<uint32_t>(1, waves)) * p - 1e-12));
+        return static_cast<uint64_t>(startup)
+            + phase_waves * static_cast<uint64_t>(std::max<uint32_t>(1, per_wave))
+            + static_cast<uint64_t>(drain);
+    };
+
+    switch (kind) {
+    case CycleInstructionKind::BConvLoad:
+        return phase(0, 1, 0, 1.0);
+    case CycleInstructionKind::BConvMAC: {
+        // Single MAC pass: multiply one input limb group with its BConv matrix
+        // column and accumulate into the output polynomial.  On the 256-lane
+        // compute array every wave pushes 256 coefficients through the
+        // multiply-add pipeline.  Lowering emits one BConvMAC group per pass;
+        // the full BConv cost emerges from alpha chained groups.
+        const uint32_t mul_delay = std::max<uint32_t>(1, cfg.ewe_mul_delay_cycles);
+        return phase(mul_delay, /*per_wave=*/1, /*drain=*/0, /*passes=*/1.0);
+    }
+    case CycleInstructionKind::BConvReduce:
+        return phase(std::max<uint32_t>(1, cfg.ewe_add_delay_cycles), 1, 0, 1.0);
+    case CycleInstructionKind::BConvStore:
+        return phase(0, 1, 0, 1.0);
+    default:
+        return 0;
+    }
+}
+
 uint64_t EstimateLatencyCycles(
     const HardwareModel& hardware,
     const KeySwitchProblem& problem,
@@ -130,6 +210,30 @@ uint64_t EstimateLatencyCycles(
         return hardware.EstimateEweSubCycles(problem);
     case CycleInstructionKind::BConv:
         return hardware.EstimateBconvCycles(problem);
+    case CycleInstructionKind::NTTLoad:
+    case CycleInstructionKind::NTTButterflyLocal:
+    case CycleInstructionKind::NTTTranspose1:
+    case CycleInstructionKind::NTTButterflyGlobal:
+    case CycleInstructionKind::NTTTranspose2:
+    case CycleInstructionKind::NTTStore:
+    case CycleInstructionKind::INTTLoad:
+    case CycleInstructionKind::INTTButterflyLocal:
+    case CycleInstructionKind::INTTTranspose1:
+    case CycleInstructionKind::INTTButterflyGlobal:
+    case CycleInstructionKind::INTTTranspose2:
+    case CycleInstructionKind::INTTStore:
+        return EstimateNttSubphaseCycles(hardware, problem, kind);
+    case CycleInstructionKind::BConvLoad:
+    case CycleInstructionKind::BConvMAC:
+    case CycleInstructionKind::BConvReduce:
+    case CycleInstructionKind::BConvStore:
+        return EstimateBconvSubphaseCycles(hardware, problem, kind);
+    case CycleInstructionKind::InterCardSend:
+    case CycleInstructionKind::InterCardRecv:
+        return hardware.EstimateInterconnectTransferCycles(bytes);
+    case CycleInstructionKind::InterCardReduce:
+        return hardware.EstimateInterconnectTransferCycles(bytes)
+            + hardware.EstimateEweAddCycles(problem);
     }
 
     return 0;
@@ -353,14 +457,6 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
     };
 
     for (const TileExecutionStep& step : execution.steps) {
-        if (IsInterCardStepType(step.type)) {
-            result.valid = false;
-            result.fallback_reason = KeySwitchFallbackReason::UnsupportedConfig;
-            result.fallback_reason_message =
-                std::string(MethodTag(method_)) + "_single_board_cycle_sim_inter_card_not_supported";
-            return result;
-        }
-
         std::vector<uint32_t> deps = map_dependencies(step);
         const uint64_t step_bytes = (step.bytes == 0)
             ? std::max(step.input_bytes, step.output_bytes)
@@ -424,45 +520,142 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
 
         case TileExecutionStepType::ModUpInttTile:
         case TileExecutionStepType::ModDownInttTile:
-        case TileExecutionStepType::InttTile:
-            terminal = append_single_group(
-                step,
-                "intt",
-                CycleInstructionKind::INTT,
-                CycleTransferPath::None,
-                std::max<uint64_t>(1, compute_instructions),
-                /*bytes=*/0,
-                step.work_items,
-                deps);
+        case TileExecutionStepType::InttTile: {
+            const auto deltas = storage_deltas(step);
+            const uint32_t g_load = AppendGroup(
+                hardware_, execution.problem, step, "intt_load",
+                CycleInstructionKind::INTTLoad, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                deltas[0], 0, deps,
+                &next_instruction_id, &result.program);
+            std::vector<uint32_t> d1{g_load};
+            const uint32_t g_bfly_local = AppendGroup(
+                hardware_, execution.problem, step, "intt_bfly_local",
+                CycleInstructionKind::INTTButterflyLocal, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                0, 0, d1,
+                &next_instruction_id, &result.program);
+            std::vector<uint32_t> d2{g_bfly_local};
+            const uint32_t g_tr1 = AppendGroup(
+                hardware_, execution.problem, step, "intt_transpose1",
+                CycleInstructionKind::INTTTranspose1, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                0, 0, d2,
+                &next_instruction_id, &result.program);
+            std::vector<uint32_t> d3{g_tr1};
+            const uint32_t g_bfly_global = AppendGroup(
+                hardware_, execution.problem, step, "intt_bfly_global",
+                CycleInstructionKind::INTTButterflyGlobal, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                0, 0, d3,
+                &next_instruction_id, &result.program);
+            std::vector<uint32_t> d4{g_bfly_global};
+            const uint32_t g_tr2 = AppendGroup(
+                hardware_, execution.problem, step, "intt_transpose2",
+                CycleInstructionKind::INTTTranspose2, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                0, 0, d4,
+                &next_instruction_id, &result.program);
+            std::vector<uint32_t> d5{g_tr2};
+            terminal = AppendGroup(
+                hardware_, execution.problem, step, "intt_store",
+                CycleInstructionKind::INTTStore, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                0, deltas[1], d5,
+                &next_instruction_id, &result.program);
             break;
+        }
 
         case TileExecutionStepType::ModUpBConvTile:
         case TileExecutionStepType::ModDownBConvTile:
-        case TileExecutionStepType::BasisConvertTile:
-            terminal = append_single_group(
-                step,
-                "bconv",
-                CycleInstructionKind::BConv,
-                CycleTransferPath::None,
-                std::max<uint64_t>(1, compute_instructions),
-                /*bytes=*/0,
-                step.work_items,
-                deps);
+        case TileExecutionStepType::BasisConvertTile: {
+            const auto deltas = storage_deltas(step);
+            const uint32_t alpha = std::max<uint32_t>(
+                1, hardware_.Alpha(execution.problem));
+
+            const uint32_t g_load = AppendGroup(
+                hardware_, execution.problem, step, "bconv_load",
+                CycleInstructionKind::BConvLoad, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                deltas[0], 0, deps,
+                &next_instruction_id, &result.program);
+
+            uint32_t prev_mac = g_load;
+            for (uint32_t pass = 0; pass < alpha; ++pass) {
+                std::vector<uint32_t> mac_deps{prev_mac};
+                prev_mac = AppendGroup(
+                    hardware_, execution.problem, step,
+                    "bconv_mac_p" + std::to_string(pass),
+                    CycleInstructionKind::BConvMAC, CycleTransferPath::None,
+                    1, /*bytes=*/0, step.work_items,
+                    0, 0, mac_deps,
+                    &next_instruction_id, &result.program);
+            }
+
+            std::vector<uint32_t> reduce_deps{prev_mac};
+            const uint32_t g_reduce = AppendGroup(
+                hardware_, execution.problem, step, "bconv_reduce",
+                CycleInstructionKind::BConvReduce, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                0, 0, reduce_deps,
+                &next_instruction_id, &result.program);
+            std::vector<uint32_t> store_deps{g_reduce};
+            terminal = AppendGroup(
+                hardware_, execution.problem, step, "bconv_store",
+                CycleInstructionKind::BConvStore, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                0, deltas[1], store_deps,
+                &next_instruction_id, &result.program);
             break;
+        }
 
         case TileExecutionStepType::ModUpNttTile:
         case TileExecutionStepType::ModDownNttTile:
-        case TileExecutionStepType::NttTile:
-            terminal = append_single_group(
-                step,
-                "ntt",
-                CycleInstructionKind::NTT,
-                CycleTransferPath::None,
-                std::max<uint64_t>(1, compute_instructions),
-                /*bytes=*/0,
-                step.work_items,
-                deps);
+        case TileExecutionStepType::NttTile: {
+            const auto deltas = storage_deltas(step);
+            const uint32_t g_load = AppendGroup(
+                hardware_, execution.problem, step, "ntt_load",
+                CycleInstructionKind::NTTLoad, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                deltas[0], 0, deps,
+                &next_instruction_id, &result.program);
+            std::vector<uint32_t> d1{g_load};
+            const uint32_t g_bfly_local = AppendGroup(
+                hardware_, execution.problem, step, "ntt_bfly_local",
+                CycleInstructionKind::NTTButterflyLocal, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                0, 0, d1,
+                &next_instruction_id, &result.program);
+            std::vector<uint32_t> d2{g_bfly_local};
+            const uint32_t g_tr1 = AppendGroup(
+                hardware_, execution.problem, step, "ntt_transpose1",
+                CycleInstructionKind::NTTTranspose1, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                0, 0, d2,
+                &next_instruction_id, &result.program);
+            std::vector<uint32_t> d3{g_tr1};
+            const uint32_t g_bfly_global = AppendGroup(
+                hardware_, execution.problem, step, "ntt_bfly_global",
+                CycleInstructionKind::NTTButterflyGlobal, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                0, 0, d3,
+                &next_instruction_id, &result.program);
+            std::vector<uint32_t> d4{g_bfly_global};
+            const uint32_t g_tr2 = AppendGroup(
+                hardware_, execution.problem, step, "ntt_transpose2",
+                CycleInstructionKind::NTTTranspose2, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                0, 0, d4,
+                &next_instruction_id, &result.program);
+            std::vector<uint32_t> d5{g_tr2};
+            terminal = AppendGroup(
+                hardware_, execution.problem, step, "ntt_store",
+                CycleInstructionKind::NTTStore, CycleTransferPath::None,
+                1, /*bytes=*/0, step.work_items,
+                0, deltas[1], d5,
+                &next_instruction_id, &result.program);
             break;
+        }
 
         case TileExecutionStepType::DecomposeTile:
             terminal = append_single_group(
@@ -586,17 +779,77 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
         }
 
         case TileExecutionStepType::InterCardSendStep:
+            terminal = append_single_group(
+                step,
+                "inter_card_send",
+                CycleInstructionKind::InterCardSend,
+                CycleTransferPath::None,
+                /*instruction_count=*/1,
+                step_bytes,
+                /*work_items=*/0,
+                deps);
+            break;
+
         case TileExecutionStepType::InterCardRecvStep:
+            terminal = append_single_group(
+                step,
+                "inter_card_recv",
+                CycleInstructionKind::InterCardRecv,
+                CycleTransferPath::None,
+                /*instruction_count=*/1,
+                step_bytes,
+                /*work_items=*/0,
+                deps);
+            break;
+
         case TileExecutionStepType::InterCardReduceStep:
+            terminal = append_single_group(
+                step,
+                "inter_card_reduce",
+                CycleInstructionKind::InterCardReduce,
+                CycleTransferPath::None,
+                /*instruction_count=*/1,
+                step_bytes,
+                step.work_items,
+                deps);
+            break;
+
         case TileExecutionStepType::BarrierStep:
-        case TileExecutionStepType::InterCardCommTile:
         case TileExecutionStepType::InterCardBarrier:
+            terminal = append_single_group(
+                step,
+                "inter_card_barrier",
+                CycleInstructionKind::InterCardSend,
+                CycleTransferPath::None,
+                /*instruction_count=*/1,
+                /*bytes=*/0,
+                /*work_items=*/0,
+                deps);
+            break;
+
+        case TileExecutionStepType::InterCardCommTile:
+            terminal = append_single_group(
+                step,
+                "inter_card_comm",
+                CycleInstructionKind::InterCardSend,
+                CycleTransferPath::None,
+                /*instruction_count=*/1,
+                step_bytes,
+                /*work_items=*/0,
+                deps);
+            break;
+
         case TileExecutionStepType::Merge:
-            result.valid = false;
-            result.fallback_reason = KeySwitchFallbackReason::UnsupportedConfig;
-            result.fallback_reason_message =
-                std::string(MethodTag(method_)) + "_single_board_cycle_sim_inter_card_not_supported";
-            return result;
+            terminal = append_single_group(
+                step,
+                "merge",
+                CycleInstructionKind::InterCardReduce,
+                CycleTransferPath::None,
+                /*instruction_count=*/1,
+                step_bytes,
+                step.work_items,
+                deps);
+            break;
         }
 
         if (terminal != invalid_group) {

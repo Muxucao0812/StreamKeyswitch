@@ -78,23 +78,11 @@ struct ExperimentConfig {
     std::string he_params_path;
     std::string csv_output_path;
 
-    // Tree-search controls.
-    bool enable_tree_search = false;
-    uint32_t tree_search_steps = 30;
-    uint32_t tree_search_neighbors = 8;
-    std::string tree_search_output_path;
     bool dump_logical_graph = (KEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH != 0);
     bool dump_runtime_plan = (KEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN != 0);
 
     // Keyswitch execution method selection.
     KeySwitchMethod keyswitch_method = KeySwitchMethod::Poseidon;
-
-    // Tree-search objective weights.
-    double objective_w_mean_latency = 1.0;
-    double objective_w_p99_latency = 1.0;
-    double objective_w_fairness_penalty = 10000.0;
-    double objective_w_reload_penalty = 10.0;
-    double objective_w_incomplete_penalty = 1000000.0;
 };
 
 struct ParseExperimentConfigResult {

@@ -309,6 +309,41 @@ HardwareUnitConfig HardwareModel::BconvConfig() const {
     return unit;
 }
 
+HardwareUnitConfig HardwareModel::ComputeArrayConfig() const {
+    HardwareUnitConfig unit;
+    unit.unit_count = std::max<uint32_t>(1, config_.compute_array_count);
+    unit.latency_cycles = std::max<uint32_t>(1, config_.compute_array_latency_cycles);
+    unit.pipeline_depth = std::max<uint32_t>(1, config_.compute_array_pipeline_depth);
+    unit.full_pipeline = config_.compute_array_full_pipeline;
+    return unit;
+}
+
+HardwareUnitConfig HardwareModel::SpuConfig() const {
+    HardwareUnitConfig unit;
+    unit.unit_count = std::max<uint32_t>(1, config_.spu_count);
+    unit.latency_cycles = std::max<uint32_t>(1, config_.spu_latency_cycles);
+    unit.pipeline_depth = std::max<uint32_t>(1, config_.spu_pipeline_depth);
+    unit.full_pipeline = config_.spu_full_pipeline;
+    return unit;
+}
+
+HardwareUnitConfig HardwareModel::InterconnectConfig() const {
+    HardwareUnitConfig unit;
+    unit.unit_count = std::max<uint32_t>(1, config_.interconnect_link_count);
+    unit.latency_cycles = std::max<uint32_t>(1, config_.interconnect_latency_cycles);
+    unit.pipeline_depth = std::max<uint32_t>(1, config_.interconnect_pipeline_depth);
+    unit.full_pipeline = config_.interconnect_full_pipeline;
+    return unit;
+}
+
+uint64_t HardwareModel::EstimateInterconnectTransferCycles(uint64_t bytes) const {
+    if (bytes == 0) {
+        return 0;
+    }
+    return TransferSetupCycles(config_.interconnect_setup_ns)
+        + EstimateTransferBodyCycles(bytes, config_.interconnect_bytes_per_ns);
+}
+
 double HardwareModel::EstimateTransferEnergyByBytes(uint64_t bytes) const {
     return static_cast<double>(bytes) * config_.energy_hbm_byte_nj;
 }

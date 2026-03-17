@@ -22,7 +22,6 @@ set(KEYAWARE_CORE_SOURCES
     src/common/config_loader.cpp
     src/common/he_params_loader.cpp
     src/model/workload.cpp
-    src/search/tree_search.cpp
     src/backend/hw/hardware_model.cpp
     src/backend/cycle_sim/arch.cpp
     src/backend/cycle_sim/driver.cpp

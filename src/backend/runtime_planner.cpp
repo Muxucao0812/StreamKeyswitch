@@ -11,8 +11,7 @@ namespace {
 
 IntermediateStorageLevel CanonicalizeOnChipStorage(IntermediateStorageLevel storage) {
     return (storage == IntermediateStorageLevel::HBM)
-        ? IntermediateStorageLevel::HBM
-        : IntermediateStorageLevel::BRAM;
+        ? IntermediateStorageLevel::HBM : IntermediateStorageLevel::BRAM;
 }
 
 IntermediateStorageLevel StorageForConnection(
@@ -37,6 +36,23 @@ std::vector<uint32_t> IterationOrder(uint32_t count) {
         order.push_back(idx);
     }
     return order;
+}
+
+uint32_t KeyExtraLimbsForTile(
+    uint32_t limb_idx,
+    uint32_t limb_tile_size,
+    uint32_t total_limbs,
+    uint32_t num_k) {
+    const uint32_t safe_limbs = std::max<uint32_t>(1, total_limbs);
+    const uint32_t begin = std::min<uint32_t>(
+        safe_limbs,
+        static_cast<uint32_t>(static_cast<uint64_t>(limb_idx) * limb_tile_size));
+    const uint32_t end = std::min<uint32_t>(safe_limbs, begin + limb_tile_size);
+    const uint32_t k_before = static_cast<uint32_t>(
+        (static_cast<uint64_t>(begin) * num_k) / safe_limbs);
+    const uint32_t k_after = static_cast<uint32_t>(
+        (static_cast<uint64_t>(end) * num_k) / safe_limbs);
+    return (k_after >= k_before) ? (k_after - k_before) : 0;
 }
 
 void AddDependencyId(
@@ -541,7 +557,8 @@ TileExecutionStep RuntimePlanner::MakeStep(
     uint64_t output_bytes,
     uint64_t work_items,
     IntermediateStorageLevel input_storage,
-    IntermediateStorageLevel output_storage) const {
+    IntermediateStorageLevel output_storage
+) const {
 
     TileExecutionStep step;
     step.type = type;
@@ -853,9 +870,7 @@ RuntimePlan RuntimePlanner::Plan(const KeySwitchExecution& execution) const {
     if (!execution.valid || !execution.logical_graph.valid || execution.problem.cards > 1) {
         return fail("unsupported_execution_shape");
     }
-    if (!HasLogicalNode(execution.logical_graph, LogicalNodeKind::ModUp)
-        || !HasLogicalNode(execution.logical_graph, LogicalNodeKind::InnerProd)
-        || !HasLogicalNode(execution.logical_graph, LogicalNodeKind::ModDown)) {
+    if (!HasLogicalNode(execution.logical_graph, LogicalNodeKind::ModUp) || !HasLogicalNode(execution.logical_graph, LogicalNodeKind::InnerProd) || !HasLogicalNode(execution.logical_graph, LogicalNodeKind::ModDown)) {
         return fail("logical_graph_missing_required_nodes");
     }
 
@@ -873,6 +888,7 @@ RuntimePlan RuntimePlanner::Plan(const KeySwitchExecution& execution) const {
 
     uint64_t host_key_step_id = 0;
     if (!plan.problem.key_resident_hit) {
+        // Xiangchen: This step is Load EvalKey from SSD to HBM
         TileExecutionStep host_key = MakeStep(
             TileExecutionStepType::KeyLoadHostToHBM,
             StageType::KeyLoad,
@@ -921,14 +937,14 @@ RuntimePlan RuntimePlanner::Plan(const KeySwitchExecution& execution) const {
     const std::vector<uint32_t> digit_order = IterationOrder(digit_tiles);
 
     for (uint32_t ct_idx = 0; ct_idx < ct_tiles; ++ct_idx) {
-        const uint32_t ct_remain =
-            plan.problem.ciphertexts - ct_idx * plan.tile_plan.ct_tile;
+        const uint32_t ct_remain = plan.problem.ciphertexts - ct_idx * plan.tile_plan.ct_tile;
         const uint32_t ct_now = std::min<uint32_t>(plan.tile_plan.ct_tile, ct_remain);
 
         std::vector<uint64_t> input_step_by_limb(limb_tiles, 0);
         std::vector<std::vector<uint64_t>> inner_terminal(
             limb_tiles,
-            std::vector<uint64_t>(digit_tiles, 0));
+            std::vector<uint64_t>(digit_tiles, 0)
+        );
 
         auto ensure_input_step = [&](uint32_t limb_idx) {
             if (input_step_by_limb[limb_idx] != 0) {
@@ -965,11 +981,16 @@ RuntimePlan RuntimePlanner::Plan(const KeySwitchExecution& execution) const {
             const uint32_t digit_remain =
                 plan.problem.digits - digit_idx * plan.tile_plan.digit_tile;
             const uint32_t digit_now = std::min<uint32_t>(plan.tile_plan.digit_tile, digit_remain);
+            const uint32_t key_limb_now = limb_now + KeyExtraLimbsForTile(
+                limb_idx,
+                plan.tile_plan.limb_tile,
+                plan.problem.limbs,
+                plan.problem.num_k);
 
             const uint64_t ct_chunk_bytes =
                 static_cast<uint64_t>(ct_now) * limb_now * plan.problem.ct_limb_bytes;
             const uint64_t key_chunk_bytes =
-                static_cast<uint64_t>(limb_now) * digit_now * plan.problem.key_digit_limb_bytes;
+                static_cast<uint64_t>(key_limb_now) * digit_now * plan.problem.key_digit_limb_bytes;
             const uint64_t decompose_work =
                 static_cast<uint64_t>(ct_now)
                 * static_cast<uint64_t>(limb_now)
@@ -987,6 +1008,12 @@ RuntimePlan RuntimePlanner::Plan(const KeySwitchExecution& execution) const {
                 decompose_work,
                 plan.policy,
                 {ensure_input_step(limb_idx)});
+
+            if (plan.policy.persist_modup_outputs_in_bram && !modup_ids.empty()) {
+                TileExecutionStep& last_modup = ctx.plan->steps.back();
+                last_modup.materialize_output = true;
+                last_modup.output_storage = IntermediateStorageLevel::BRAM;
+            }
 
             std::vector<uint64_t> inner_deps = ConnectSubgraphsWithPolicy(
                 &ctx,
@@ -1032,8 +1059,7 @@ RuntimePlan RuntimePlanner::Plan(const KeySwitchExecution& execution) const {
             inner_terminal[limb_idx][digit_idx] = inner_ids.back();
         };
 
-        if (plan.policy.granularity == KeySwitchProcessingGranularity::Digit
-            || plan.policy.prefer_digit_locality) {
+        if (plan.policy.granularity == KeySwitchProcessingGranularity::Digit) {
             for (uint32_t digit_idx : digit_order) {
                 for (uint32_t limb_idx : limb_order) {
                     build_for_pair(limb_idx, digit_idx);
@@ -1047,29 +1073,37 @@ RuntimePlan RuntimePlanner::Plan(const KeySwitchExecution& execution) const {
             }
         }
 
+        // Phase 1: Build reduction subgraphs for all limbs.
+        std::vector<uint64_t> reduction_terminals(limb_tiles, 0);
+
         for (uint32_t limb_idx : limb_order) {
             const uint32_t limb_remain =
                 plan.problem.limbs - limb_idx * plan.tile_plan.limb_tile;
             const uint32_t limb_now = std::min<uint32_t>(plan.tile_plan.limb_tile, limb_remain);
             const uint64_t out_bytes =
                 static_cast<uint64_t>(ct_now) * limb_now * plan.problem.out_limb_bytes;
-            const uint64_t moddown_input_bytes = plan.policy.supports_moddown_shortcut
-                ? std::max<uint64_t>(1, out_bytes / 2)
-                : out_bytes;
             const uint64_t reduction_work =
                 static_cast<uint64_t>(ct_now)
                 * static_cast<uint64_t>(limb_now)
                 * static_cast<uint64_t>(plan.problem.poly_modulus_degree);
 
+            const StageConnectionMode ip_to_reduce_conn =
+                plan.policy.persist_partials_in_bram
+                    ? StageConnectionMode::BufferInBRAM
+                    : plan.policy.innerprod_to_reduction;
+
             uint64_t reduction_terminal = 0;
-            if (plan.policy.supports_partial_reduction_overlap) {
+            const bool streaming_reduce =
+                plan.policy.supports_partial_reduction_overlap
+                || plan.policy.overlap_reduce_with_innerprod;
+            if (streaming_reduce) {
                 for (uint32_t digit_idx : digit_order) {
                     std::vector<uint64_t> deps = ConnectSubgraphsWithPolicy(
                         &ctx,
                         ct_idx,
                         limb_idx,
                         digit_idx,
-                        plan.policy.innerprod_to_reduction,
+                        ip_to_reduce_conn,
                         out_bytes,
                         {inner_terminal[limb_idx][digit_idx]});
                     AddDependencyId(&deps, reduction_terminal);
@@ -1090,7 +1124,7 @@ RuntimePlan RuntimePlanner::Plan(const KeySwitchExecution& execution) const {
                         ct_idx,
                         limb_idx,
                         digit_idx,
-                        plan.policy.innerprod_to_reduction,
+                        ip_to_reduce_conn,
                         out_bytes,
                         {inner_terminal[limb_idx][digit_idx]});
                     for (uint64_t dep : conn) {
@@ -1107,14 +1141,57 @@ RuntimePlan RuntimePlanner::Plan(const KeySwitchExecution& execution) const {
                 reduction_terminal = reduce_ids.back();
             }
 
+            if (plan.policy.persist_partials_in_bram && reduction_terminal != 0) {
+                TileExecutionStep& reduce_step = ctx.plan->steps.back();
+                reduce_step.materialize_output = true;
+                reduce_step.output_storage = IntermediateStorageLevel::BRAM;
+            }
+
+            reduction_terminals[limb_idx] = reduction_terminal;
+        }
+
+        // Phase 2: Build moddown + output subgraphs.
+        // FullAfterReduce: every moddown depends on ALL limb reductions completing.
+        // LimbStreaming / ShortcutStreaming: each moddown depends only on its own
+        // limb's reduction (already the case via per-limb reduction_terminal).
+        const bool full_after_reduce =
+            (plan.policy.moddown_strategy == ModDownStrategy::FullAfterReduce);
+
+        for (uint32_t limb_idx : limb_order) {
+            const uint32_t limb_remain =
+                plan.problem.limbs - limb_idx * plan.tile_plan.limb_tile;
+            const uint32_t limb_now = std::min<uint32_t>(plan.tile_plan.limb_tile, limb_remain);
+            const uint64_t out_bytes =
+                static_cast<uint64_t>(ct_now) * limb_now * plan.problem.out_limb_bytes;
+            const uint64_t moddown_input_bytes = plan.policy.supports_moddown_shortcut
+                ? std::max<uint64_t>(1, out_bytes / 2)
+                : out_bytes;
+
+            std::vector<uint64_t> moddown_barrier;
+            if (full_after_reduce) {
+                for (uint32_t other_limb : limb_order) {
+                    if (reduction_terminals[other_limb] != 0) {
+                        AddDependencyId(&moddown_barrier, reduction_terminals[other_limb]);
+                    }
+                }
+            } else {
+                if (reduction_terminals[limb_idx] != 0) {
+                    moddown_barrier.push_back(reduction_terminals[limb_idx]);
+                }
+            }
+
+            const StageConnectionMode reduce_to_md_conn =
+                plan.policy.direct_forward_to_moddown
+                    ? StageConnectionMode::DirectForward
+                    : plan.policy.reduction_to_moddown;
             const std::vector<uint64_t> moddown_deps = ConnectSubgraphsWithPolicy(
                 &ctx,
                 ct_idx,
                 limb_idx,
                 0,
-                plan.policy.reduction_to_moddown,
+                reduce_to_md_conn,
                 moddown_input_bytes,
-                {reduction_terminal});
+                moddown_barrier);
             const uint64_t moddown_work =
                 static_cast<uint64_t>(ct_now)
                 * static_cast<uint64_t>(limb_now)

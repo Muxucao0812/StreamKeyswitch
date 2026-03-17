@@ -11,7 +11,7 @@ struct HEParams {
 
     uint32_t poly_modulus_degree = 65536;
     uint32_t num_polys = 2;
-    uint32_t num_rns_limbs = 23;
+    uint32_t num_rns_limbs = 8;
     uint32_t num_digits = 3;
     uint32_t key_component_count = 2;
     uint32_t bytes_per_coeff = 8;
@@ -25,7 +25,9 @@ struct HEParams {
         uint32_t rns_limb_count,
         uint32_t digit_width_limbs) const {
         const uint32_t safe_digits = std::max<uint32_t>(1, digit_width_limbs);
-        return ((rns_limb_count + 1) / safe_digits) + 1;
+        // k = ceil((l + 1) / a), where:
+        //   l = rns_limb_count, a = digit_width_limbs
+        return (rns_limb_count + 1 + safe_digits - 1) / safe_digits;
     }
 
     uint64_t ComputeCiphertextBytes(
@@ -66,6 +68,7 @@ struct HEParams {
     }
 
     static HEParams BuiltInDefault() {
+        
         return HEParams{};
     }
 };

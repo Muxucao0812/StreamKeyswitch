@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iostream>
 #include <limits>
 #include <ostream>
 #include <string>
@@ -56,6 +57,40 @@ Time TotalLatency(const ExecutionBreakdown& breakdown) {
 }
 
 constexpr std::size_t kStageTypeCount = 6;
+
+const char* ToString(KeySwitchMethod method) {
+    switch (method) {
+    case KeySwitchMethod::Auto:
+        return "Auto";
+    case KeySwitchMethod::SingleBoardClassic:
+        return "SingleBoardClassic";
+    case KeySwitchMethod::SingleBoardFused:
+        return "SingleBoardFused";
+    case KeySwitchMethod::ScaleOutLimb:
+        return "ScaleOutLimb";
+    case KeySwitchMethod::ScaleOutDigit:
+        return "ScaleOutDigit";
+    case KeySwitchMethod::ScaleOutCiphertext:
+        return "ScaleOutCiphertext";
+    case KeySwitchMethod::Poseidon:
+        return "Poseidon";
+    case KeySwitchMethod::OLA:
+        return "OLA";
+    case KeySwitchMethod::FAB:
+        return "FAB";
+    case KeySwitchMethod::FAST:
+        return "FAST";
+    case KeySwitchMethod::HERA:
+        return "HERA";
+    case KeySwitchMethod::Cinnamon:
+        return "Cinnamon";
+    }
+    return "Unknown";
+}
+
+uint8_t MethodKey(KeySwitchMethod method) {
+    return static_cast<uint8_t>(method);
+}
 
 bool IsSharedSingleBoardMethod(KeySwitchMethod method) {
     switch (method) {
@@ -563,10 +598,32 @@ bool TryEstimateSharedSingleBoardWithRuntimePlanner(
 
 } // namespace
 
+void CycleBackend::SetDebugDumpOptions(bool dump_logical_graph, bool dump_runtime_plan) {
+    dump_logical_graph_ = dump_logical_graph;
+    dump_runtime_plan_ = dump_runtime_plan;
+    dumped_logical_methods_.clear();
+    dumped_runtime_methods_.clear();
+}
+
+bool CycleBackend::ShouldDumpLogicalGraph(KeySwitchMethod method) const {
+    if (!dump_logical_graph_) {
+        return false;
+    }
+    return dumped_logical_methods_.insert(MethodKey(method)).second;
+}
+
+bool CycleBackend::ShouldDumpRuntimePlan(KeySwitchMethod method) const {
+    if (!dump_runtime_plan_) {
+        return false;
+    }
+    return dumped_runtime_methods_.insert(MethodKey(method)).second;
+}
+
 KeySwitchMethod CycleBackend::ResolveKeySwitchMethod(
     const Request& req,
     const ExecutionPlan& plan,
-    const SystemState& /*state*/) const {
+    const SystemState&
+) const {
 
     const KeySwitchMethod requested = req.ks_profile.method;
     if (requested != KeySwitchMethod::Auto) {
@@ -640,6 +697,35 @@ ExecutionResult CycleBackend::EstimateMethod(
     // 执行模型不可用时，返回带原因的统一兜底结果。
     if (!execution.valid) {
         return MakeExecutionFallbackResult(req, execution, method);
+    }
+
+    const KeySwitchMethod effective_method = (execution.effective_method == KeySwitchMethod::Auto) ? method : execution.effective_method;
+
+    if (ShouldDumpLogicalGraph(effective_method)) {
+        std::cout << "=== Logical Graph [method=" << ToString(effective_method)
+                  << ", request=" << req.request_id << "] ===\n";
+        if (!execution.logical_graph.valid || execution.logical_graph.nodes.empty()) {
+            std::cout << "LogicalGraph: unavailable\n";
+        } else {
+            DumpLogicalGraph(execution.logical_graph, std::cout);
+        }
+        std::cout << "============================================\n";
+    }
+
+    if (ShouldDumpRuntimePlan(effective_method)) {
+        RuntimePlanner planner(hw_model_, execution_model_.TilePlannerParams());
+        const RuntimePlan runtime_plan = planner.Plan(execution);
+        std::cout << "=== Runtime Plan [method=" << ToString(effective_method) << ", request=" << req.request_id << "] ===\n";
+        if (!runtime_plan.valid) {
+            std::cout << "RuntimePlan: unavailable";
+            if (!runtime_plan.failure_reason.empty()) {
+                std::cout << " reason=" << runtime_plan.failure_reason;
+            }
+            std::cout << "\n";
+        } else {
+            DumpRuntimePlan(runtime_plan, std::cout);
+        }
+        std::cout << "===========================================\n";
     }
 
     // 单板方法优先走 runtime-plan + step-graph-runtime 的 estimate 路径。

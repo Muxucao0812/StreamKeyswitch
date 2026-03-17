@@ -50,6 +50,13 @@ enum class CollectiveStrategy : uint8_t {
     RingAllReduce
 };
 
+enum class MultiBoardMode : uint8_t {
+    Auto,
+    Sequential,
+    InputBroadcast,
+    OutputAggregation
+};
+
 struct KeySwitchProfile {
     uint32_t num_ciphertexts = 1;
     uint32_t num_polys = 2;
@@ -74,6 +81,7 @@ struct KeySwitchProfile {
     CollectiveStrategy collective = CollectiveStrategy::Auto;
 
     // Multi-card behavior controls.
+    MultiBoardMode multi_board_mode = MultiBoardMode::Auto;
     bool enable_inter_card_merge = true;
     // 0 means "auto by assigned cards"; >0 requests explicit scale-out card count.
     uint32_t scale_out_cards = 0;
