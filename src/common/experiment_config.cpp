@@ -106,7 +106,10 @@ bool ParseKeySwitchMethod(
         {"fast", KeySwitchMethod::FAST},
         {"ola", KeySwitchMethod::OLA},
         {"hera", KeySwitchMethod::HERA},
-        {"cinnamon", KeySwitchMethod::Cinnamon}};
+        {"cinnamon", KeySwitchMethod::Cinnamon},
+        {"digit_centric", KeySwitchMethod::DigitCentric},
+        {"output_centric", KeySwitchMethod::OutputCentric},
+        {"max_parallel", KeySwitchMethod::MaxParallel}};
 
     const auto it = mapping.find(text);
     if (it == mapping.end()) {
@@ -132,6 +135,12 @@ const char* ToString(KeySwitchMethod method) {
         return "hera";
     case KeySwitchMethod::Cinnamon:
         return "cinnamon";
+    case KeySwitchMethod::DigitCentric:
+        return "digit_centric";
+    case KeySwitchMethod::OutputCentric:
+        return "output_centric";
+    case KeySwitchMethod::MaxParallel:
+        return "max_parallel";
     case KeySwitchMethod::SingleBoardClassic:
         return "single_board_classic";
     case KeySwitchMethod::SingleBoardFused:

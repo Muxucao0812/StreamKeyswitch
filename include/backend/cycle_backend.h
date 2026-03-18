@@ -9,6 +9,10 @@
 #include <iosfwd>
 #include <unordered_set>
 
+struct CycleLoweringResult;
+struct CycleSimStats;
+struct CycleProgram;
+
 struct CycleBackendStats {
     uint64_t estimate_calls = 0;
     uint64_t fallback_count = 0;
@@ -35,10 +39,25 @@ public:
     ) const;
 
 private:
+    // 阶段 1：构建 CycleProgram（memory-aware 调度 + 直接生成硬件指令）。
+    CycleProgram BuildProgram(
+        const Request& req,
+        const ExecutionPlan& plan,
+        const SystemState& state,
+        KeySwitchMethod method) const;
+
+    // 阶段 2：运行 cycle 级仿真。
+    CycleSimStats Simulate(const CycleProgram& program) const;
+
+    // 阶段 3：将仿真统计汇聚为最终结果。
+    ExecutionResult CollectResult(
+        const Request& req,
+        KeySwitchMethod effective_method,
+        const CycleSimStats& sim_stats) const;
+
     bool ShouldDumpLogicalGraph(KeySwitchMethod method) const;
     bool ShouldDumpRuntimePlan(KeySwitchMethod method) const;
 
-private:
     KeySwitchMethod ResolveKeySwitchMethod(
         const Request& req,
         const ExecutionPlan& plan,

@@ -1,1 +1,0 @@
-/usr/bin/c++ -g CMakeFiles/keyaware_regression_tests.dir/tests/regression_tests.cpp.o -o keyaware_regression_tests  libkeyaware_core.a 

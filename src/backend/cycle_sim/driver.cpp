@@ -101,7 +101,7 @@ CycleSimStats CycleDriver::Run(const CycleProgram& program) const {
     // 周期推进主循环。
     uint64_t cycle = 0;
     // 防止异常依赖图导致无限循环，给一个上限保护。
-    constexpr uint64_t kMaxSimCycles = 200'000;
+    constexpr uint64_t kMaxSimCycles = 20'000'000;
     // spill/reload 次数用于最后估算 hbm_round_trips。
     uint64_t spill_count = 0;
     uint64_t reload_count = 0;

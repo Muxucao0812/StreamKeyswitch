@@ -1,1 +1,0 @@
-/usr/bin/c++ -g CMakeFiles/keyaware_unit_tests.dir/tests/unit_tests.cpp.o -o keyaware_unit_tests  libkeyaware_core.a 

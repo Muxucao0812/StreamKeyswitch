@@ -183,6 +183,9 @@ bool IsSharedSingleBoardMethod(KeySwitchMethod method) {
     case KeySwitchMethod::FAB:
     case KeySwitchMethod::FAST:
     case KeySwitchMethod::HERA:
+    case KeySwitchMethod::DigitCentric:
+    case KeySwitchMethod::OutputCentric:
+    case KeySwitchMethod::MaxParallel:
         return true;
     default:
         return false;
@@ -542,6 +545,156 @@ struct CandidateEval {
     TileCostBreakdown cost;
 };
 
+struct CandidateStats {
+    // 传输流量与次数（用于 CostTransfer）。
+    uint64_t key_bytes = 0;
+    uint64_t ct_bytes = 0;
+    uint64_t out_bytes_total = 0;
+    uint64_t key_transfer_count = 0;
+    uint64_t ct_transfer_count = 0;
+    uint64_t out_transfer_count = 0;
+
+    // 计算工作量与 launch 次数（用于 CostCompute）。
+    uint64_t decompose_work = 0;
+    uint64_t ks_inner_work = 0;
+    uint64_t accumulate_work = 0;
+    uint64_t basis_work = 0;
+    uint64_t decompose_launch = 0;
+    uint64_t ks_inner_launch = 0;
+    uint64_t accumulate_launch = 0;
+    uint64_t basis_launch = 0;
+};
+
+// 计算某一维度在第 index 个 tile 上的实际覆盖长度。
+// 作用：统一处理尾块（最后一个 tile 可能小于 tile_size）的边界逻辑。
+uint32_t TileExtent(uint32_t index, uint32_t tile_size, uint32_t total_size) {
+    const uint32_t remain = total_size - index * tile_size;
+    return std::min<uint32_t>(tile_size, remain);
+}
+
+// 模拟单个 (ct_tile, limb_tile, digit_tile) 组合在 digit 维度的一次执行：
+// 1) 处理 key 分块加载（仅非常驻模式）；
+// 2) 申请/释放动态 temp；
+// 3) 累加 decompose/inner/accumulate 工作量与 launch 次数。
+void SimulateDigitTile(
+    const KeySwitchProblem& problem,
+    bool key_persistent,
+    uint32_t limb_idx,
+    uint32_t limb_tile,
+    uint32_t ct_now,
+    uint32_t limb_now,
+    uint32_t digit_now,
+    BufferTracker* tracker,
+    CandidateStats* stats) {
+
+    uint64_t key_chunk_bytes = 0;
+    if (!key_persistent) {
+        // 非常驻模式：每个 (limb, digit) 组合都需要一次 key 分块加载。
+        const uint32_t key_limb_now = limb_now + KeyExtraLimbsForTile(
+            limb_idx,
+            limb_tile,
+            problem.limbs,
+            problem.num_k);
+        key_chunk_bytes =
+            static_cast<uint64_t>(key_limb_now) * digit_now * problem.key_digit_limb_bytes;
+        tracker->AcquireDynamicKey(key_chunk_bytes);
+        stats->key_bytes += key_chunk_bytes;
+        stats->key_transfer_count += 1;
+    }
+
+    // 动态 temp 工作区：估算该组合执行中的临时峰值占用。
+    const uint64_t dynamic_temp_bytes =
+        DynamicWorkingTempBytes(problem, ct_now, limb_now, digit_now);
+    tracker->AcquireDynamicTemp(dynamic_temp_bytes);
+
+    // 工作量模型：local_decompose 作为基准，派生 inner/accumulate 的计算量与 launch 数。
+    const uint64_t local_decompose =
+        static_cast<uint64_t>(ct_now)
+        * static_cast<uint64_t>(limb_now)
+        * static_cast<uint64_t>(digit_now)
+        * static_cast<uint64_t>(problem.poly_modulus_degree);
+    stats->decompose_work += local_decompose;
+    stats->ks_inner_work += local_decompose * static_cast<uint64_t>(problem.polys);
+    stats->accumulate_work += local_decompose;
+    stats->decompose_launch += 1;
+    stats->ks_inner_launch += 1;
+    stats->accumulate_launch += 1;
+
+    // 该 (ct,limb,digit) 组合结束后释放动态占用。
+    tracker->ReleaseDynamicTemp(dynamic_temp_bytes);
+    if (!key_persistent) {
+        tracker->ReleaseDynamicKey(key_chunk_bytes);
+    }
+}
+
+// 基于累计统计量构建候选成本分解，并计算最终 total_cost。
+// 该函数只做“统计量 -> 成本”的映射，不参与可行性判断。
+TileCostBreakdown BuildCandidateCost(
+    const TilePlanner::Params& params,
+    uint32_t total_tile_count,
+    const CandidateStats& stats) {
+
+    TileCostBreakdown cost;
+    const double tile_overhead_cost =
+        static_cast<double>(total_tile_count) * static_cast<double>(params.per_tile_fixed_overhead_ns);
+    const double key_transfer_cost = CostTransfer(
+        stats.key_bytes,
+        stats.key_transfer_count,
+        params.hbm_to_bram_bw_bytes_per_ns,
+        params.dma_setup_ns);
+    const double ct_transfer_cost = CostTransfer(
+        stats.ct_bytes,
+        stats.ct_transfer_count,
+        params.hbm_to_bram_bw_bytes_per_ns,
+        params.dma_setup_ns);
+    const double output_store_cost = CostTransfer(
+        stats.out_bytes_total,
+        stats.out_transfer_count,
+        params.bram_to_hbm_bw_bytes_per_ns,
+        params.dma_setup_ns);
+    const double decompose_cost = CostCompute(
+        stats.decompose_work,
+        stats.decompose_launch,
+        params.decompose_work_per_ns,
+        params.kernel_launch_ns);
+    const double ks_inner_cost = CostCompute(
+        stats.ks_inner_work,
+        stats.ks_inner_launch,
+        params.multiply_work_per_ns,
+        params.kernel_launch_ns);
+    const double accumulate_cost = CostCompute(
+        stats.accumulate_work,
+        stats.accumulate_launch,
+        params.multiply_work_per_ns,
+        params.kernel_launch_ns);
+    const double basis_cost = CostCompute(
+        stats.basis_work,
+        stats.basis_launch,
+        params.basis_work_per_ns,
+        params.kernel_launch_ns);
+
+    // 回填分项，便于诊断 planner 选型原因。
+    cost.tile_overhead_cost = tile_overhead_cost;
+    cost.key_transfer_cost = key_transfer_cost;
+    cost.ct_transfer_cost = ct_transfer_cost;
+    cost.output_store_cost = output_store_cost;
+    cost.decompose_compute_cost = decompose_cost;
+    cost.multiply_compute_cost = ks_inner_cost + accumulate_cost;
+    cost.basis_convert_cost = basis_cost;
+    // 总成本 = 分项成本按权重线性组合。
+    cost.total_cost =
+        params.w_tile_overhead * tile_overhead_cost
+        + params.w_key_transfer * key_transfer_cost
+        + params.w_ct_transfer * ct_transfer_cost
+        + params.w_output_store * output_store_cost
+        + params.w_decompose_compute * decompose_cost
+        + params.w_multiply_compute * (ks_inner_cost + accumulate_cost)
+        + params.w_basis_convert * basis_cost;
+    return cost;
+}
+
+// 评估一个 tile 候选是否可行，并估算峰值 BRAM 与成本分解。
+// 返回 valid=false 表示该候选超预算或维度非法，不可执行。
 CandidateEval EvaluateCandidate(
     const KeySwitchProblem& problem,
     const TilePlanner::Params& params,
@@ -582,42 +735,22 @@ CandidateEval EvaluateCandidate(
     // BufferTracker 用于在“模拟执行过程中”追踪 persistent/static/dynamic 占用峰值。
     BufferTracker tracker(occupancy_budget);
 
-    // 传输流量与次数统计（用于 CostTransfer）。
-    uint64_t key_bytes = 0;
-    uint64_t ct_bytes = 0;
-    uint64_t out_bytes_total = 0;
-    uint64_t key_transfer_count = 0;
-    uint64_t ct_transfer_count = 0;
-    uint64_t out_transfer_count = 0;
-
-    // 计算工作量与 launch 次数统计（用于 CostCompute）。
-    uint64_t decompose_work = 0;
-    uint64_t ks_inner_work = 0;
-    uint64_t accumulate_work = 0;
-    uint64_t basis_work = 0;
-    uint64_t decompose_launch = 0;
-    uint64_t ks_inner_launch = 0;
-    uint64_t accumulate_launch = 0;
-    uint64_t basis_launch = 0;
+    CandidateStats stats;
 
     // key 常驻模式：先一次性加载并占用 persistent key。
     // 后续内层循环不再重复加载 key 分块。
     if (key_persistent) {
         tracker.AcquirePersistentKey(problem.key_bytes);
-        key_bytes += problem.key_bytes;
-        key_transfer_count += 1;
+        stats.key_bytes += problem.key_bytes;
+        stats.key_transfer_count += 1;
     }
 
     // 三维遍历所有 tile 组合，模拟该候选的资源占用与工作量。
     for (uint32_t ct_idx = 0; ct_idx < eval.ct_tiles; ++ct_idx) {
-        // 尾块保护：最后一个 ct tile 的真实大小可能小于 ct_tile。
-        const uint32_t ct_remain = problem.ciphertexts - ct_idx * ct_tile;
-        const uint32_t ct_now = std::min<uint32_t>(ct_tile, ct_remain);
+        const uint32_t ct_now = TileExtent(ct_idx, ct_tile, problem.ciphertexts);
 
         for (uint32_t limb_idx = 0; limb_idx < eval.limb_tiles; ++limb_idx) {
-            // 尾块保护：limb 维度同理。
-            const uint32_t limb_remain = problem.limbs - limb_idx * limb_tile;
-            const uint32_t limb_now = std::min<uint32_t>(limb_tile, limb_remain);
+            const uint32_t limb_now = TileExtent(limb_idx, limb_tile, problem.limbs);
 
             // 当前 (ct, limb) 下的输出静态缓冲、静态 temp 与输入分块字节。
             const uint64_t out_bytes =
@@ -631,66 +764,34 @@ CandidateEval EvaluateCandidate(
             tracker.AcquireStaticAccum(out_bytes);
             tracker.AcquireStaticTemp(static_temp_bytes);
             tracker.AcquireDynamicCt(ct_chunk_bytes);
-            ct_bytes += ct_chunk_bytes;
-            ct_transfer_count += 1;
+            stats.ct_bytes += ct_chunk_bytes;
+            stats.ct_transfer_count += 1;
 
             for (uint32_t digit_idx = 0; digit_idx < eval.digit_tiles; ++digit_idx) {
-                // 尾块保护：digit 维度同理。
-                const uint32_t digit_remain = problem.digits - digit_idx * digit_tile;
-                const uint32_t digit_now = std::min<uint32_t>(digit_tile, digit_remain);
-
-                uint64_t key_chunk_bytes = 0;
-                if (!key_persistent) {
-                    // 非常驻模式：每个 (limb, digit) 组合都需要一次 key 分块加载。
-                    const uint32_t key_limb_now = limb_now + KeyExtraLimbsForTile(
-                        limb_idx,
-                        limb_tile,
-                        problem.limbs,
-                        problem.num_k);
-                    key_chunk_bytes =
-                        static_cast<uint64_t>(key_limb_now) * digit_now * problem.key_digit_limb_bytes;
-                    tracker.AcquireDynamicKey(key_chunk_bytes);
-                    key_bytes += key_chunk_bytes;
-                    key_transfer_count += 1;
-                }
-
-                // 动态 temp 工作区：估算该组合执行中的临时峰值占用。
-                const uint64_t dynamic_temp_bytes =
-                    DynamicWorkingTempBytes(problem, ct_now, limb_now, digit_now);
-                tracker.AcquireDynamicTemp(dynamic_temp_bytes);
-
-                // 工作量模型：
-                // local_decompose 作为基准，派生 inner/accumulate 的计算量与 launch 数。
-                const uint64_t local_decompose =
-                    static_cast<uint64_t>(ct_now)
-                    * static_cast<uint64_t>(limb_now)
-                    * static_cast<uint64_t>(digit_now)
-                    * static_cast<uint64_t>(problem.poly_modulus_degree);
-                decompose_work += local_decompose;
-                ks_inner_work += local_decompose * static_cast<uint64_t>(problem.polys);
-                accumulate_work += local_decompose;
-                decompose_launch += 1;
-                ks_inner_launch += 1;
-                accumulate_launch += 1;
-
-                // 该 (ct,limb,digit) 组合结束后释放动态占用。
-                tracker.ReleaseDynamicTemp(dynamic_temp_bytes);
-                if (!key_persistent) {
-                    tracker.ReleaseDynamicKey(key_chunk_bytes);
-                }
+                const uint32_t digit_now = TileExtent(digit_idx, digit_tile, problem.digits);
+                SimulateDigitTile(
+                    problem,
+                    key_persistent,
+                    limb_idx,
+                    limb_tile,
+                    ct_now,
+                    limb_now,
+                    digit_now,
+                    &tracker,
+                    &stats);
             }
 
             // basis 阶段按 (ct, limb) 维度累计一次。
-            basis_work +=
+            stats.basis_work +=
                 static_cast<uint64_t>(ct_now)
                 * static_cast<uint64_t>(limb_now)
                 * static_cast<uint64_t>(problem.polys)
                 * static_cast<uint64_t>(problem.poly_modulus_degree);
-            basis_launch += 1;
+            stats.basis_launch += 1;
 
             // 记录输出回写流量并释放本层 (ct,limb) 占用。
-            out_bytes_total += out_bytes;
-            out_transfer_count += 1;
+            stats.out_bytes_total += out_bytes;
+            stats.out_transfer_count += 1;
             tracker.ReleaseDynamicCt(ct_chunk_bytes);
             tracker.ReleaseStaticAccum(out_bytes);
             tracker.ReleaseStaticTemp(static_temp_bytes);
@@ -710,68 +811,82 @@ CandidateEval EvaluateCandidate(
     // 可行候选：回填有效标记与估算峰值占用。
     eval.valid = true;
     eval.estimated_peak_bram_bytes = tracker.Peaks().total_peak_bytes;
-
-    // 成本分项：
-    // - tile_overhead_cost：每 tile 固定开销
-    // - key/ct/output：传输成本
-    // - decompose/inner/accumulate/basis：计算成本
-    const double tile_overhead_cost =
-        static_cast<double>(eval.total_tile_count) * static_cast<double>(params.per_tile_fixed_overhead_ns);
-    const double key_transfer_cost = CostTransfer(
-        key_bytes,
-        key_transfer_count,
-        params.hbm_to_bram_bw_bytes_per_ns,
-        params.dma_setup_ns);
-    const double ct_transfer_cost = CostTransfer(
-        ct_bytes,
-        ct_transfer_count,
-        params.hbm_to_bram_bw_bytes_per_ns,
-        params.dma_setup_ns);
-    const double output_store_cost = CostTransfer(
-        out_bytes_total,
-        out_transfer_count,
-        params.bram_to_hbm_bw_bytes_per_ns,
-        params.dma_setup_ns);
-    const double decompose_cost = CostCompute(
-        decompose_work,
-        decompose_launch,
-        params.decompose_work_per_ns,
-        params.kernel_launch_ns);
-    const double ks_inner_cost = CostCompute(
-        ks_inner_work,
-        ks_inner_launch,
-        params.multiply_work_per_ns,
-        params.kernel_launch_ns);
-    const double accumulate_cost = CostCompute(
-        accumulate_work,
-        accumulate_launch,
-        params.multiply_work_per_ns,
-        params.kernel_launch_ns);
-    const double basis_cost = CostCompute(
-        basis_work,
-        basis_launch,
-        params.basis_work_per_ns,
-        params.kernel_launch_ns);
-
-    // 回填分项，便于诊断 planner 选型原因。
-    eval.cost.tile_overhead_cost = tile_overhead_cost;
-    eval.cost.key_transfer_cost = key_transfer_cost;
-    eval.cost.ct_transfer_cost = ct_transfer_cost;
-    eval.cost.output_store_cost = output_store_cost;
-    eval.cost.decompose_compute_cost = decompose_cost;
-    eval.cost.multiply_compute_cost = ks_inner_cost + accumulate_cost;
-    eval.cost.basis_convert_cost = basis_cost;
-    // 总成本 = 分项成本按权重线性组合。
-    eval.cost.total_cost =
-        params.w_tile_overhead * tile_overhead_cost
-        + params.w_key_transfer * key_transfer_cost
-        + params.w_ct_transfer * ct_transfer_cost
-        + params.w_output_store * output_store_cost
-        + params.w_decompose_compute * decompose_cost
-        + params.w_multiply_compute * (ks_inner_cost + accumulate_cost)
-        + params.w_basis_convert * basis_cost;
+    eval.cost = BuildCandidateCost(params, eval.total_tile_count, stats);
 
     return eval;
+}
+
+// 用一个新候选尝试更新当前最优解。
+// 选择优先级：
+// 1) total_cost 更小；
+// 2) total_cost 近似相等时，peak_bram 更小；
+// 3) 若仍相等，score 更大（偏好更粗粒度 tile）。
+void TryUpdateBestCandidate(
+    const KeySwitchProblem& problem,
+    const TilePlanner::Params& params,
+    bool key_persistent,
+    uint32_t ct_tile,
+    uint32_t limb_tile,
+    uint32_t digit_tile,
+    TileCandidate* best,
+    CandidateEval* best_eval) {
+
+    // EvaluateCandidate 会检查容量约束与成本模型；
+    // invalid 候选（超预算/不可执行）直接丢弃。
+    const CandidateEval eval = EvaluateCandidate(
+        problem,
+        params,
+        ct_tile,
+        limb_tile,
+        digit_tile,
+        key_persistent);
+    if (!eval.valid) {
+        return;
+    }
+
+    // 将评估结果转成可比较的候选摘要。
+    TileCandidate candidate;
+    candidate.valid = true;
+    candidate.key_persistent = key_persistent;
+    candidate.ct_tile = ct_tile;
+    candidate.limb_tile = limb_tile;
+    candidate.digit_tile = digit_tile;
+    candidate.score = static_cast<uint64_t>(ct_tile) * limb_tile * digit_tile;
+    candidate.estimated_peak_bram_bytes = eval.estimated_peak_bram_bytes;
+    candidate.estimated_total_cost = eval.cost.total_cost;
+
+    // 浮点比较容差，避免 total_cost 因数值误差导致抖动。
+    constexpr double kCostEps = 1e-6;
+    const auto cost_less = [](double lhs, double rhs) {
+        return lhs + kCostEps < rhs;
+    };
+    const auto cost_equal = [](double lhs, double rhs) {
+        return std::abs(lhs - rhs) <= kCostEps;
+    };
+
+    // 选择规则（按优先级）：
+    // 1) total_cost 更小优先；
+    // 2) 若成本近似相等，peak_bram 更小优先；
+    // 3) 若仍相等，score（tile 覆盖体积）更大优先，倾向更粗粒度分块。
+    bool choose = false;
+    if (!best->valid) {
+        choose = true;
+    } else if (cost_less(candidate.estimated_total_cost, best->estimated_total_cost)) {
+        choose = true;
+    } else if (cost_equal(candidate.estimated_total_cost, best->estimated_total_cost)) {
+        if (candidate.estimated_peak_bram_bytes < best->estimated_peak_bram_bytes) {
+            choose = true;
+        } else if (
+            candidate.estimated_peak_bram_bytes == best->estimated_peak_bram_bytes
+            && candidate.score > best->score) {
+            choose = true;
+        }
+    }
+
+    if (choose) {
+        *best = candidate;
+        *best_eval = eval;
+    }
 }
 
 } // namespace
@@ -909,66 +1024,6 @@ TilePlan TilePlanner::Plan(const KeySwitchProblem& problem) const {
     // best / best_eval 用于记录当前最优候选及其详细评估结果。
     TileCandidate best;
     CandidateEval best_eval;
-    // 浮点比较容差，避免 total_cost 在数值误差下抖动导致不稳定选择。
-    constexpr double kCostEps = 1e-6;
-    const auto cost_less = [kCostEps](double lhs, double rhs) {
-        return lhs + kCostEps < rhs;
-    };
-    const auto cost_equal = [kCostEps](double lhs, double rhs) {
-        return std::abs(lhs - rhs) <= kCostEps;
-    };
-    const auto try_update_best = [&](
-                                     bool key_persistent,
-                                     uint32_t ct_tile,
-                                     uint32_t limb_tile,
-                                     uint32_t digit_tile) {
-        // EvaluateCandidate 会检查容量约束与成本模型；
-        // invalid 候选（超预算/不可执行）直接丢弃。
-        const CandidateEval eval = EvaluateCandidate(
-            problem,
-            params_,
-            ct_tile,
-            limb_tile,
-            digit_tile,
-            key_persistent);
-        if (!eval.valid) {
-            return;
-        }
-
-        TileCandidate candidate;
-        candidate.valid = true;
-        candidate.key_persistent = key_persistent;
-        candidate.ct_tile = ct_tile;
-        candidate.limb_tile = limb_tile;
-        candidate.digit_tile = digit_tile;
-        candidate.score = static_cast<uint64_t>(ct_tile) * limb_tile * digit_tile;
-        candidate.estimated_peak_bram_bytes = eval.estimated_peak_bram_bytes;
-        candidate.estimated_total_cost = eval.cost.total_cost;
-
-        // 选择规则（按优先级）：
-        // 1) total_cost 更小优先；
-        // 2) 若成本近似相等，peak_bram 更小优先；
-        // 3) 若仍相等，score（tile 覆盖体积）更大优先，倾向更粗粒度分块。
-        bool choose = false;
-        if (!best.valid) {
-            choose = true;
-        } else if (cost_less(candidate.estimated_total_cost, best.estimated_total_cost)) {
-            choose = true;
-        } else if (cost_equal(candidate.estimated_total_cost, best.estimated_total_cost)) {
-            if (candidate.estimated_peak_bram_bytes < best.estimated_peak_bram_bytes) {
-                choose = true;
-            } else if (
-                candidate.estimated_peak_bram_bytes == best.estimated_peak_bram_bytes
-                && candidate.score > best.score) {
-                choose = true;
-            }
-        }
-
-        if (choose) {
-            best = candidate;
-            best_eval = eval;
-        }
-    };
 
     // 搜索空间：
     // - ct_tile:   [1, ciphertexts]
@@ -978,19 +1033,27 @@ TilePlan TilePlanner::Plan(const KeySwitchProblem& problem) const {
     for (uint32_t ct_tile = 1; ct_tile <= problem.ciphertexts; ++ct_tile) {
         for (uint32_t limb_tile = 1; limb_tile <= problem.limbs; ++limb_tile) {
             if (params_.allow_key_persistent) {
-                try_update_best(
+                TryUpdateBestCandidate(
+                    problem,
+                    params_,
                     /*key_persistent=*/true,
                     ct_tile,
                     limb_tile,
-                    problem.digits);
+                    problem.digits,
+                    &best,
+                    &best_eval);
             }
 
             for (uint32_t digit_tile = 1; digit_tile <= problem.digits; ++digit_tile) {
-                try_update_best(
+                TryUpdateBestCandidate(
+                    problem,
+                    params_,
                     /*key_persistent=*/false,
                     ct_tile,
                     limb_tile,
-                    digit_tile);
+                    digit_tile,
+                    &best,
+                    &best_eval);
             }
         }
     }

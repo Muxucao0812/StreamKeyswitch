@@ -36,6 +36,9 @@ bool IsSharedSingleBoardMethod(KeySwitchMethod method) {
     case KeySwitchMethod::FAST:
     case KeySwitchMethod::OLA:
     case KeySwitchMethod::HERA:
+    case KeySwitchMethod::DigitCentric:
+    case KeySwitchMethod::OutputCentric:
+    case KeySwitchMethod::MaxParallel:
         return true;
     default:
         return false;

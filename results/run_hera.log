@@ -1,0 +1,57 @@
+=== Experiment Config ===
+Scheduler: fifo
+Backend: cycle_stub
+Workload: synthetic
+KeySwitchMethod: hera
+Seed: 123
+NumCards: 1
+NumUsers: 1
+EnableMultiCard: false
+SyntheticRequestsPerUser: 1
+SyntheticInterArrival: 300
+SyntheticStartTime: 0
+BurstBursts: 4
+BurstRequestsPerUserPerBurst: 2
+BurstIntraGap: 20
+BurstInterGap: 1200
+BurstStartTime: 0
+BurstLevel: 1
+NumPools: 1
+PoolConfigSource: built-in default
+TreeConfigSource: built-in default
+HEParamsSource: built-in default
+CSVOutput: results/metrics_hera.csv
+DumpLogicalGraph: true
+DumpRuntimePlan: true
+=========================
+[keyswitch] request=0 status=fallback fallback_used=1 method_degraded=0 unsupported_method=0 unsupported_config=0 compatibility_fallback=0 requested_method=HERA effective_method=HERA reason=tile_plan_invalid
+Scheduler=fifo
+Backend=cycle_stub
+RuntimeBackend=cycle_stub
+Workload=synthetic
+Seed=123
+NumCards=1
+=== Request Metrics ===
+Completed requests: 1
+Mean latency(ns): 0.0000
+P95 latency(ns): 0
+P99 latency(ns): 0
+Max latency(ns): 0
+Mean queue time(ns): 0.0000
+Mean service time(ns): 0.0000
+=== User Metrics ===
+User 0: completed=1, mean_latency(ns)=0.0000, throughput(req/ns)=0.0000, reload_count=1
+=== Card Metrics ===
+Card 0: utilization=0.0000, reload_count=1, served_requests=1
+=== System Metrics ===
+Total throughput(req/ns): 0.0000
+Total reload count: 1
+Jain fairness index: 0.0000
+Simulation window(ns): [64, 64], duration=0
+PoolConfigSource=built-in default
+TreeConfigSource=built-in default
+HEParamsSource=built-in default
+=== CycleBackend Method Dispatch Stats ===
+EstimateCalls=1
+CycleFallbackCount=1
+CSVOutput=results/metrics_hera.csv

@@ -1,1 +1,1 @@
-/usr/bin/c++ -g CMakeFiles/keyaware_sim.dir/src/main.cpp.o -o keyaware_sim  libkeyaware_core.a 
+/usr/bin/c++ -g -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/keyaware_sim.dir/src/main.cpp.o -o keyaware_sim  libkeyaware_core.a

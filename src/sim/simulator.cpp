@@ -29,9 +29,14 @@ const char* ToString(KeySwitchMethod method) {
         return "FAST";
     case KeySwitchMethod::HERA:
         return "HERA";
+    case KeySwitchMethod::DigitCentric:
+        return "DigitCentric";
+    case KeySwitchMethod::OutputCentric:
+        return "OutputCentric";
+    case KeySwitchMethod::MaxParallel:
+        return "MaxParallel";
     case KeySwitchMethod::Cinnamon:
         return "Cinnamon";
-
     }
     return "Unknown";
 }

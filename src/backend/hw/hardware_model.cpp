@@ -107,7 +107,7 @@ uint64_t HardwareModel::EstimateDirectForwardCycles(uint64_t /*bytes*/) const {
 }
 
 uint64_t HardwareModel::EstimateDecomposeCycles(
-    const KeySwitchProblem& problem) const {
+    const KeySwitchProblem& problem, uint32_t num_limbs) const {
 
     const uint32_t waves = WavesPerPoly(problem);
     return PhaseCycles(
@@ -115,15 +115,16 @@ uint64_t HardwareModel::EstimateDecomposeCycles(
         /*startup_cycles=*/1,
         std::max<uint32_t>(1, config_.spu_stream_delay_cycles),
         /*drain_cycles=*/1,
-        /*wave_passes=*/1.0);
+        /*wave_passes=*/1.0,
+        num_limbs);
 }
 
 uint64_t HardwareModel::EstimateNttCycles(
-    const KeySwitchProblem& problem) const {
+    const KeySwitchProblem& problem, uint32_t num_limbs) const {
 
     const uint32_t waves = WavesPerPoly(problem);
     uint64_t cycles = 0;
-    cycles += PhaseCycles(waves, 0, 1, 0, 1.0);
+    cycles += PhaseCycles(waves, 0, 1, 0, 1.0, num_limbs);
     cycles += PhaseCycles(
         waves,
         /*startup_cycles=*/1,
@@ -137,7 +138,7 @@ uint64_t HardwareModel::EstimateNttCycles(
         /*drain_cycles=*/0,
         /*wave_passes=*/8.0);
     cycles += config_.intra_transpose_delay_cycles;
-    cycles += PhaseCycles(waves, 0, 1, 0, 1.0);
+    cycles += PhaseCycles(waves, 0, 1, 0, 1.0, num_limbs);
     cycles += PhaseCycles(
         waves,
         /*startup_cycles=*/1,
@@ -155,7 +156,7 @@ uint64_t HardwareModel::EstimateNttCycles(
 }
 
 uint64_t HardwareModel::EstimateInttCycles(
-    const KeySwitchProblem& problem) const {
+    const KeySwitchProblem& problem, uint32_t num_limbs) const {
 
     const uint32_t waves = WavesPerPoly(problem);
     uint64_t cycles = 0;
@@ -171,7 +172,7 @@ uint64_t HardwareModel::EstimateInttCycles(
         std::max<uint32_t>(1, config_.butterfly_delay_cycles),
         /*drain_cycles=*/0,
         /*wave_passes=*/8.0);
-    cycles += PhaseCycles(waves, 0, 1, 0, 1.0);
+    cycles += PhaseCycles(waves, 0, 1, 0, 1.0, num_limbs);
     cycles += config_.intra_transpose_delay_cycles;
     cycles += PhaseCycles(
         waves,
@@ -185,65 +186,53 @@ uint64_t HardwareModel::EstimateInttCycles(
         std::max<uint32_t>(1, config_.butterfly_delay_cycles),
         /*drain_cycles=*/0,
         /*wave_passes=*/8.0);
-    cycles += PhaseCycles(waves, 0, 1, 0, 1.0);
+    cycles += PhaseCycles(waves, 0, 1, 0, 1.0, num_limbs);
     cycles += config_.inter_transpose_delay_cycles;
     return cycles;
 }
 
 uint64_t HardwareModel::EstimateEweMulCycles(
-    const KeySwitchProblem& problem) const {
+    const KeySwitchProblem& problem, uint32_t num_limbs) const {
 
     const uint32_t waves = WavesPerPoly(problem);
     return PhaseCycles(
         waves,
         std::max<uint32_t>(1, config_.ewe_mul_delay_cycles),
-        /*per_wave_cycles=*/1,
-        /*drain_cycles=*/0,
-        /*wave_passes=*/1.0);
+        1, 0, 1.0, num_limbs);
 }
 
 uint64_t HardwareModel::EstimateEweAddCycles(
-    const KeySwitchProblem& problem) const {
+    const KeySwitchProblem& problem, uint32_t num_limbs) const {
 
     const uint32_t waves = WavesPerPoly(problem);
     return PhaseCycles(
         waves,
         std::max<uint32_t>(1, config_.ewe_add_delay_cycles),
-        /*per_wave_cycles=*/1,
-        /*drain_cycles=*/0,
-        /*wave_passes=*/1.0);
+        1, 0, 1.0, num_limbs);
 }
 
 uint64_t HardwareModel::EstimateEweSubCycles(
-    const KeySwitchProblem& problem) const {
+    const KeySwitchProblem& problem, uint32_t num_limbs) const {
 
     const uint32_t waves = WavesPerPoly(problem);
     return PhaseCycles(
         waves,
         std::max<uint32_t>(1, config_.ewe_sub_delay_cycles),
-        /*per_wave_cycles=*/1,
-        /*drain_cycles=*/0,
-        /*wave_passes=*/1.0);
+        1, 0, 1.0, num_limbs);
 }
 
 uint64_t HardwareModel::EstimateBconvCycles(
-    const KeySwitchProblem& problem) const {
+    const KeySwitchProblem& problem, uint32_t num_output_limbs) const {
 
+    // BConv = 矩阵乘法：l 个输入 limbs → k 个输出 limbs。
+    // 硬件：256 lanes，每 lane 1 个模乘 + 1 个模加。
+    // 每个 clock 处理 1 个输入 limb 的 1 个 wave（256 个系数）。
+    // 产出 1 个输出 limb = l × waves 个 clock。
+    // 产出 k 个输出 limb = k × l × waves 个 clock。
     const uint32_t waves = WavesPerPoly(problem);
-    const uint32_t alpha = Alpha(problem);
-    const uint32_t passes = CeilDivU32(
-        alpha,
-        std::max<uint32_t>(1, config_.bconv_array_height));
-    const uint32_t per_wave_cycles = std::max<uint32_t>(
-        1,
-        config_.bconv_array_width / 2);
-    return PhaseCycles(
-               waves,
-               std::max<uint32_t>(1, config_.bconv_fifo_delay_cycles),
-               per_wave_cycles,
-               /*drain_cycles=*/2,
-               static_cast<double>(passes))
-        + std::max<uint32_t>(1, config_.bconv_mac_delay_cycles);
+    const uint32_t l = std::max<uint32_t>(1, problem.limbs);
+    const uint32_t k = std::max<uint32_t>(1, num_output_limbs);
+    return static_cast<uint64_t>(k) * l * waves;
 }
 
 HardwareUnitConfig HardwareModel::MemoryConfig() const {
@@ -372,11 +361,14 @@ uint64_t HardwareModel::PhaseCycles(
     uint32_t startup_cycles,
     uint32_t per_wave_cycles,
     uint32_t drain_cycles,
-    double wave_passes) const {
+    double wave_passes,
+    uint32_t num_limbs) const {
 
+    const uint32_t limbs = std::max<uint32_t>(1, num_limbs);
     const uint64_t phase_waves = static_cast<uint64_t>(
         std::ceil(static_cast<double>(std::max<uint32_t>(1, waves_per_poly)) * wave_passes - 1e-12));
+    const uint64_t body = phase_waves * static_cast<uint64_t>(std::max<uint32_t>(1, per_wave_cycles));
     return static_cast<uint64_t>(startup_cycles)
-        + phase_waves * static_cast<uint64_t>(std::max<uint32_t>(1, per_wave_cycles))
+        + body * static_cast<uint64_t>(limbs)
         + static_cast<uint64_t>(drain_cycles);
 }

@@ -105,19 +105,19 @@ public:
     uint64_t EstimateDirectForwardCycles(uint64_t bytes) const;
 
     uint64_t EstimateDecomposeCycles(
-        const KeySwitchProblem& problem) const;
+        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
     uint64_t EstimateNttCycles(
-        const KeySwitchProblem& problem) const;
+        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
     uint64_t EstimateInttCycles(
-        const KeySwitchProblem& problem) const;
+        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
     uint64_t EstimateEweMulCycles(
-        const KeySwitchProblem& problem) const;
+        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
     uint64_t EstimateEweAddCycles(
-        const KeySwitchProblem& problem) const;
+        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
     uint64_t EstimateEweSubCycles(
-        const KeySwitchProblem& problem) const;
+        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
     uint64_t EstimateBconvCycles(
-        const KeySwitchProblem& problem) const;
+        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
 
     HardwareUnitConfig MemoryConfig() const;
     HardwareUnitConfig DecomposeConfig() const;
@@ -145,7 +145,8 @@ private:
         uint32_t startup_cycles,
         uint32_t per_wave_cycles,
         uint32_t drain_cycles,
-        double wave_passes) const;
+        double wave_passes,
+        uint32_t num_limbs = 1) const;
 
 private:
     HardwareConfig config_;

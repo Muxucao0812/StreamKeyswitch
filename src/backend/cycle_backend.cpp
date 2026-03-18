@@ -1,8 +1,5 @@
 #include "backend/cycle_backend.h"
 #include "backend/cycle_sim/driver.h"
-#include "backend/cycle_sim/lowering.h"
-#include "backend/runtime_planner.h"
-#include "backend/step_graph_runtime.h"
 
 #include <algorithm>
 #include <array>
@@ -58,51 +55,474 @@ Time TotalLatency(const ExecutionBreakdown& breakdown) {
 
 constexpr std::size_t kStageTypeCount = 6;
 
-const char* ToString(KeySwitchMethod method) {
-    switch (method) {
-    case KeySwitchMethod::Auto:
-        return "Auto";
-    case KeySwitchMethod::SingleBoardClassic:
-        return "SingleBoardClassic";
-    case KeySwitchMethod::SingleBoardFused:
-        return "SingleBoardFused";
-    case KeySwitchMethod::ScaleOutLimb:
-        return "ScaleOutLimb";
-    case KeySwitchMethod::ScaleOutDigit:
-        return "ScaleOutDigit";
-    case KeySwitchMethod::ScaleOutCiphertext:
-        return "ScaleOutCiphertext";
-    case KeySwitchMethod::Poseidon:
-        return "Poseidon";
-    case KeySwitchMethod::OLA:
-        return "OLA";
-    case KeySwitchMethod::FAB:
-        return "FAB";
-    case KeySwitchMethod::FAST:
-        return "FAST";
-    case KeySwitchMethod::HERA:
-        return "HERA";
-    case KeySwitchMethod::Cinnamon:
-        return "Cinnamon";
+// BRAM 占用追踪器：按 buffer 名称管理 acquire/release，记录峰值并检测超预算。
+class BramTracker {
+public:
+    explicit BramTracker(uint64_t budget_bytes)
+        : budget_(budget_bytes) {}
+
+    void Acquire(uint64_t bytes) {
+        live_ += bytes;
+        peak_ = std::max(peak_, live_);
+        if (live_ > budget_) {
+            overflowed_ = true;
+        }
     }
-    return "Unknown";
+
+    void Release(uint64_t bytes) {
+        live_ = (bytes > live_) ? 0 : (live_ - bytes);
+    }
+
+    // 试探：如果 acquire 这么多字节，是否会超预算。
+    bool CanAcquire(uint64_t bytes) const {
+        return (live_ + bytes) <= budget_;
+    }
+
+    uint64_t Budget() const { return budget_; }
+    uint64_t Remaining() const { return (budget_ > live_) ? (budget_ - live_) : 0; }
+    bool Overflowed() const { return overflowed_; }
+    uint64_t Peak() const { return peak_; }
+    uint64_t Live() const { return live_; }
+
+private:
+    uint64_t budget_ = 0;
+    uint64_t live_ = 0;
+    uint64_t peak_ = 0;
+    bool overflowed_ = false;
+};
+
+// Memory-aware 执行构建器。
+// 在做 memory 决策的同时直接生成 CycleProgram（跳过 TileExecutionStep 中间层）。
+// 所有数据流行为硬编码，不依赖 KeySwitchMethodPolicy。
+struct ExecutionBuilder {
+    const KeySwitchProblem& problem;
+    const HardwareModel& hardware;
+    BramTracker bram;
+    CycleProgram program;
+    uint64_t next_instruction_id = 0;
+
+    ExecutionBuilder(
+        const KeySwitchProblem& p,
+        const HardwareModel& hw,
+        KeySwitchMethod method)
+        : problem(p)
+        , hardware(hw)
+        , bram(p.bram_budget_bytes > p.bram_guard_bytes
+               ? p.bram_budget_bytes - p.bram_guard_bytes
+               : 0) {
+        program.method = method;
+        program.name = "stream_keyswitch";
+    }
+
+    // 向 program 追加一个 instruction group，返回 group id。
+    // num_limbs: 该操作涉及的 limb 数量，计算类指令 cycle = num_limbs × 单 poly cycle。
+    uint32_t Emit(
+        const std::string& name,
+        CycleInstructionKind kind,
+        CycleTransferPath transfer_path,
+        StageType stage_type,
+        uint64_t bytes,
+        uint64_t work_items,
+        uint32_t num_limbs,
+        int64_t bram_delta_issue,
+        int64_t bram_delta_complete,
+        const std::vector<uint32_t>& deps) {
+
+        const uint32_t limbs = std::max<uint32_t>(1, num_limbs);
+        // 每条 instruction = 1 个 limb 的操作延迟。
+        const uint64_t per_limb_cycles = std::max<uint64_t>(
+            1, EstimateCycles(kind, transfer_path, bytes / limbs, 1));
+        // 总延迟（用于打印，实际由 Driver 逐条调度）。
+        const uint64_t total_cycles = EstimateCycles(kind, transfer_path, bytes, num_limbs);
+
+        CycleInstructionGroup group;
+        group.id = static_cast<uint32_t>(program.groups.size());
+        group.name = name;
+        group.kind = kind;
+        group.transfer_path = transfer_path;
+        group.stage_type = stage_type;
+        group.bytes = bytes;
+        group.work_items = work_items;
+        group.live_bytes_delta_on_issue = bram_delta_issue;
+        group.live_bytes_delta_on_complete = bram_delta_complete;
+        group.dependencies = deps;
+
+        const uint64_t bytes_per_limb = (limbs > 0) ? (bytes / limbs) : bytes;
+        const uint64_t work_per_limb = (limbs > 0) ? (work_items / limbs) : work_items;
+
+        for (uint32_t i = 0; i < limbs; ++i) {
+            CycleInstruction instr;
+            instr.id = next_instruction_id++;
+            instr.group_id = group.id;
+            instr.kind = kind;
+            instr.transfer_path = transfer_path;
+            instr.stage_type = stage_type;
+            instr.bytes = bytes_per_limb;
+            instr.work_items = work_per_limb;
+            instr.latency_cycles = per_limb_cycles;
+            group.instructions.push_back(std::move(instr));
+        }
+
+        const uint32_t gid = group.id;
+        program.instruction_count += limbs;
+        program.groups.push_back(std::move(group));
+
+        std::cout << "  [group " << gid << "] " << name
+                  << "  kind=" << ToString(kind)
+                  << "  limbs=" << num_limbs
+                  << "  instrs=" << limbs
+                  << "  per_limb_cycles=" << per_limb_cycles
+                  << "  total_cycles=" << total_cycles
+                  << "  bytes=" << bytes
+                  << "  bram_live=" << bram.Live()
+                  << "\n";
+
+        return gid;
+    }
+
+    uint64_t EstimateCycles(
+        CycleInstructionKind kind,
+        CycleTransferPath path,
+        uint64_t bytes,
+        uint32_t num_limbs) const {
+
+        switch (kind) {
+        case CycleInstructionKind::LoadHBM:
+            return hardware.EstimateTransferCycles(
+                (path == CycleTransferPath::HostToHBM) ? HardwareTransferPath::HostToHBM : HardwareTransferPath::HBMToSPM, bytes);
+        case CycleInstructionKind::StoreHBM:
+            return hardware.EstimateTransferCycles(HardwareTransferPath::SPMToHBM, bytes);
+        case CycleInstructionKind::NTT:
+            return hardware.EstimateNttCycles(problem, num_limbs);
+        case CycleInstructionKind::INTT:
+            return hardware.EstimateInttCycles(problem, num_limbs);
+        case CycleInstructionKind::BConv:
+            return hardware.EstimateBconvCycles(problem, num_limbs);
+        case CycleInstructionKind::EweMul:
+            return hardware.EstimateEweMulCycles(problem, num_limbs);
+        case CycleInstructionKind::EweAdd:
+            return hardware.EstimateEweAddCycles(problem, num_limbs);
+        case CycleInstructionKind::EweSub:
+            return hardware.EstimateEweSubCycles(problem, num_limbs);
+        default:
+            return 1;
+        }
+    }
+
+    static uint32_t TileExtent(uint32_t idx, uint32_t tile_size, uint32_t total) {
+        return std::min<uint32_t>(tile_size, total - idx * tile_size);
+    }
+
+    // 上一步的 terminal group id（用于建立依赖链）。
+    uint32_t last_group = std::numeric_limits<uint32_t>::max();
+
+    std::vector<uint32_t> Deps() const {
+        if (last_group == std::numeric_limits<uint32_t>::max()) return {};
+        return {last_group};
+    }
+
+    uint64_t LoadInput(uint32_t ct_now, uint32_t limb_now) {
+        const uint64_t ct_chunk_bytes =
+            static_cast<uint64_t>(ct_now) * limb_now * problem.ct_limb_bytes;
+        std::cout << "=== LoadInput: ct=" << ct_now << " l=" << limb_now
+                  << " bytes=" << ct_chunk_bytes << " ===\n";
+        bram.Acquire(ct_chunk_bytes);
+        last_group = Emit("load_input", CycleInstructionKind::LoadHBM,
+            CycleTransferPath::HBMToSPM, StageType::Dispatch,
+            ct_chunk_bytes, 0, limb_now,
+            static_cast<int64_t>(ct_chunk_bytes), 0, Deps());
+        return ct_chunk_bytes;
+    }
+
+    // ModUp 子图：对一个 digit 的输入做 INTT → BConv → NTT。
+    //
+    // 数据维度变化（per ciphertext, per digit）：
+    //   INTT:  l limbs → l limbs（就地变换）
+    //   BConv: l limbs → k limbs（矩阵乘法，生成额外 limbs）
+    //   NTT:   l+k limbs → l+k limbs（就地变换）
+    //
+    // is_last_digit: 最后一个 digit 可以跳过 spill，输出直接留在 BRAM 给 InnerProd 用。
+    // 返回 ModUp 输出占用的字节数。
+    uint64_t ModUp(uint32_t ct_now, uint64_t input_bram_bytes, bool* spilled) {
+        const uint32_t l = problem.limbs;
+        const uint32_t k = problem.num_k;
+        const uint64_t k_limbs_bytes =
+            static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes;
+        const uint64_t modup_output_bytes = input_bram_bytes + k_limbs_bytes;
+
+        std::cout << "=== ModUp: l=" << l << " k=" << k
+                  << " input=" << input_bram_bytes
+                  << " output=" << modup_output_bytes << " ===\n";
+
+        // INTT: 对 l 个 limbs 做 INTT
+        last_group = Emit("modup_intt", CycleInstructionKind::INTT,
+            CycleTransferPath::None, StageType::BasisConvert,
+            input_bram_bytes, input_bram_bytes, l,
+            0, 0, Deps());
+
+        // BConv: l limbs → k limbs
+        bram.Acquire(k_limbs_bytes);
+        last_group = Emit("modup_bconv", CycleInstructionKind::BConv,
+            CycleTransferPath::None, StageType::BasisConvert,
+            modup_output_bytes, modup_output_bytes, k,
+            static_cast<int64_t>(k_limbs_bytes), 0, Deps());
+
+        // NTT: 对 l+k 个 limbs 做 NTT
+        last_group = Emit("modup_ntt", CycleInstructionKind::NTT,
+            CycleTransferPath::None, StageType::BasisConvert,
+            modup_output_bytes, modup_output_bytes, l + k,
+            0, 0, Deps());
+
+        // Spill 判断
+        const uint64_t accum_bytes =
+            static_cast<uint64_t>(ct_now) * problem.polys
+            * problem.key_limbs * problem.ct_limb_bytes;
+        const uint64_t one_limb_key = problem.key_digit_limb_bytes;
+        const bool should_spill = !bram.CanAcquire(accum_bytes + one_limb_key);
+
+        if (should_spill) {
+            bram.Release(modup_output_bytes);
+            last_group = Emit("modup_spill", CycleInstructionKind::StoreHBM,
+                CycleTransferPath::SPMToHBM, StageType::Dispatch,
+                modup_output_bytes, 0, l + k,
+                0, -static_cast<int64_t>(modup_output_bytes), Deps());
+            *spilled = true;
+        } else {
+            *spilled = false;
+        }
+
+        return modup_output_bytes;
+    }
+
+    // InnerProd + Reduction（融合，流式）：
+    //
+    // 流式处理：按 limb 逐个流过，每次只在 BRAM 中放 1 个 limb 的 modup_out + 1 个 limb 的 key，
+    // 乘完累加到 accum 后释放，再搬下一个 limb。
+    //
+    // BRAM 峰值 = accum + 1_limb_modup + 1_limb_key。
+    //
+    // modup_spilled: ModUp 输出是否在 HBM（true=从HBM逐limb reload，false=从BRAM逐limb读取）
+    // accum_in_bram: 调用方维护
+    // 返回 accum 的字节数。
+    uint64_t InnerProd(
+        uint32_t ct_now,
+        uint64_t modup_output_bytes,
+        bool modup_spilled,
+        bool is_last_digit,
+        bool* accum_in_bram) {
+
+        const uint32_t lk = problem.key_limbs;  // l+k
+        const uint32_t p = problem.polys;
+        const uint32_t p_lk = p * lk;  // accum 的 limb 数
+
+        const uint64_t accum_bytes =
+            static_cast<uint64_t>(ct_now) * p_lk * problem.ct_limb_bytes;
+
+        const uint64_t one_limb_modup = static_cast<uint64_t>(ct_now) * problem.ct_limb_bytes;
+        const uint64_t one_limb_key = problem.key_digit_limb_bytes;
+
+        std::cout << "=== InnerProd: modup_limbs=" << lk
+                  << " key_limbs=" << lk
+                  << " accum_limbs=" << p_lk
+                  << " spilled=" << (modup_spilled ? "yes" : "no")
+                  << " last=" << (is_last_digit ? "yes" : "no") << " ===\n";
+
+        // 确保 accum 在 BRAM。
+        if (!(*accum_in_bram)) {
+            bram.Acquire(accum_bytes);
+            *accum_in_bram = true;
+        }
+
+        // 流式乘法累加：
+        if (modup_spilled) {
+            last_group = Emit("innerprod_reload_modup", CycleInstructionKind::LoadHBM,
+                CycleTransferPath::HBMToSPM, StageType::Multiply,
+                modup_output_bytes, 0, lk,
+                static_cast<int64_t>(one_limb_modup), 0, Deps());
+            bram.Acquire(one_limb_modup + one_limb_key);
+            bram.Release(one_limb_modup + one_limb_key);
+        } else {
+            bram.Acquire(one_limb_key);
+            bram.Release(one_limb_key);
+            bram.Release(modup_output_bytes);
+        }
+
+        // 加载 key（流式）。
+        const uint64_t total_key_bytes =
+            static_cast<uint64_t>(lk) * problem.key_digit_limb_bytes;
+        last_group = Emit("innerprod_load_key", CycleInstructionKind::LoadHBM,
+            CycleTransferPath::HBMToSPM, StageType::Multiply,
+            total_key_bytes, 0, lk,
+            static_cast<int64_t>(one_limb_key), 0, Deps());
+
+        // 乘法：对 p*(l+k) 个 limb 做 EweMul。
+        last_group = Emit("innerprod_mul", CycleInstructionKind::EweMul,
+            CycleTransferPath::None, StageType::Multiply,
+            0, modup_output_bytes, p_lk,
+            0, 0, Deps());
+
+        // 累加：对 p*(l+k) 个 limb 做 EweAdd。
+        if (p > 1) {
+            last_group = Emit("innerprod_add", CycleInstructionKind::EweAdd,
+                CycleTransferPath::None, StageType::Multiply,
+                0, modup_output_bytes, p_lk,
+                0, 0, Deps());
+        }
+
+        if (is_last_digit) {
+            // 最后 digit：accum 留给 ModDown。
+        } else {
+            if (!bram.CanAcquire(modup_output_bytes)) {
+                bram.Release(accum_bytes);
+                last_group = Emit("innerprod_spill_accum", CycleInstructionKind::StoreHBM,
+                    CycleTransferPath::SPMToHBM, StageType::Multiply,
+                    accum_bytes, 0, p_lk,
+                    0, -static_cast<int64_t>(accum_bytes), Deps());
+                *accum_in_bram = false;
+            }
+        }
+
+        return accum_bytes;
+    }
+
+    // ModDown：将 accum = 2×(l+k) limbs 变换回 2×l limbs 的最终输出。
+    //
+    // 数据流：
+    //   accum (在 HBM) = [2×l limbs (NTT域)] + [2×k limbs (NTT域)]
+    //
+    //   1) 只 reload 2×k limbs 到 BRAM（2×l 部分留在 HBM，subtract 时再用）
+    //   2) INTT：对 2×k limbs 就地变换（不能流式，整块在 BRAM）
+    //   3) BConv：2×k limbs → 2×l limbs（输入全部在 BRAM）
+    //      BRAM 峰值 = 2k + 2l（输入+输出同时存在）
+    //   4) 释放 2×k limbs（BConv 输入不再需要）
+    //   5) NTT：对 2×l limbs 就地变换（不能流式，整块在 BRAM）
+    //   6) Subtract（流式）：逐 limb 从 HBM reload accum 的 2×l 部分，
+    //      与 BConv 输出相减，结果逐 limb 写回 HBM
+    //   7) 释放 BConv 输出
+    //
+    // accum_in_bram: accum 是否在 BRAM
+    // accum_bytes: accum 大小 = polys×(l+k)×ct_limb_bytes×ct_now
+    // 返回最终输出大小（2×l limbs）。
+    uint64_t ModDown(uint32_t ct_now, bool accum_in_bram) {
+        const uint32_t l = problem.limbs;
+        const uint32_t k = problem.num_k;
+        const uint32_t p = problem.polys;
+        const uint32_t p_l = p * l;
+        const uint32_t p_k = p * k;
+
+        const uint64_t per_limb = static_cast<uint64_t>(ct_now) * problem.ct_limb_bytes;
+        const uint64_t two_l_bytes = p_l * per_limb;
+        const uint64_t two_k_bytes = p_k * per_limb;
+        const uint64_t one_limb = per_limb;
+
+        std::cout << "=== ModDown: p*l=" << p_l << " p*k=" << p_k
+                  << " accum_in_bram=" << (accum_in_bram ? "yes" : "no") << " ===\n";
+
+        if (accum_in_bram) {
+            // accum (p*(l+k)) 在 BRAM。先 spill 2l 部分到 HBM，保留 2k。
+            bram.Release(two_l_bytes);
+            last_group = Emit("moddown_spill_2l", CycleInstructionKind::StoreHBM,
+                CycleTransferPath::SPMToHBM, StageType::Dispatch,
+                two_l_bytes, 0, p_l,
+                0, -static_cast<int64_t>(two_l_bytes), Deps());
+        } else {
+            // accum 在 HBM，只 reload 2k 部分。
+            bram.Acquire(two_k_bytes);
+            last_group = Emit("moddown_reload_2k", CycleInstructionKind::LoadHBM,
+                CycleTransferPath::HBMToSPM, StageType::BasisConvert,
+                two_k_bytes, 0, p_k,
+                static_cast<int64_t>(two_k_bytes), 0, Deps());
+        }
+        // BRAM = 2k limbs.
+
+        // INTT
+        last_group = Emit("moddown_intt", CycleInstructionKind::INTT,
+            CycleTransferPath::None, StageType::BasisConvert,
+            two_k_bytes, two_k_bytes, p_k,
+            0, 0, Deps());
+
+        // BConv: p*k -> p*l. Issue: +2l. Complete: -2k.
+        bram.Acquire(two_l_bytes);
+        bram.Release(two_k_bytes);
+        last_group = Emit("moddown_bconv", CycleInstructionKind::BConv,
+            CycleTransferPath::None, StageType::BasisConvert,
+            two_k_bytes + two_l_bytes, two_k_bytes + two_l_bytes, p_l,
+            static_cast<int64_t>(two_l_bytes),
+            -static_cast<int64_t>(two_k_bytes), Deps());
+        // BRAM = 2l limbs.
+
+        // NTT
+        last_group = Emit("moddown_ntt", CycleInstructionKind::NTT,
+            CycleTransferPath::None, StageType::BasisConvert,
+            two_l_bytes, two_l_bytes, p_l,
+            0, 0, Deps());
+
+        // Subtract (streaming): reload 2l + sub. Issue: +1 limb. Complete: -1 limb.
+        bram.Acquire(one_limb);
+        bram.Release(one_limb);
+        last_group = Emit("moddown_reload_2l", CycleInstructionKind::LoadHBM,
+            CycleTransferPath::HBMToSPM, StageType::Multiply,
+            two_l_bytes, 0, p_l,
+            static_cast<int64_t>(one_limb),
+            -static_cast<int64_t>(one_limb), Deps());
+        last_group = Emit("moddown_subtract", CycleInstructionKind::EweSub,
+            CycleTransferPath::None, StageType::Multiply,
+            two_l_bytes, two_l_bytes, p_l,
+            0, 0, Deps());
+
+        // Store output. Complete: -2l.
+        bram.Release(two_l_bytes);
+        last_group = Emit("moddown_store_output", CycleInstructionKind::StoreHBM,
+            CycleTransferPath::SPMToHBM, StageType::Dispatch,
+            two_l_bytes, 0, p_l,
+            0, -static_cast<int64_t>(two_l_bytes), Deps());
+
+        return two_l_bytes;
+    }
+
+    // 调试用：打印当前 BRAM 状态。
+    void DumpState(const char* label) const {
+        std::cout << "  [" << label << "] "
+                  << "live=" << bram.Live()
+                  << " peak=" << bram.Peak()
+                  << " overflow=" << (bram.Overflowed() ? "YES" : "no")
+                  << "\n";
+    }
+};
+
+// Poseidon：按 digit 循环，每个 digit 做 ModUp + InnerProd，digit 间累加。
+CycleProgram BuildPoseidonProgram(
+    const KeySwitchProblem& problem,
+    const HardwareModel& hardware) {
+
+    ExecutionBuilder builder(problem, hardware, KeySwitchMethod::Poseidon);
+
+    const uint32_t ct_now = problem.ciphertexts;
+    const uint32_t limb_now = problem.limbs;
+    bool accum_in_bram = false;
+
+    for (uint32_t digit_idx = 0; digit_idx < problem.digits; ++digit_idx) {
+        builder.LoadInput(ct_now, limb_now);
+
+        bool modup_spilled = false;
+        const uint64_t modup_out = builder.ModUp(ct_now,
+            static_cast<uint64_t>(ct_now) * limb_now * problem.ct_limb_bytes,
+            &modup_spilled);
+
+        const bool is_last = (digit_idx == problem.digits - 1);
+        builder.InnerProd(ct_now, modup_out, modup_spilled, is_last, &accum_in_bram);
+    }
+
+    builder.ModDown(ct_now, accum_in_bram);
+
+    builder.program.estimated_peak_live_bytes = builder.bram.Peak();
+    return std::move(builder.program);
 }
+
+
 
 uint8_t MethodKey(KeySwitchMethod method) {
     return static_cast<uint8_t>(method);
-}
-
-bool IsSharedSingleBoardMethod(KeySwitchMethod method) {
-    switch (method) {
-    case KeySwitchMethod::Poseidon:
-    case KeySwitchMethod::FAB:
-    case KeySwitchMethod::FAST:
-    case KeySwitchMethod::OLA:
-    case KeySwitchMethod::HERA:
-        return true;
-    default:
-        return false;
-    }
 }
 
 std::size_t StageIndex(StageType stage_type) {
@@ -220,19 +640,6 @@ void AddCycleComputeTime(
     AddComputeTime(breakdown, timing.source_step_type, value);
 }
 
-void CopyPeakBuffers(
-    PeakBufferBreakdown* dst,
-    const PeakBufferUsage& src) {
-
-    dst->persistent_peak_bytes = src.persistent_peak_bytes;
-    dst->static_peak_bytes = src.static_peak_bytes;
-    dst->dynamic_peak_bytes = src.dynamic_peak_bytes;
-    dst->key_peak_bytes = src.key_peak_bytes;
-    dst->ct_peak_bytes = src.ct_peak_bytes;
-    dst->out_peak_bytes = src.out_peak_bytes;
-    dst->temp_peak_bytes = src.temp_peak_bytes;
-}
-
 ExecutionResult MakeFallbackResult(
     const Request& req,
     KeySwitchMethod effective_method,
@@ -270,85 +677,6 @@ ExecutionResult MakeFallbackResult(
 
     NormalizeStatusFlags(&result);
     return result;
-}
-
-void PopulateResultMetadataFromExecution(
-    const Request& req,
-    const KeySwitchExecution& execution,
-    KeySwitchMethod effective_method,
-    ExecutionResult* result) {
-
-    result->requested_method = req.ks_profile.method;
-    result->effective_method = effective_method;
-    result->method_degraded = execution.method_degraded;
-    result->degraded_reason = execution.degraded_reason;
-    result->primitive_breakdown_primary = true;
-    result->stage_breakdown_compat_only = true;
-    result->tiled_execution = execution.tiled_execution;
-
-    if (execution.tile_count > 0) {
-        result->tile_count = execution.tile_count;
-    }
-    if (execution.working_set_bytes > 0) {
-        result->working_set_bytes = execution.working_set_bytes;
-    }
-
-    result->key_resident_reuse = execution.key_resident_hit;
-    result->key_resident_hit = execution.key_resident_hit;
-    result->key_persistent_bram = execution.key_persistent_bram;
-
-    if (execution.key_host_to_hbm_bytes > 0 || execution.key_resident_hit) {
-        result->key_host_to_hbm_bytes = execution.key_host_to_hbm_bytes;
-    }
-    if (execution.key_hbm_to_bram_bytes > 0) {
-        result->key_hbm_to_bram_bytes = execution.key_hbm_to_bram_bytes;
-    }
-    if (execution.ct_hbm_to_bram_bytes > 0) {
-        result->ct_hbm_to_bram_bytes = execution.ct_hbm_to_bram_bytes;
-    }
-    if (execution.out_bram_to_hbm_bytes > 0) {
-        result->out_bram_to_hbm_bytes = execution.out_bram_to_hbm_bytes;
-    }
-
-    if (execution.peak_bram_bytes > 0) {
-        result->peak_bram_bytes = execution.peak_bram_bytes;
-        CopyPeakBuffers(&result->peak_buffers, execution.peak_buffers);
-    }
-
-    const uint64_t hbm_candidate = std::max<uint64_t>(
-        result->working_set_bytes,
-        execution.problem.output_bytes);
-    result->peak_hbm_bytes = hbm_candidate;
-    result->peak_total_bytes = std::max(result->peak_bram_bytes, result->peak_hbm_bytes);
-    result->primitive_peak_memory_bytes = result->peak_total_bytes;
-    result->peak_memory_bytes = result->peak_total_bytes;
-
-    result->hbm_read_bytes =
-        result->key_host_to_hbm_bytes
-        + result->key_hbm_to_bram_bytes
-        + result->ct_hbm_to_bram_bytes;
-    result->hbm_write_bytes = result->out_bram_to_hbm_bytes;
-}
-
-void PopulateResultMetadataFromRuntimePlan(
-    const RuntimePlan& plan,
-    ExecutionResult* result) {
-
-    result->tiled_execution = true;
-    result->tile_count = plan.tile_count;
-    result->working_set_bytes = plan.working_set_bytes;
-    result->key_resident_reuse = plan.key_resident_hit;
-    result->key_resident_hit = plan.key_resident_hit;
-    result->key_persistent_bram = plan.key_persistent_bram;
-    result->key_host_to_hbm_bytes = plan.key_host_to_hbm_bytes;
-    result->key_hbm_to_bram_bytes = plan.key_hbm_to_bram_bytes;
-    result->ct_hbm_to_bram_bytes = plan.ct_hbm_to_bram_bytes;
-    result->out_bram_to_hbm_bytes = plan.out_bram_to_hbm_bytes;
-    result->hbm_read_bytes =
-        result->key_host_to_hbm_bytes
-        + result->key_hbm_to_bram_bytes
-        + result->ct_hbm_to_bram_bytes;
-    result->hbm_write_bytes = result->out_bram_to_hbm_bytes;
 }
 
 ExecutionBreakdown StageBreakdownFromCycles(
@@ -435,165 +763,101 @@ PrimitiveComputeBreakdown ComputeBreakdownFromCycles(
     return breakdown;
 }
 
-ExecutionResult MakeExecutionFallbackResult(
-    const Request& req,
-    const KeySwitchExecution& execution,
-    KeySwitchMethod method) {
+void DumpDetailedStats(
+    const CycleProgram& program,
+    const CycleSimStats& stats,
+    const HardwareModel& hw) {
 
-    ExecutionResult result = MakeFallbackResult(
-        req,
-        method,
-        execution.fallback_reason);
-    PopulateResultMetadataFromExecution(
-        req,
-        execution,
-        (execution.effective_method == KeySwitchMethod::Auto)
-            ? method
-            : execution.effective_method,
-        &result);
-    return result;
-}
+    std::cout << "\n========== Detailed Execution Statistics ==========\n";
 
-bool TryEstimateSharedSingleBoardWithRuntimePlanner(
-    const Request& req,
-    const KeySwitchExecution& execution,
-    KeySwitchMethod method,
-    const HardwareModel& hw_model,
-    const KeySwitchExecutionModel& execution_model,
-    ExecutionResult* out_result) {
+    // 1. 总览
+    const Time total_ns = hw.CyclesToNs(stats.total_cycles);
+    std::cout << "\n--- Summary ---\n";
+    std::cout << "Total cycles:           " << stats.total_cycles << "\n";
+    std::cout << "Total latency (ns):     " << total_ns << "\n";
+    std::cout << "Peak BRAM live (bytes): " << stats.peak_bram_live_bytes << "\n";
+    std::cout << "HBM read (bytes):       " << stats.hbm_read_bytes << "\n";
+    std::cout << "HBM write (bytes):      " << stats.hbm_write_bytes << "\n";
+    std::cout << "Dependency stalls:      " << stats.dependency_stall_cycles << " cycles\n";
+    std::cout << "Resource stalls:        " << stats.resource_stall_cycles << " cycles\n";
+    std::cout << "Instruction groups:     " << program.groups.size() << "\n";
+    std::cout << "Total instructions:     " << program.instruction_count << "\n";
 
-    // 仅处理“共享单板方法 + 单卡问题”。
-    // 多卡（例如 Cinnamon）仍走后续 cycle lowering 路径。
-    if (!IsSharedSingleBoardMethod(method) || execution.problem.cards > 1) {
-        return false;
-    }
-
-    // 对外结果的 effective_method 统一按当前执行上下文归一：
-    // - 若 execution.effective_method 仍是 Auto，占位回退到入参 method；
-    // - 否则使用 execution 已解析出的 effective_method。
-    const KeySwitchMethod effective_method =
-        (execution.effective_method == KeySwitchMethod::Auto)
-        ? method
-        : execution.effective_method;
-
-    // 第一步：把 logical execution 映射为 runtime plan（tile 切分 + step DAG）。
-    // 这一层失败通常意味着：
-    // - logical_graph 不完整，
-    // - tile_plan 不可行，
-    // - 或 step dataflow 校验未通过。
-    RuntimePlanner runtime_planner(hw_model, execution_model.TilePlannerParams());
-    const RuntimePlan runtime_plan = runtime_planner.Plan(execution);
-    if (!runtime_plan.valid) {
-        ExecutionResult fallback = MakeFallbackResult(
-            req,
-            effective_method,
-            KeySwitchFallbackReason::TilePlanInvalid);
-        PopulateResultMetadataFromExecution(
-            req,
-            execution,
-            effective_method,
-            &fallback);
-        fallback.fallback_reason_message = std::string(ToString(fallback.fallback_reason));
-        if (!runtime_plan.failure_reason.empty()) {
-            // 把 runtime planner 的细粒度失败原因透传出来，便于定位。
-            fallback.fallback_reason_message += ": " + runtime_plan.failure_reason;
-        } else {
-            fallback.fallback_reason_message += ": runtime_planner_failed";
+    // 2. 按操作类型统计 cycle 占比
+    std::cout << "\n--- Cycle Breakdown by Instruction Kind ---\n";
+    struct KindStat { const char* name; uint64_t cycles; uint64_t count; uint64_t bytes; };
+    std::vector<KindStat> kind_stats;
+    for (std::size_t i = 0; i < kCycleInstructionKindCount; ++i) {
+        if (stats.instruction_cycles[i] > 0 || stats.instruction_counts[i] > 0) {
+            kind_stats.push_back({
+                ToString(static_cast<CycleInstructionKind>(i)),
+                stats.instruction_cycles[i],
+                stats.instruction_counts[i],
+                stats.instruction_bytes[i]
+            });
         }
-        NormalizeStatusFlags(&fallback);
-        *out_result = std::move(fallback);
-        return true;
+    }
+    for (const auto& ks : kind_stats) {
+        const double pct = (stats.total_cycles > 0)
+            ? (100.0 * static_cast<double>(ks.cycles) / static_cast<double>(stats.total_cycles))
+            : 0.0;
+        std::cout << "  " << ks.name
+                  << ": cycles=" << ks.cycles
+                  << " (" << pct << "%)"
+                  << "  count=" << ks.count
+                  << "  bytes=" << ks.bytes
+                  << "\n";
     }
 
-    // 第二步：在 step graph runtime 上执行计划，得到 compute/transfer/live-memory 统计。
-    // 这一层失败代表动态依赖/存储流在执行器里不可满足。
-    StepGraphRuntimeExecutor runtime_executor(hw_model);
-    const RuntimeState runtime = runtime_executor.ExecuteStepGraph(runtime_plan);
-    if (!runtime.valid) {
-        ExecutionResult fallback = MakeFallbackResult(
-            req,
-            effective_method,
-            KeySwitchFallbackReason::UnsupportedConfig);
-        PopulateResultMetadataFromExecution(
-            req,
-            execution,
-            effective_method,
-            &fallback);
-        PopulateResultMetadataFromRuntimePlan(runtime_plan, &fallback);
-        fallback.fallback_reason_message =
-            std::string(ToString(fallback.fallback_reason))
-            + ": dynamic_step_graph_runtime_failed";
-        NormalizeStatusFlags(&fallback);
-        *out_result = std::move(fallback);
-        return true;
+    // 3. Group 时序表（含 BRAM 占用）
+    std::cout << "\n--- Group Timeline ---\n";
+    std::cout << "  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes\n";
+    for (const CycleGroupTiming& t : stats.group_timings) {
+        const auto& group = program.groups[t.group_id];
+        char buf[256];
+        snprintf(buf, sizeof(buf),
+            "  %2u  %-24s %7lu   %7lu   %8lu  %11lu  %11lu  %lu\n",
+            t.group_id,
+            group.name.c_str(),
+            static_cast<unsigned long>(t.start_cycle),
+            static_cast<unsigned long>(t.finish_cycle),
+            static_cast<unsigned long>(t.DurationCycles()),
+            static_cast<unsigned long>(t.live_bytes_before),
+            static_cast<unsigned long>(t.live_bytes_after),
+            static_cast<unsigned long>(t.bytes));
+        std::cout << buf;
     }
 
-    // 第三步：把 runtime 的细粒度记录聚合回 ExecutionResult：
-    // - stage 粒度时延，
-    // - transfer / compute 分解，
-    // - HBM/BRAM 读写与 spill/reload，
-    // - 峰值内存与能耗。
-    ExecutionResult result{};
-    PopulateResultMetadataFromExecution(
-        req,
-        execution,
-        effective_method,
-        &result);
-    PopulateResultMetadataFromRuntimePlan(runtime_plan, &result);
-
-    std::array<uint64_t, kStageTypeCount> stage_cycles{};
-    TransferBreakdown transfer_cycles;
-    PrimitiveComputeBreakdown compute_cycles;
-    for (const StepRuntimeRecord& record : runtime.step_records) {
-        SaturatingAdd(
-            &stage_cycles[StageIndex(record.stage_type)],
-            record.total_cycles);
-        AddTransferTime(
-            &transfer_cycles,
-            record.step_type,
-            record.transfer_cycles);
-        AddComputeTime(
-            &compute_cycles,
-            record.step_type,
-            record.compute_cycles);
+    // 4. BRAM 占用时间线（每个 group 的 start/end 对应的 BRAM 状态，可用于画图）
+    std::cout << "\n--- BRAM Timeline (cycle, live_bytes) ---\n";
+    std::cout << "# cycle,bram_bytes\n";
+    std::cout << "0,0\n";
+    for (const CycleGroupTiming& t : stats.group_timings) {
+        std::cout << t.start_cycle << "," << t.live_bytes_before << "\n";
+        std::cout << t.finish_cycle << "," << t.live_bytes_after << "\n";
     }
 
-    const Time total_latency_ns = hw_model.CyclesToNs(runtime.total_cycles);
-    result.breakdown = StageBreakdownFromCycles(
-        hw_model,
-        stage_cycles,
-        total_latency_ns);
-    result.transfer_breakdown = TransferBreakdownFromCycles(hw_model, transfer_cycles);
-    result.compute_breakdown = ComputeBreakdownFromCycles(hw_model, compute_cycles);
-
-    result.total_latency = TotalLatency(result.breakdown);
-    result.compute_cycles = runtime.compute_cycles;
-    result.transfer_cycles = runtime.transfer_cycles;
-    result.hbm_read_bytes = runtime.hbm_read_bytes;
-    result.hbm_write_bytes = runtime.hbm_write_bytes;
-    result.bram_read_bytes = runtime.bram_read_bytes;
-    result.bram_write_bytes = runtime.bram_write_bytes;
-    result.hbm_round_trips = std::min(runtime.spill_count, runtime.reload_count);
-    result.direct_forward_count = runtime.direct_forward_count;
-    result.direct_forward_bytes = runtime.direct_forward_bytes;
-    result.spill_count = runtime.spill_count;
-    result.reload_count = runtime.reload_count;
-    result.spill_bytes = runtime.spill_bytes;
-    result.reload_bytes = runtime.reload_bytes;
-    result.peak_hbm_bytes = std::max(result.peak_hbm_bytes, runtime.peak_hbm_bytes);
-    result.peak_bram_bytes = std::max(result.peak_bram_bytes, runtime.peak_bram_bytes);
-    result.peak_total_bytes = std::max(result.peak_bram_bytes, result.peak_hbm_bytes);
-    result.primitive_peak_memory_bytes = result.peak_total_bytes;
-    result.peak_memory_bytes = result.peak_total_bytes;
-    result.energy_nj = hw_model.EstimateTransferEnergyByBytes(
-        runtime.hbm_read_bytes + runtime.hbm_write_bytes);
-    result.fine_step_cycles.assign(kTileExecutionStepTypeCount, 0);
-    for (std::size_t idx = 0; idx < kTileExecutionStepTypeCount; ++idx) {
-        result.fine_step_cycles[idx] = hw_model.CyclesToNs(runtime.fine_step_cycles[idx]);
+    // 5. 传输 vs 计算统计
+    uint64_t transfer_cycles = 0;
+    uint64_t compute_cycles = 0;
+    for (const CycleGroupTiming& t : stats.group_timings) {
+        if (t.transfer_path != CycleTransferPath::None) {
+            transfer_cycles += t.DurationCycles();
+        } else {
+            compute_cycles += t.DurationCycles();
+        }
     }
+    const double transfer_pct = (stats.total_cycles > 0)
+        ? (100.0 * static_cast<double>(transfer_cycles) / static_cast<double>(stats.total_cycles))
+        : 0.0;
+    const double compute_pct = (stats.total_cycles > 0)
+        ? (100.0 * static_cast<double>(compute_cycles) / static_cast<double>(stats.total_cycles))
+        : 0.0;
+    std::cout << "\n--- Transfer vs Compute ---\n";
+    std::cout << "Transfer: " << transfer_cycles << " cycles (" << transfer_pct << "%)\n";
+    std::cout << "Compute:  " << compute_cycles << " cycles (" << compute_pct << "%)\n";
 
-    *out_result = std::move(result);
-    return true;
+    std::cout << "====================================================\n\n";
 }
 
 } // namespace
@@ -666,6 +930,18 @@ ExecutionResult CycleBackend::Estimate(
         result = EstimateMethod(req, plan, state, KeySwitchMethod::HERA);
         break;
 
+    case KeySwitchMethod::DigitCentric:
+        result = EstimateMethod(req, plan, state, KeySwitchMethod::DigitCentric);
+        break;
+
+    case KeySwitchMethod::OutputCentric:
+        result = EstimateMethod(req, plan, state, KeySwitchMethod::OutputCentric);
+        break;
+
+    case KeySwitchMethod::MaxParallel:
+        result = EstimateMethod(req, plan, state, KeySwitchMethod::MaxParallel);
+        break;
+
     case KeySwitchMethod::Cinnamon:
         result = EstimateMethod(req, plan, state, KeySwitchMethod::Cinnamon);
         break;
@@ -682,114 +958,53 @@ ExecutionResult CycleBackend::Estimate(
     return result;
 }
 
-ExecutionResult CycleBackend::EstimateMethod(
+CycleProgram CycleBackend::BuildProgram(
     const Request& req,
     const ExecutionPlan& plan,
     const SystemState& state,
-    KeySwitchMethod method
-) const {
+    KeySwitchMethod method) const {
 
-    // 固定本次估算方法，构建可执行的 KeySwitch 执行描述。
     Request method_req = req;
     method_req.ks_profile.method = method;
-    const KeySwitchExecution execution = execution_model_.Build(method_req, plan, state);
-    
-    // 执行模型不可用时，返回带原因的统一兜底结果。
-    if (!execution.valid) {
-        return MakeExecutionFallbackResult(req, execution, method);
+    const KeySwitchProblem problem = execution_model_.BuildProblem(method_req, plan, state);
+
+    if (!problem.valid) {
+        return CycleProgram{};
     }
 
-    const KeySwitchMethod effective_method = (execution.effective_method == KeySwitchMethod::Auto) ? method : execution.effective_method;
-
-    if (ShouldDumpLogicalGraph(effective_method)) {
-        std::cout << "=== Logical Graph [method=" << ToString(effective_method)
-                  << ", request=" << req.request_id << "] ===\n";
-        if (!execution.logical_graph.valid || execution.logical_graph.nodes.empty()) {
-            std::cout << "LogicalGraph: unavailable\n";
-        } else {
-            DumpLogicalGraph(execution.logical_graph, std::cout);
-        }
-        std::cout << "============================================\n";
+    switch (method) {
+    case KeySwitchMethod::Poseidon:
+        return BuildPoseidonProgram(problem, hw_model_);
+    case KeySwitchMethod::DigitCentric:
+    case KeySwitchMethod::OutputCentric:
+    case KeySwitchMethod::MaxParallel:
+        // TODO: 各方法的实现待补充。
+        return CycleProgram{};
+    default:
+        return CycleProgram{};
     }
+}
 
-    if (ShouldDumpRuntimePlan(effective_method)) {
-        RuntimePlanner planner(hw_model_, execution_model_.TilePlannerParams());
-        const RuntimePlan runtime_plan = planner.Plan(execution);
-        std::cout << "=== Runtime Plan [method=" << ToString(effective_method) << ", request=" << req.request_id << "] ===\n";
-        if (!runtime_plan.valid) {
-            std::cout << "RuntimePlan: unavailable";
-            if (!runtime_plan.failure_reason.empty()) {
-                std::cout << " reason=" << runtime_plan.failure_reason;
-            }
-            std::cout << "\n";
-        } else {
-            DumpRuntimePlan(runtime_plan, std::cout);
-        }
-        std::cout << "===========================================\n";
-    }
+CycleSimStats CycleBackend::Simulate(
+    const CycleProgram& program) const {
 
-    // 单板方法优先走 runtime-plan + step-graph-runtime 的 estimate 路径。
-    // 这样可以直接利用 dataflow 依赖信息来做更细的 transfer/compute 聚合。
-    ExecutionResult shared_single_board_result{};
-    if (TryEstimateSharedSingleBoardWithRuntimePlanner(
-        req,
-        execution,
-        method,
-        hw_model_,
-        execution_model_,
-        &shared_single_board_result)) {
-        return shared_single_board_result;
-    }
-
-    // 将高层执行步骤 lower 到 cycle simulator 可运行的程序表示。
-    CycleLowererSelector lowerer(hw_model_);
-    const CycleLoweringResult lowering = lowerer.Lower(execution);
-    
-    if (!lowering.valid) {
-        // lowering 失败时保留上下文元信息，并补齐可读的失败原因。
-        ExecutionResult result = MakeFallbackResult(
-            req,
-            (execution.effective_method == KeySwitchMethod::Auto)
-                ? method
-                : execution.effective_method,
-            (lowering.fallback_reason == KeySwitchFallbackReason::None)
-                ? KeySwitchFallbackReason::UnsupportedConfig
-                : lowering.fallback_reason);
-        PopulateResultMetadataFromExecution(
-            req,
-            execution,
-            (execution.effective_method == KeySwitchMethod::Auto)
-                ? method
-                : execution.effective_method,
-            &result);
-        if (!lowering.fallback_reason_message.empty()) {
-            result.fallback_reason_message =
-                std::string(ToString(result.fallback_reason))
-                + ": " + lowering.fallback_reason_message;
-        }
-        NormalizeStatusFlags(&result);
-        return result;
-    }
-
-    // 运行 cycle 级仿真，拿到分组时序与资源统计。
     CycleDriver driver(hw_model_);
-    const CycleSimStats sim_stats = driver.Run(lowering.program);
+    return driver.Run(program);
+}
 
+ExecutionResult CycleBackend::CollectResult(
+    const Request& req,
+    KeySwitchMethod effective_method,
+    const CycleSimStats& sim_stats) const {
+
+    (void)req;
+    (void)effective_method;
     ExecutionResult result{};
-    // 先写入请求/方法等元信息，再填充各类统计字段。
-    PopulateResultMetadataFromExecution(
-        req,
-        execution,
-        (execution.effective_method == KeySwitchMethod::Auto)
-            ? method
-            : execution.effective_method,
-        &result);
 
     std::array<uint64_t, kStageTypeCount> stage_cycles{};
     TransferBreakdown transfer_cycles;
     PrimitiveComputeBreakdown compute_cycles;
 
-    // 汇总每个阶段的周期、传输时间和算子时间，并累计传输能耗。
     for (const CycleGroupTiming& timing : sim_stats.group_timings) {
         const uint64_t duration_cycles = timing.DurationCycles();
         SaturatingAdd(
@@ -808,12 +1023,9 @@ ExecutionResult CycleBackend::EstimateMethod(
         }
     }
 
-    // 将仿真统计统一换算成结果结构体中的时延/带宽/峰值内存等指标。
     const Time total_latency_ns = hw_model_.CyclesToNs(sim_stats.total_cycles);
     result.breakdown = StageBreakdownFromCycles(hw_model_, stage_cycles, total_latency_ns);
-
     result.transfer_breakdown = TransferBreakdownFromCycles(hw_model_, transfer_cycles);
-
     result.compute_breakdown = ComputeBreakdownFromCycles(hw_model_, compute_cycles);
 
     result.total_latency = total_latency_ns;
@@ -835,7 +1047,31 @@ ExecutionResult CycleBackend::EstimateMethod(
     result.primitive_peak_memory_bytes = result.peak_total_bytes;
     result.peak_memory_bytes = result.peak_total_bytes;
     result.total_latency = TotalLatency(result.breakdown);
+
+    NormalizeStatusFlags(&result);
     return result;
+}
+
+ExecutionResult CycleBackend::EstimateMethod(
+    const Request& req,
+    const ExecutionPlan& plan,
+    const SystemState& state,
+    KeySwitchMethod method) const {
+
+    // 1. 构建 CycleProgram：memory-aware 调度 + 直接生成硬件指令。
+    const CycleProgram program = BuildProgram(req, plan, state, method);
+    if (program.empty()) {
+        return MakeFallbackResult(req, method, KeySwitchFallbackReason::TilePlanInvalid);
+    }
+
+    // 2. 运行 cycle 级仿真。
+    const CycleSimStats sim_stats = Simulate(program);
+
+    // 3. 详细统计。
+    DumpDetailedStats(program, sim_stats, hw_model_);
+
+    // 4. 汇聚结果。
+    return CollectResult(req, method, sim_stats);
 }
 
 CycleBackendStats CycleBackend::GetStats() const {

@@ -326,6 +326,13 @@ inline KeySwitchMethodPolicy ResolveMethodPolicy(KeySwitchMethod method) {
         policy.direct_forward_to_moddown = false;
         return policy;
 
+    case KeySwitchMethod::DigitCentric:
+    case KeySwitchMethod::OutputCentric:
+    case KeySwitchMethod::MaxParallel:
+        // 新的 stream-oriented 方法暂时复用 Poseidon 的 policy。
+        // TODO: 各方法的策略差异待补充。
+        return ResolveMethodPolicy(KeySwitchMethod::Poseidon);
+
     case KeySwitchMethod::Auto:
     default:
         return ResolveMethodPolicy(KeySwitchMethod::Poseidon);

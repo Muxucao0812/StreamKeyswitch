@@ -22,9 +22,12 @@ enum class KeySwitchMethod : uint8_t {
     FAB,
     FAST,
     HERA,
+    // Single Board (stream-oriented)
+    DigitCentric,
+    OutputCentric,
+    MaxParallel,
     // Multi Board
     Cinnamon,
-    
 };
 
 enum class PartitionStrategy : uint8_t {
