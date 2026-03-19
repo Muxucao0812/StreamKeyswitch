@@ -31,6 +31,8 @@ set(KEYAWARE_CORE_SOURCES
     src/backend/model/keyswitch_execution_model.cpp
     src/backend/primitive_simulator.cpp
     src/backend/cycle_backend/cycle_backend.cpp
+    src/backend/cycle_backend/cycle_backend_primitives.cpp
+    src/backend/cycle_backend/cycle_backend_fab.cpp
     src/backend/cycle_backend/cycle_backend_ola.cpp
     src/backend/cycle_backend/cycle_backend_poseidon.cpp
     src/scheduler/fifo_scheduler.cpp

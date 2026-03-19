@@ -1,6 +1,12 @@
 #include "backend/cycle_backend/cycle_backend.h"
 #include "backend/cycle_backend/cycle_backend_ola.h"
 #include "backend/cycle_backend/cycle_backend_poseidon.h"
+#include "backend/cycle_backend/cycle_backend_fab.h"
+#include "backend/cycle_backend/cycle_backend_fast.h"
+#include "backend/cycle_backend/cycle_backend_hera.h"
+#include "backend/cycle_backend/cycle_backend_digital_centric.h"
+#include "backend/cycle_backend/cycle_backend_output_centric.h"
+#include "backend/cycle_backend/cycle_backend_max_parrallel.h"
 #include "backend/cycle_sim/driver.h"
 
 #include <algorithm>
@@ -667,13 +673,17 @@ CycleProgram CycleBackend::BuildProgram(
     case KeySwitchMethod::OLA:
         return BuildOLAProgram(problem, hw_model_);
     case KeySwitchMethod::FAB:
+        return BuildFABProgram(problem, hw_model_);
     case KeySwitchMethod::FAST:
+        return BuildFastProgram(problem, hw_model_);
     case KeySwitchMethod::HERA:
+        return BuildHERAProgram(problem, hw_model_);
     case KeySwitchMethod::DigitCentric:
+        return BuildDigitalCentricProgram(problem, hw_model_);
     case KeySwitchMethod::OutputCentric:
+        return BuildOutputCentricProgram(problem, hw_model_);
     case KeySwitchMethod::MaxParallel:
-        // TODO: 各方法的实现待补充。
-        return CycleProgram{};
+        return BuildMaxParallelProgram(problem, hw_model_);
     default:
         return CycleProgram{};
     }

@@ -152,6 +152,8 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cp
  /home/mxc/work/KeyAwareSwitch/include/model/resource_tree.h \
  /usr/include/c++/11/cstddef \
  /home/mxc/work/KeyAwareSwitch/include/backend/hw/hardware_model.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_primitives.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/bram_accounting.h \
  /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/bram_tracker.h \
  /usr/include/c++/11/algorithm /usr/include/c++/11/bits/stl_algo.h \
  /usr/include/c++/11/bits/algorithmfwd.h \
@@ -170,9 +172,9 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cp
  /usr/include/c++/11/bits/node_handle.h \
  /usr/include/c++/11/bits/unordered_map.h \
  /usr/include/c++/11/bits/erase_if.h \
- /usr/include/c++/11/pstl/execution_defs.h /usr/include/c++/11/iostream \
- /usr/include/c++/11/ostream /usr/include/c++/11/ios \
- /usr/include/c++/11/bits/ios_base.h \
+ /usr/include/c++/11/pstl/execution_defs.h /usr/include/c++/11/limits \
+ /usr/include/c++/11/iostream /usr/include/c++/11/ostream \
+ /usr/include/c++/11/ios /usr/include/c++/11/bits/ios_base.h \
  /usr/include/c++/11/bits/locale_classes.h \
  /usr/include/c++/11/bits/locale_classes.tcc \
  /usr/include/c++/11/system_error \
@@ -188,4 +190,4 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cp
  /usr/include/c++/11/bits/locale_facets.tcc \
  /usr/include/c++/11/bits/basic_ios.tcc \
  /usr/include/c++/11/bits/ostream.tcc /usr/include/c++/11/istream \
- /usr/include/c++/11/bits/istream.tcc /usr/include/c++/11/limits
+ /usr/include/c++/11/bits/istream.tcc

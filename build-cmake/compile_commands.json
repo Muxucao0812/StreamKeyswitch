@@ -66,6 +66,11 @@
 },
 {
   "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_primitives.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_primitives.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_primitives.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
   "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_ola.cpp",
   "file": "/home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_ola.cpp"
 },

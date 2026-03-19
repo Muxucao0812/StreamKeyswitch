@@ -5,6 +5,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o.d"
   "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o"
   "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o.d"
+  "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_primitives.cpp.o"
+  "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_primitives.cpp.o.d"
   "CMakeFiles/keyaware_core.dir/src/backend/cycle_sim/arch.cpp.o"
   "CMakeFiles/keyaware_core.dir/src/backend/cycle_sim/arch.cpp.o.d"
   "CMakeFiles/keyaware_core.dir/src/backend/cycle_sim/driver.cpp.o"

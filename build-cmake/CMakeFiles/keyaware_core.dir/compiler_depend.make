@@ -432,6 +432,7 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o: 
   ../include/model/resource_tree.h \
   /usr/include/c++/11/cstddef \
   ../include/backend/hw/hardware_model.h \
+  ../include/backend/cycle_backend/bram_accounting.h \
   ../include/backend/cycle_backend/bram_tracker.h \
   /usr/include/c++/11/algorithm \
   /usr/include/c++/11/bits/stl_algo.h \
@@ -455,7 +456,31 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o: 
   /usr/include/c++/11/bits/unordered_map.h \
   /usr/include/c++/11/bits/erase_if.h \
   /usr/include/c++/11/pstl/execution_defs.h \
-  /usr/include/c++/11/limits
+  /usr/include/c++/11/limits \
+  /usr/include/c++/11/iostream \
+  /usr/include/c++/11/ostream \
+  /usr/include/c++/11/ios \
+  /usr/include/c++/11/bits/ios_base.h \
+  /usr/include/c++/11/bits/locale_classes.h \
+  /usr/include/c++/11/bits/locale_classes.tcc \
+  /usr/include/c++/11/system_error \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/error_constants.h \
+  /usr/include/c++/11/stdexcept \
+  /usr/include/c++/11/streambuf \
+  /usr/include/c++/11/bits/streambuf.tcc \
+  /usr/include/c++/11/bits/basic_ios.h \
+  /usr/include/c++/11/bits/locale_facets.h \
+  /usr/include/c++/11/cwctype \
+  /usr/include/wctype.h \
+  /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/ctype_base.h \
+  /usr/include/c++/11/bits/streambuf_iterator.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/ctype_inline.h \
+  /usr/include/c++/11/bits/locale_facets.tcc \
+  /usr/include/c++/11/bits/basic_ios.tcc \
+  /usr/include/c++/11/bits/ostream.tcc \
+  /usr/include/c++/11/istream \
+  /usr/include/c++/11/bits/istream.tcc
 
 CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o: ../src/backend/cycle_backend/cycle_backend_poseidon.cpp \
   /usr/include/stdc-predef.h \
@@ -637,6 +662,7 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cp
   ../include/model/resource_tree.h \
   /usr/include/c++/11/cstddef \
   ../include/backend/hw/hardware_model.h \
+  ../include/backend/cycle_backend/bram_accounting.h \
   ../include/backend/cycle_backend/bram_tracker.h \
   /usr/include/c++/11/algorithm \
   /usr/include/c++/11/bits/stl_algo.h \
@@ -660,6 +686,7 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cp
   /usr/include/c++/11/bits/unordered_map.h \
   /usr/include/c++/11/bits/erase_if.h \
   /usr/include/c++/11/pstl/execution_defs.h \
+  /usr/include/c++/11/limits \
   /usr/include/c++/11/iostream \
   /usr/include/c++/11/ostream \
   /usr/include/c++/11/ios \
@@ -683,8 +710,7 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cp
   /usr/include/c++/11/bits/basic_ios.tcc \
   /usr/include/c++/11/bits/ostream.tcc \
   /usr/include/c++/11/istream \
-  /usr/include/c++/11/bits/istream.tcc \
-  /usr/include/c++/11/limits
+  /usr/include/c++/11/bits/istream.tcc
 
 CMakeFiles/keyaware_core.dir/src/backend/cycle_sim/arch.cpp.o: ../src/backend/cycle_sim/arch.cpp \
   /usr/include/stdc-predef.h \
@@ -5240,6 +5266,8 @@ CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o: ../src/sim/simulator.cpp \
 
 ../src/backend/cycle_sim/driver.cpp:
 
+/usr/include/c++/11/bits/deque.tcc:
+
 /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
 
 ../src/backend/step_graph_runtime.cpp:
@@ -5289,8 +5317,6 @@ CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o: ../src/sim/simulator.cpp \
 /usr/include/x86_64-linux-gnu/bits/select.h:
 
 /usr/include/c++/11/algorithm:
-
-/usr/include/c++/11/bits/deque.tcc:
 
 /usr/include/c++/11/bits/cxxabi_forced.h:
 
@@ -5548,8 +5574,6 @@ CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o: ../src/sim/simulator.cpp \
 
 /usr/include/c++/11/bits/align.h:
 
-/usr/include/c++/11/bits/ostream.tcc:
-
 /usr/include/c++/11/climits:
 
 /usr/include/c++/11/bits/sstream.tcc:
@@ -5795,6 +5819,10 @@ CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o: ../src/sim/simulator.cpp \
 /usr/include/c++/11/cwctype:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/ctype_inline.h:
+
+/usr/include/c++/11/bits/ostream.tcc:
+
+../include/backend/cycle_backend/bram_accounting.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
 

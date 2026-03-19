@@ -7,7 +7,8 @@ BUILD_DIR := build
 RESULTS_DIR := results
 
 MODE ?= release
-METHODS ?= poseidon fab fast ola hera cinnamon
+METHODS ?=  fast 
+PROFILE_METHODS ?= poseidon ola fab fast
 RUN_SEED ?= 123
 RUN_NUM_CARDS ?= 1
 RUN_NUM_USERS ?= 1
@@ -35,7 +36,7 @@ SOURCES := $(shell find $(SRC_DIR) -type f -name "*.cpp")
 OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SOURCES))
 DEPS := $(OBJECTS:.o=.d)
 
-.PHONY: all make clean run draw
+.PHONY: all make clean run draw draw-profile
 
 all: $(TARGET)
 
@@ -78,14 +79,49 @@ draw:
 		--input-glob "$(RESULTS_DIR)/metrics_*.csv" \
 		--metric p99_latency \
 		--output "$(RESULTS_DIR)/latency_p99.svg"
+	@set -eu; \
+	for m in $(PROFILE_METHODS); do \
+		echo "=== drawing $$m execution profile ==="; \
+		$(PYTHON) scripts/plot_execution.py \
+			--ks-method "$$m" \
+			--input-log "$(RESULTS_DIR)/run_$$m.log" \
+			--seed $(RUN_SEED) \
+			--num-cards $(RUN_NUM_CARDS) \
+			--num-users $(RUN_NUM_USERS) \
+			--requests-per-user $(RUN_REQUESTS_PER_USER) \
+			--output "$(RESULTS_DIR)/$${m}_execution_profile.png"; \
+	done
 	@echo "Charts generated:"
 	@echo "  $(RESULTS_DIR)/latency_mean.svg"
 	@echo "  $(RESULTS_DIR)/latency_p99.svg"
+	@for m in $(PROFILE_METHODS); do \
+		echo "  $(RESULTS_DIR)/$${m}_execution_profile.png"; \
+	done
+
+draw-profile: $(TARGET)
+	@mkdir -p $(RESULTS_DIR)
+	@set -eu; \
+	for m in $(PROFILE_METHODS); do \
+		echo "=== drawing $$m execution profile ==="; \
+		$(PYTHON) scripts/plot_execution.py \
+			--ks-method "$$m" \
+			--input-log "$(RESULTS_DIR)/run_$$m.log" \
+			--seed $(RUN_SEED) \
+			--num-cards $(RUN_NUM_CARDS) \
+			--num-users $(RUN_NUM_USERS) \
+			--requests-per-user $(RUN_REQUESTS_PER_USER) \
+			--output "$(RESULTS_DIR)/$${m}_execution_profile.png"; \
+	done
+	@echo "Execution profiles generated:"
+	@for m in $(PROFILE_METHODS); do \
+		echo "  $(RESULTS_DIR)/$${m}_execution_profile.png"; \
+	done
 
 clean:
 	rm -rf $(BUILD_DIR) $(TARGET)
 	rm -f $(RESULTS_DIR)/metrics_*.csv \
 	      $(RESULTS_DIR)/run_*.log \
-	      $(RESULTS_DIR)/latency_*.svg
+	      $(RESULTS_DIR)/latency_*.svg \
+	      $(RESULTS_DIR)/*_execution_profile.png
 
 -include $(DEPS)

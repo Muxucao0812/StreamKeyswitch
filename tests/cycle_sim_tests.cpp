@@ -1,4 +1,7 @@
-#include "backend/cycle_backend.h"
+#include "backend/cycle_backend/cycle_backend.h"
+#include "backend/cycle_backend/cycle_backend_ola.h"
+#include "backend/cycle_backend/cycle_backend_poseidon.h"
+#include "backend/cycle_backend/cycle_backend_primitives.h"
 #include "backend/cycle_sim/arch.h"
 #include "backend/cycle_sim/driver.h"
 #include "backend/cycle_sim/lowering.h"
@@ -151,6 +154,50 @@ bool HasInterCardSteps(const std::vector<TileExecutionStep>& steps) {
         }
     }
     return false;
+}
+
+struct LiveReplayResult {
+    bool underflow = false;
+    uint64_t peak_live = 0;
+    uint64_t live_end = 0;
+};
+
+uint64_t ApplyLiveDeltaForTest(uint64_t live_bytes, int64_t delta) {
+    if (delta >= 0) {
+        return live_bytes + static_cast<uint64_t>(delta);
+    }
+    const uint64_t released = static_cast<uint64_t>(-delta);
+    return (released >= live_bytes) ? 0 : (live_bytes - released);
+}
+
+LiveReplayResult ReplayProgramLiveBytes(const CycleProgram& program) {
+    LiveReplayResult replay;
+    for (const CycleInstructionGroup& group : program.groups) {
+        if (group.live_bytes_delta_on_issue < 0) {
+            const uint64_t released =
+                static_cast<uint64_t>(-group.live_bytes_delta_on_issue);
+            if (released > replay.live_end) {
+                replay.underflow = true;
+            }
+        }
+        replay.live_end = ApplyLiveDeltaForTest(
+            replay.live_end,
+            group.live_bytes_delta_on_issue);
+        replay.peak_live = std::max<uint64_t>(replay.peak_live, replay.live_end);
+
+        if (group.live_bytes_delta_on_complete < 0) {
+            const uint64_t released =
+                static_cast<uint64_t>(-group.live_bytes_delta_on_complete);
+            if (released > replay.live_end) {
+                replay.underflow = true;
+            }
+        }
+        replay.live_end = ApplyLiveDeltaForTest(
+            replay.live_end,
+            group.live_bytes_delta_on_complete);
+        replay.peak_live = std::max<uint64_t>(replay.peak_live, replay.live_end);
+    }
+    return replay;
 }
 
 Time StageSum(const ExecutionResult& result) {
@@ -654,6 +701,124 @@ void TestEstimatePoseidonCyclePath(testfw::TestContext& ctx) {
     EXPECT_TRUE(ctx, result.peak_bram_bytes > 0);
 }
 
+void TestPoseidonProgramMemoryAccountingConsistency(testfw::TestContext& ctx) {
+    Request req = MakePoseidonRequest(
+        /*request_id=*/30,
+        /*user_id=*/31,
+        /*ciphertexts=*/2,
+        /*digits=*/3,
+        /*limbs=*/4,
+        /*polys=*/2,
+        /*poly_degree=*/65536,
+        /*input_bytes=*/4096,
+        /*output_bytes=*/4096,
+        /*key_bytes=*/8192);
+    req.ks_profile.method = KeySwitchMethod::Poseidon;
+
+    const SystemState state = MakeState(/*num_cards=*/1);
+    const HardwareModel hardware;
+    const KeySwitchExecution execution = BuildPhysicalExecution(req, state, hardware);
+    EXPECT_TRUE(ctx, execution.valid);
+    if (!execution.valid) {
+        return;
+    }
+
+    const CycleProgram program = BuildPoseidonProgram(execution.problem, hardware);
+    EXPECT_TRUE(ctx, !program.empty());
+    if (program.empty()) {
+        return;
+    }
+
+    const LiveReplayResult replay = ReplayProgramLiveBytes(program);
+    EXPECT_EQ(ctx, program.estimated_peak_live_bytes, replay.peak_live);
+
+    CycleDriver driver(hardware);
+    const CycleSimStats stats = driver.Run(program);
+    EXPECT_EQ(ctx, stats.peak_bram_live_bytes, replay.peak_live);
+}
+
+void TestOLAProgramMemoryAccountingConsistency(testfw::TestContext& ctx) {
+    Request req = MakePoseidonRequest(
+        /*request_id=*/31,
+        /*user_id=*/32,
+        /*ciphertexts=*/2,
+        /*digits=*/3,
+        /*limbs=*/4,
+        /*polys=*/2,
+        /*poly_degree=*/65536,
+        /*input_bytes=*/4096,
+        /*output_bytes=*/4096,
+        /*key_bytes=*/8192);
+    req.ks_profile.method = KeySwitchMethod::OLA;
+
+    const SystemState state = MakeState(/*num_cards=*/1);
+    const HardwareModel hardware;
+    const KeySwitchExecution execution = BuildPhysicalExecution(req, state, hardware);
+    EXPECT_TRUE(ctx, execution.valid);
+    if (!execution.valid) {
+        return;
+    }
+
+    const CycleProgram program = BuildOLAProgram(execution.problem, hardware);
+    EXPECT_TRUE(ctx, !program.empty());
+    if (program.empty()) {
+        return;
+    }
+
+    const LiveReplayResult replay = ReplayProgramLiveBytes(program);
+    EXPECT_TRUE(ctx, !replay.underflow);
+    EXPECT_EQ(ctx, program.estimated_peak_live_bytes, replay.peak_live);
+
+    CycleDriver driver(hardware);
+    const CycleSimStats stats = driver.Run(program);
+    EXPECT_EQ(ctx, stats.peak_bram_live_bytes, replay.peak_live);
+}
+
+void TestOLASpillReloadAccountingNoUnderflow(testfw::TestContext& ctx) {
+    Request req = MakePoseidonRequest(
+        /*request_id=*/32,
+        /*user_id=*/33,
+        /*ciphertexts=*/2,
+        /*digits=*/4,
+        /*limbs=*/4,
+        /*polys=*/2,
+        /*poly_degree=*/65536,
+        /*input_bytes=*/4096,
+        /*output_bytes=*/4096,
+        /*key_bytes=*/8192);
+    req.ks_profile.method = KeySwitchMethod::OLA;
+
+    const SystemState state = MakeState(/*num_cards=*/1);
+    const HardwareModel hardware;
+    const KeySwitchExecution execution = BuildPhysicalExecution(req, state, hardware);
+    EXPECT_TRUE(ctx, execution.valid);
+    if (!execution.valid) {
+        return;
+    }
+
+    const CycleProgram program = BuildOLAProgram(execution.problem, hardware);
+    EXPECT_TRUE(ctx, !program.empty());
+    if (program.empty()) {
+        return;
+    }
+
+    uint64_t spill_groups = 0;
+    uint64_t reload_groups = 0;
+    for (const CycleInstructionGroup& group : program.groups) {
+        if (group.name.find("spill") != std::string::npos) {
+            ++spill_groups;
+        }
+        if (group.name.find("reload") != std::string::npos) {
+            ++reload_groups;
+        }
+    }
+
+    const LiveReplayResult replay = ReplayProgramLiveBytes(program);
+    EXPECT_TRUE(ctx, !replay.underflow);
+    EXPECT_TRUE(ctx, spill_groups > 0);
+    EXPECT_TRUE(ctx, reload_groups > 0);
+}
+
 void TestExecutionModelSharedSingleBoardMethods(testfw::TestContext& ctx) {
     const SystemState state = MakeState(/*num_cards=*/1);
     const ExecutionPlan plan = MakePlan(/*request_id=*/21, /*num_cards=*/1);
@@ -1154,6 +1319,247 @@ void TestHardwareScalingMonotonicity(testfw::TestContext& ctx) {
     EXPECT_TRUE(ctx, strong_latency_ns <= weak_latency_ns);
 }
 
+void TestCyclePrimitiveEmitterMicroOpRules(testfw::TestContext& ctx) {
+    Request req = MakePoseidonRequest(
+        /*request_id=*/49,
+        /*user_id=*/25,
+        /*ciphertexts=*/2,
+        /*digits=*/3,
+        /*limbs=*/4,
+        /*polys=*/2,
+        /*poly_degree=*/65536,
+        /*input_bytes=*/4096,
+        /*output_bytes=*/4096,
+        /*key_bytes=*/8192);
+    const SystemState state = MakeState(/*num_cards=*/1);
+    const HardwareModel hardware;
+    const KeySwitchExecution execution = BuildPhysicalExecution(req, state, hardware);
+    EXPECT_TRUE(ctx, execution.valid);
+    if (!execution.valid) {
+        return;
+    }
+
+    CyclePrimitiveEmitter emitter(
+        execution.problem,
+        hardware,
+        KeySwitchMethod::Poseidon,
+        "primitive_micro_ops");
+
+    CyclePrimitiveDesc desc;
+    desc.stage_type = StageType::Dispatch;
+    desc.transfer_path = CycleTransferPath::HBMToSPM;
+
+    desc.name = "load";
+    desc.bytes = 500;
+    desc.input_limbs = 5;
+    desc.output_limbs = 0;
+    emitter.EmitLoadHBM(desc);
+    EXPECT_EQ(
+        ctx,
+        emitter.Program().groups.back().instructions.size(),
+        static_cast<std::size_t>(5));
+
+    desc.name = "store";
+    desc.transfer_path = CycleTransferPath::SPMToHBM;
+    desc.bytes = 700;
+    desc.input_limbs = 0;
+    desc.output_limbs = 7;
+    emitter.EmitStoreHBM(desc);
+    EXPECT_EQ(
+        ctx,
+        emitter.Program().groups.back().instructions.size(),
+        static_cast<std::size_t>(7));
+
+    desc.name = "ntt";
+    desc.transfer_path = CycleTransferPath::None;
+    desc.stage_type = StageType::BasisConvert;
+    desc.bytes = 300;
+    desc.input_limbs = 3;
+    desc.output_limbs = 0;
+    emitter.EmitNTT(desc);
+    EXPECT_EQ(
+        ctx,
+        emitter.Program().groups.back().instructions.size(),
+        static_cast<std::size_t>(3));
+
+    desc.name = "intt";
+    desc.bytes = 200;
+    desc.input_limbs = 2;
+    emitter.EmitINTT(desc);
+    EXPECT_EQ(
+        ctx,
+        emitter.Program().groups.back().instructions.size(),
+        static_cast<std::size_t>(2));
+
+    desc.name = "mul";
+    desc.stage_type = StageType::Multiply;
+    desc.bytes = 400;
+    desc.input_limbs = 4;
+    emitter.EmitEweMul(desc);
+    EXPECT_EQ(
+        ctx,
+        emitter.Program().groups.back().instructions.size(),
+        static_cast<std::size_t>(4));
+
+    desc.name = "add";
+    desc.bytes = 600;
+    desc.input_limbs = 6;
+    emitter.EmitEweAdd(desc);
+    EXPECT_EQ(
+        ctx,
+        emitter.Program().groups.back().instructions.size(),
+        static_cast<std::size_t>(6));
+
+    desc.name = "sub";
+    desc.bytes = 800;
+    desc.input_limbs = 8;
+    emitter.EmitEweSub(desc);
+    EXPECT_EQ(
+        ctx,
+        emitter.Program().groups.back().instructions.size(),
+        static_cast<std::size_t>(8));
+
+    desc.name = "bconv";
+    desc.stage_type = StageType::BasisConvert;
+    desc.bytes = 1200;
+    desc.input_limbs = 3;
+    desc.output_limbs = 4;
+    emitter.EmitBConv(desc);
+    EXPECT_EQ(
+        ctx,
+        emitter.Program().groups.back().instructions.size(),
+        static_cast<std::size_t>(12));
+}
+
+void TestCyclePrimitiveEmitterMemoryReplayConsistency(testfw::TestContext& ctx) {
+    Request req = MakePoseidonRequest(
+        /*request_id=*/50,
+        /*user_id=*/26,
+        /*ciphertexts=*/2,
+        /*digits=*/3,
+        /*limbs=*/4,
+        /*polys=*/2,
+        /*poly_degree=*/65536,
+        /*input_bytes=*/4096,
+        /*output_bytes=*/4096,
+        /*key_bytes=*/8192);
+    const SystemState state = MakeState(/*num_cards=*/1);
+    const HardwareModel hardware;
+    const KeySwitchExecution execution = BuildPhysicalExecution(req, state, hardware);
+    EXPECT_TRUE(ctx, execution.valid);
+    if (!execution.valid) {
+        return;
+    }
+
+    CyclePrimitiveEmitter emitter(
+        execution.problem,
+        hardware,
+        KeySwitchMethod::Poseidon,
+        "primitive_memory");
+
+    CyclePrimitiveDesc desc;
+    desc.transfer_path = CycleTransferPath::HBMToSPM;
+    desc.source_step_type = TileExecutionStepType::InputHBMToBRAM;
+    desc.stage_type = StageType::Dispatch;
+
+    emitter.Bram().AcquireOnIssue(256);
+    desc.name = "load_chunk";
+    desc.bytes = 256;
+    desc.input_limbs = 4;
+    desc.output_limbs = 0;
+    emitter.EmitLoadHBM(desc);
+
+    emitter.Bram().AcquireOnComplete(128);
+    desc.name = "bconv_chunk";
+    desc.transfer_path = CycleTransferPath::None;
+    desc.source_step_type = TileExecutionStepType::ModUpBConvTile;
+    desc.stage_type = StageType::BasisConvert;
+    desc.bytes = 384;
+    desc.input_limbs = 4;
+    desc.output_limbs = 2;
+    emitter.EmitBConv(desc);
+
+    emitter.Bram().ReleaseOnComplete(384);
+    desc.name = "store_chunk";
+    desc.transfer_path = CycleTransferPath::SPMToHBM;
+    desc.source_step_type = TileExecutionStepType::OutputBRAMToHBM;
+    desc.stage_type = StageType::Dispatch;
+    desc.bytes = 384;
+    desc.input_limbs = 0;
+    desc.output_limbs = 6;
+    emitter.EmitStoreHBM(desc);
+
+    EXPECT_TRUE(ctx, emitter.ValidateMemoryAccounting("PrimitiveTest"));
+
+    CycleProgram& program = emitter.Program();
+    program.estimated_peak_live_bytes = emitter.Bram().Peak();
+    const LiveReplayResult replay = ReplayProgramLiveBytes(program);
+    EXPECT_TRUE(ctx, !replay.underflow);
+    EXPECT_EQ(ctx, program.estimated_peak_live_bytes, replay.peak_live);
+
+    CycleDriver driver(hardware);
+    const CycleSimStats stats = driver.Run(program);
+    EXPECT_EQ(ctx, stats.peak_bram_live_bytes, replay.peak_live);
+}
+
+void TestPoseidonAndOLAProgramShapeRegression(testfw::TestContext& ctx) {
+    Request req = MakePoseidonRequest(
+        /*request_id=*/51,
+        /*user_id=*/27,
+        /*ciphertexts=*/2,
+        /*digits=*/3,
+        /*limbs=*/4,
+        /*polys=*/2,
+        /*poly_degree=*/65536,
+        /*input_bytes=*/4096,
+        /*output_bytes=*/4096,
+        /*key_bytes=*/8192);
+    const SystemState state = MakeState(/*num_cards=*/1);
+    const HardwareModel hardware;
+    const KeySwitchExecution execution = BuildPhysicalExecution(req, state, hardware);
+    EXPECT_TRUE(ctx, execution.valid);
+    if (!execution.valid) {
+        return;
+    }
+
+    const CycleProgram poseidon = BuildPoseidonProgram(execution.problem, hardware);
+    const CycleProgram ola = BuildOLAProgram(execution.problem, hardware);
+    EXPECT_TRUE(ctx, !poseidon.empty());
+    EXPECT_TRUE(ctx, !ola.empty());
+    if (poseidon.empty() || ola.empty()) {
+        return;
+    }
+
+    uint64_t poseidon_spill = 0;
+    uint64_t poseidon_reload = 0;
+    for (const CycleInstructionGroup& group : poseidon.groups) {
+        if (group.name.find("spill") != std::string::npos) {
+            ++poseidon_spill;
+        }
+        if (group.name.find("reload") != std::string::npos) {
+            ++poseidon_reload;
+        }
+    }
+
+    uint64_t ola_spill = 0;
+    uint64_t ola_reload = 0;
+    for (const CycleInstructionGroup& group : ola.groups) {
+        if (group.name.find("spill") != std::string::npos) {
+            ++ola_spill;
+        }
+        if (group.name.find("reload") != std::string::npos) {
+            ++ola_reload;
+        }
+    }
+
+    EXPECT_TRUE(ctx, poseidon_spill > 0);
+    EXPECT_TRUE(ctx, poseidon_reload > 0);
+    EXPECT_TRUE(ctx, ola_spill > 0);
+    EXPECT_TRUE(ctx, ola_reload > 0);
+    EXPECT_TRUE(ctx, poseidon.estimated_peak_live_bytes > 0);
+    EXPECT_TRUE(ctx, ola.estimated_peak_live_bytes > 0);
+}
+
 } // namespace
 
 int main() {
@@ -1167,6 +1573,9 @@ int main() {
     TestCycleDriverRoundRobinOverlap(ctx);
     TestCycleDriverPeakTracking(ctx);
     TestEstimatePoseidonCyclePath(ctx);
+    TestPoseidonProgramMemoryAccountingConsistency(ctx);
+    TestOLAProgramMemoryAccountingConsistency(ctx);
+    TestOLASpillReloadAccountingNoUnderflow(ctx);
     TestExecutionModelSharedSingleBoardMethods(ctx);
     TestCycleLowererSelectorDispatch(ctx);
     TestCycleBackendSharedSingleBoardMethods(ctx);
@@ -1179,6 +1588,9 @@ int main() {
     TestBuiltInScaleSingleBoardNoLongerFallsBack(ctx);
     TestProblemSizeMonotonicity(ctx);
     TestHardwareScalingMonotonicity(ctx);
+    TestCyclePrimitiveEmitterMicroOpRules(ctx);
+    TestCyclePrimitiveEmitterMemoryReplayConsistency(ctx);
+    TestPoseidonAndOLAProgramShapeRegression(ctx);
 
     std::cout << "Cycle sim assertions: " << ctx.assertions
               << ", failures: " << ctx.failures << "\n";

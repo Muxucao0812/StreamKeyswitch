@@ -214,6 +214,30 @@ src/backend/cycle_backend/cycle_backend_poseidon.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.s
 .PHONY : src/backend/cycle_backend/cycle_backend_poseidon.cpp.s
 
+src/backend/cycle_backend/cycle_backend_primitives.o: src/backend/cycle_backend/cycle_backend_primitives.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_primitives.o
+
+# target to build an object file
+src/backend/cycle_backend/cycle_backend_primitives.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_primitives.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_primitives.cpp.o
+
+src/backend/cycle_backend/cycle_backend_primitives.i: src/backend/cycle_backend/cycle_backend_primitives.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_primitives.i
+
+# target to preprocess a source file
+src/backend/cycle_backend/cycle_backend_primitives.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_primitives.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_primitives.cpp.i
+
+src/backend/cycle_backend/cycle_backend_primitives.s: src/backend/cycle_backend/cycle_backend_primitives.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_primitives.s
+
+# target to generate assembly for a file
+src/backend/cycle_backend/cycle_backend_primitives.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_primitives.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_primitives.cpp.s
+
 src/backend/cycle_sim/arch.o: src/backend/cycle_sim/arch.cpp.o
 .PHONY : src/backend/cycle_sim/arch.o
 
@@ -737,6 +761,9 @@ help:
 	@echo "... src/backend/cycle_backend/cycle_backend_poseidon.o"
 	@echo "... src/backend/cycle_backend/cycle_backend_poseidon.i"
 	@echo "... src/backend/cycle_backend/cycle_backend_poseidon.s"
+	@echo "... src/backend/cycle_backend/cycle_backend_primitives.o"
+	@echo "... src/backend/cycle_backend/cycle_backend_primitives.i"
+	@echo "... src/backend/cycle_backend/cycle_backend_primitives.s"
 	@echo "... src/backend/cycle_sim/arch.o"
 	@echo "... src/backend/cycle_sim/arch.i"
 	@echo "... src/backend/cycle_sim/arch.s"

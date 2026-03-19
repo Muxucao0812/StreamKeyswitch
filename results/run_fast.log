@@ -24,7 +24,43 @@ CSVOutput: results/metrics_fast.csv
 DumpLogicalGraph: true
 DumpRuntimePlan: true
 =========================
-[keyswitch] request=0 status=fallback fallback_used=1 method_degraded=0 unsupported_method=0 unsupported_config=0 compatibility_fallback=0 requested_method=FAST effective_method=FAST reason=tile_plan_invalid
+Step 1: load ct to BRAM, total bytes: 25165824
+Emitted group 0: load_input, kind=0, bytes=25165824, work_items=0, micro_ops=48, est_cycles/op=346, total_est_cycles=15747, bram_live=25165824
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           4155
+Total latency (ns):     13850
+Peak BRAM live (bytes): 25165824
+HBM read (bytes):       25165824
+HBM write (bytes):      0
+Dependency stalls:      346 cycles
+Resource stalls:        3809 cycles
+Instruction groups:     1
+Total instructions:     48
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=4155 (100%)  count=48  bytes=25165824
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=346  groups=1  instrs=48
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input                     0      4155       4155            0     25165824  25165824
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+4155,25165824
+
+--- Transfer vs Compute ---
+Transfer: 4155 cycles (100%)
+Compute:  0 cycles (0%)
+====================================================
+
 Scheduler=fifo
 Backend=cycle_stub
 RuntimeBackend=cycle_stub
@@ -33,25 +69,25 @@ Seed=123
 NumCards=1
 === Request Metrics ===
 Completed requests: 1
-Mean latency(ns): 0.0000
-P95 latency(ns): 0
-P99 latency(ns): 0
-Max latency(ns): 0
+Mean latency(ns): 13850.0000
+P95 latency(ns): 13850
+P99 latency(ns): 13850
+Max latency(ns): 13850
 Mean queue time(ns): 0.0000
-Mean service time(ns): 0.0000
+Mean service time(ns): 13850.0000
 === User Metrics ===
-User 0: completed=1, mean_latency(ns)=0.0000, throughput(req/ns)=0.0000, reload_count=1
+User 0: completed=1, mean_latency(ns)=13850.0000, throughput(req/ns)=0.0001, reload_count=1
 === Card Metrics ===
-Card 0: utilization=0.0000, reload_count=1, served_requests=1
+Card 0: utilization=1.0000, reload_count=1, served_requests=1
 === System Metrics ===
-Total throughput(req/ns): 0.0000
+Total throughput(req/ns): 0.0001
 Total reload count: 1
-Jain fairness index: 0.0000
-Simulation window(ns): [23, 23], duration=0
+Jain fairness index: 1.0000
+Simulation window(ns): [23, 13873], duration=13850
 PoolConfigSource=built-in default
 TreeConfigSource=built-in default
 HEParamsSource=built-in default
 === CycleBackend Method Dispatch Stats ===
 EstimateCalls=1
-CycleFallbackCount=1
+CycleFallbackCount=0
 CSVOutput=results/metrics_fast.csv
