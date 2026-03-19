@@ -2,7 +2,43 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug keyaware_sim (OLA, single-card)",
+      "name": "Debug keyaware_sim (Linux, OLA, single-card)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "fifo",
+        "--backend",
+        "cycle_stub",
+        "--workload",
+        "synthetic",
+        "--ks-method",
+        "ola",
+        "--disable-multi-card",
+        "--seed",
+        "42",
+        "--num-users",
+        "1",
+        "--requests-per-user",
+        "1",
+        "--inter-arrival",
+        "10",
+        "--num-cards",
+        "4"
+      ],
+      "stopAtEntry": true,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "preLaunchTask": "build keyaware debug (linux)",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    },
+    {
+      "name": "Debug keyaware_sim (macOS, OLA, single-card)",
       "type": "lldb",
       "request": "launch",
       "program": "${workspaceFolder}/build-cmake/keyaware_sim",
@@ -30,41 +66,7 @@
       "stopAtEntry": true,
       "cwd": "${workspaceFolder}",
       "terminal": "integrated",
-      "preLaunchTask": "build keyaware debug",
-      "sourceLanguages": [
-        "cpp"
-      ]
-    },
-    {
-      "name": "Debug keyaware_sim (Cinnamon, multi-card)",
-      "type": "lldb",
-      "request": "launch",
-      "program": "${workspaceFolder}/build-cmake/keyaware_sim",
-      "args": [
-        "--scheduler",
-        "fifo",
-        "--backend",
-        "cycle_stub",
-        "--workload",
-        "synthetic",
-        "--ks-method",
-        "cinnamon",
-        "--enable-multi-card",
-        "--seed",
-        "42",
-        "--num-users",
-        "1",
-        "--requests-per-user",
-        "1",
-        "--inter-arrival",
-        "10",
-        "--num-cards",
-        "4"
-      ],
-      "stopAtEntry": true,
-      "cwd": "${workspaceFolder}",
-      "terminal": "integrated",
-      "preLaunchTask": "build keyaware debug",
+      "preLaunchTask": "build keyaware debug (mac)",
       "sourceLanguages": [
         "cpp"
       ]

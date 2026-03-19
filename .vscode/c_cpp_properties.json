@@ -7,6 +7,13 @@
       "compilerPath": "/usr/bin/c++",
       "intelliSenseMode": "linux-gcc-x64",
       "cppStandard": "c++17"
+    },
+    {
+      "name": "macOS",
+      "compileCommands": "${workspaceFolder}/build-cmake/compile_commands.json",
+      "compilerPath": "/usr/bin/clang++",
+      "intelliSenseMode": "macos-clang-arm64",
+      "cppStandard": "c++17"
     }
   ]
 }

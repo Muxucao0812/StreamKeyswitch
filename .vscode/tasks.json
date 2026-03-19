@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "build keyaware debug",
+      "label": "build keyaware debug (linux)",
       "type": "shell",
       "command": "cmake -S ${workspaceFolder} -B ${workspaceFolder}/build-cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && cmake --build ${workspaceFolder}/build-cmake -j4",
       "options": {
@@ -12,6 +12,18 @@
         "kind": "build",
         "isDefault": true
       },
+      "problemMatcher": [
+        "$gcc"
+      ]
+    },
+    {
+      "label": "build keyaware debug (mac)",
+      "type": "shell",
+      "command": "cmake -S ${workspaceFolder} -B ${workspaceFolder}/build-cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && cmake --build ${workspaceFolder}/build-cmake -j4",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
       "problemMatcher": [
         "$gcc"
       ]
