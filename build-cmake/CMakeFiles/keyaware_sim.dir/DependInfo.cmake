@@ -8,15 +8,12 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/main.cpp" "CMakeFiles/keyaware_sim.dir/src/main.cpp.o" "gcc" "CMakeFiles/keyaware_sim.dir/src/main.cpp.o.d"
+  "/home/mxc/work/KeyAwareSwitch/src/main.cpp" "CMakeFiles/keyaware_sim.dir/src/main.cpp.o" "gcc" "CMakeFiles/keyaware_sim.dir/src/main.cpp.o.d"
   )
 
-# Targets to which this target links which contain Fortran sources.
-set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
-  )
-
-# Targets to which this target links which contain Fortran sources.
-set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
+# Targets to which this target links.
+set(CMAKE_TARGET_LINKED_INFO_FILES
+  "/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles/keyaware_core.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

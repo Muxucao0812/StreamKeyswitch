@@ -43,13 +43,16 @@ struct HEParams {
 
     uint64_t ComputeKeyBytes(
         uint32_t digit_width_limbs,
-        uint32_t rns_limb_count) const {
+        uint32_t rns_limb_count
+    ) const {
         const uint32_t safe_digits = std::max<uint32_t>(1, digit_width_limbs);
         const uint32_t safe_rns_limbs = std::max<uint32_t>(1, rns_limb_count);
         const uint32_t num_k = ComputeNumK(safe_rns_limbs, safe_digits);
+        const uint32_t digit_limbs = num_k;
+
         const uint64_t raw_bytes =
             static_cast<uint64_t>(poly_modulus_degree)
-            * static_cast<uint64_t>(safe_rns_limbs + num_k)
+            * static_cast<uint64_t>(digit_limbs + num_k)
             * static_cast<uint64_t>(safe_digits)
             * static_cast<uint64_t>(key_component_count)
             * static_cast<uint64_t>(bytes_per_coeff);

@@ -24,7 +24,7 @@ struct HardwareConfig {
 
     double gamma_pattern = 1.0;
     double pcie_write_bytes_per_ns = 12.0;
-    double hbm_bytes_per_ns = 32.0;
+    double hbm_bytes_per_ns = 480.0;
     Time host_to_hbm_setup_ns = 80;
     Time dma_setup_ns = 60;
 
@@ -67,8 +67,8 @@ struct HardwareConfig {
     uint32_t ewe_mul_delay_cycles = 4;
     uint32_t ewe_add_delay_cycles = 2;
     uint32_t ewe_sub_delay_cycles = 2;
-    uint32_t butterfly_delay_cycles = 5;
-    uint32_t spu_stream_delay_cycles = 2;
+    uint32_t butterfly_delay_cycles = 12;
+    uint32_t spu_stream_delay_cycles = 1;
     uint32_t intra_transpose_delay_cycles = 16;
     uint32_t inter_transpose_delay_cycles = 256;
     uint32_t bconv_mac_delay_cycles = 20;
@@ -105,19 +105,34 @@ public:
     uint64_t EstimateDirectForwardCycles(uint64_t bytes) const;
 
     uint64_t EstimateDecomposeCycles(
-        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
+        const KeySwitchProblem& problem, 
+        uint32_t num_input_limbs = 1
+    ) const;
     uint64_t EstimateNttCycles(
-        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
+        const KeySwitchProblem& problem, 
+        uint32_t num_input_limbs = 1
+    ) const;
     uint64_t EstimateInttCycles(
-        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
+        const KeySwitchProblem& problem, 
+        uint32_t num_input_limbs = 1
+    ) const;
     uint64_t EstimateEweMulCycles(
-        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
+        const KeySwitchProblem& problem, 
+        uint32_t num_input_limbs = 1
+    ) const;
     uint64_t EstimateEweAddCycles(
-        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
+        const KeySwitchProblem& problem,
+        uint32_t num_input_limbs = 1
+    ) const;
     uint64_t EstimateEweSubCycles(
-        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
+        const KeySwitchProblem& problem, 
+        uint32_t num_input_limbs = 1
+    ) const;
     uint64_t EstimateBconvCycles(
-        const KeySwitchProblem& problem, uint32_t num_limbs = 1) const;
+        const KeySwitchProblem& problem,
+        uint32_t num_input_limbs = 1, 
+        uint32_t num_output_limbs = 1
+    ) const;
 
     HardwareUnitConfig MemoryConfig() const;
     HardwareUnitConfig DecomposeConfig() const;

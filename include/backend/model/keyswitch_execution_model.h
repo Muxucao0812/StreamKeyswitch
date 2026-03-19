@@ -30,6 +30,7 @@ struct KeySwitchProblem {
     uint32_t limbs = 1;
     // 扩展模数维度：k = ceil((l + 1) / a), key_limbs = l + k。
     uint32_t num_k = 1;
+    uint32_t digit_limbs = 1;
     uint32_t key_limbs = 2;
     uint32_t polys = 1;
     uint32_t poly_modulus_degree = 1;

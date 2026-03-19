@@ -8,6 +8,7 @@
 #include <limits>
 #include <ostream>
 #include <sstream>
+#include <iostream>
 
 namespace {
 
@@ -1335,85 +1336,94 @@ bool KeySwitchExecutionModel::ResidentKeyHit(
     return true;
 }
 
-KeySwitchProblem KeySwitchExecutionModel::BuildProblem(
+namespace {
+
+void InitializeProblemBase(
+    const Request& req,
+    const TilePlanner::Params& planner_params,
+    KeySwitchProblem* problem) {
+
+    problem->working_set_bytes = req.ks_profile.input_bytes + req.ks_profile.key_bytes;
+    problem->temp_buffer_ratio = planner_params.temp_buffer_ratio;
+    problem->bram_guard_bytes = planner_params.bram_guard_bytes;
+}
+
+void ResolveProblemMethodAndCards(
     const Request& req,
     const ExecutionPlan& plan,
-    const SystemState& state
-) const {
+    KeySwitchProblem* problem) {
 
-    // 初始化问题描述，并先写入与 tile planner 直接相关的全局参数。
-    // working_set_bytes：用于估算总体内存压力（输入密文 + key）。
-    // temp_buffer_ratio / bram_guard_bytes：影响后续 tile 规划安全边界。
-    KeySwitchProblem problem;
-    problem.working_set_bytes = req.ks_profile.input_bytes + req.ks_profile.key_bytes;
-    problem.temp_buffer_ratio = params_.tile_planner.temp_buffer_ratio;
-    problem.bram_guard_bytes = params_.tile_planner.bram_guard_bytes;
+    const uint32_t assigned_cards = static_cast<uint32_t>(
+        std::max<size_t>(1, plan.assigned_cards.size()));
+    problem->method = ResolveKeySwitchMethodForAssignedCards(
+        req.ks_profile.method,
+        assigned_cards);
+    problem->cards = (problem->method == KeySwitchMethod::Cinnamon) ? assigned_cards : 1;
+}
 
-    // 没有任何分配卡时，本次构建不具备执行条件，直接返回 invalid。
-    if (plan.assigned_cards.empty()) {
-        problem.valid = false;
-        return problem;
-    }
+void NormalizeProblemDimensions(
+    const Request& req,
+    KeySwitchProblem* problem) {
 
-    // 解析“本次真正执行的方法”：
-    // - 若请求是 Auto，则按分配卡数自动解析（单卡 -> Poseidon，多卡 -> Cinnamon）。
-    // - 非 Auto 时保持请求方法不变。
-    // 同时确定问题视角下真正参与计算的 cards 数量：
-    // - Cinnamon 按实际分配卡数参与；
-    // - 其它单板方法固定视为 1 卡。
-    const uint32_t assigned_cards = static_cast<uint32_t>(std::max<size_t>(1, plan.assigned_cards.size()));
-    problem.method = ResolveKeySwitchMethodForAssignedCards(req.ks_profile.method, assigned_cards);
-    problem.cards = (problem.method == KeySwitchMethod::Cinnamon) ? assigned_cards : 1;
-
-    // 归一化问题维度（至少为 1，避免后续除法/分块出现 0）。
-    // ciphertexts 当前两分支逻辑一致，保留分支便于后续按方法扩展差异规则。
-    if (problem.method == KeySwitchMethod::Cinnamon) {
-        problem.ciphertexts = std::max<uint32_t>(1, req.ks_profile.num_ciphertexts);
+    if (problem->method == KeySwitchMethod::Cinnamon) {
+        // Xiangchen: raise not implement and exit
+        std::cerr << "Cinnamon method is not implemented yet." << std::endl;
+        std::exit(1);
     } else {
-        problem.ciphertexts = std::max<uint32_t>(1, req.ks_profile.num_ciphertexts);
+        problem->ciphertexts = std::max<uint32_t>(1, req.ks_profile.num_ciphertexts);
+        problem->limbs = std::max<uint32_t>(1, req.ks_profile.num_rns_limbs);
+        problem->digits = std::max<uint32_t>(1, req.ks_profile.num_digits);
+        problem->num_k = CeilDivU32(problem->limbs + 1, problem->digits);
+        problem->digit_limbs = problem->num_k;
+        problem->key_limbs = problem->digit_limbs + problem->num_k;
+        problem->polys = std::max<uint32_t>(1, req.ks_profile.num_polys);
+        problem->poly_modulus_degree = std::max<uint32_t>(1, req.ks_profile.poly_modulus_degree);
     }
-    problem.digits = std::max<uint32_t>(1, req.ks_profile.num_digits);
-    // 多卡 Cinnamon 下 limbs 按卡数切分到“每卡局部问题”；
-    // 单板方法直接沿用原始 limbs。
-    if (problem.method == KeySwitchMethod::Cinnamon) {
-        problem.limbs = std::max<uint32_t>(1, static_cast<uint32_t>(CeilDivU64(req.ks_profile.num_rns_limbs, problem.cards)));
+
+}
+
+void NormalizeProblemBytes(
+    const Request& req,
+    KeySwitchProblem* problem) {
+
+    if (problem->method == KeySwitchMethod::Cinnamon) {
+        std::cerr << "Cinnamon method is not implemented yet." << std::endl;
+        std::exit(1);
     } else {
-        problem.limbs = std::max<uint32_t>(1, req.ks_profile.num_rns_limbs);
+        problem->input_bytes = std::max<uint64_t>(1, req.ks_profile.input_bytes);
+        problem->output_bytes = std::max<uint64_t>(1, req.ks_profile.output_bytes);
+        problem->key_bytes = std::max<uint64_t>(1, req.ks_profile.key_bytes);
     }
-    problem.num_k = CeilDivU32(problem.limbs + 1, problem.digits);
-    problem.key_limbs = problem.limbs + problem.num_k;
-    problem.polys = std::max<uint32_t>(1, req.ks_profile.num_polys);
-    problem.poly_modulus_degree = std::max<uint32_t>(1, req.ks_profile.poly_modulus_degree);
+}
 
-    // 归一化输入/输出/key 字节：
-    // - Cinnamon：按卡均摊，得到“单卡本地处理字节量”；
-    // - 单板：保持请求给出的总字节量。
-    if (problem.method == KeySwitchMethod::Cinnamon) {
-        problem.input_bytes = std::max<uint64_t>(1, CeilDivU64(req.ks_profile.input_bytes, problem.cards));
-        problem.output_bytes = std::max<uint64_t>(1, CeilDivU64(req.ks_profile.output_bytes, problem.cards));
-        problem.key_bytes = std::max<uint64_t>(1, CeilDivU64(req.ks_profile.key_bytes, problem.cards));
-    } else {
-        problem.input_bytes = std::max<uint64_t>(1, req.ks_profile.input_bytes);
-        problem.output_bytes = std::max<uint64_t>(1, req.ks_profile.output_bytes);
-        problem.key_bytes = std::max<uint64_t>(1, req.ks_profile.key_bytes);
-    }
+void DeriveProblemGranularityBytes(
+    KeySwitchProblem* problem) {
 
-    // 由总字节反推到“最小分块粒度”的字节：
-    // - ct_limb_bytes：每个 (ciphertext, limb) 的输入字节；
-    // - out_limb_bytes：每个 (ciphertext, limb) 的输出字节；
-    // - key_digit_limb_bytes：每个 (digit, limb) 的 key 字节。
-    // 这些字段是后续构图和周期估算的核心粒度参数。
-    const uint64_t ct_limb_denom = static_cast<uint64_t>(problem.ciphertexts) * problem.limbs;
-    const uint64_t out_limb_denom = static_cast<uint64_t>(problem.ciphertexts) * problem.limbs;
-    const uint64_t key_denom = static_cast<uint64_t>(problem.digits) * problem.key_limbs;
-    problem.ct_limb_bytes = std::max<uint64_t>(1, CeilDivU64(problem.input_bytes, ct_limb_denom));
-    problem.out_limb_bytes = std::max<uint64_t>(1, CeilDivU64(problem.output_bytes, out_limb_denom));
-    problem.key_digit_limb_bytes = std::max<uint64_t>(1, CeilDivU64(problem.key_bytes, key_denom));
+    const uint64_t ct_limb_denom = static_cast<uint64_t>(problem->ciphertexts) * problem->limbs;
+    const uint64_t out_limb_denom = static_cast<uint64_t>(problem->ciphertexts) * problem->limbs;
+    // evalkey has 2 items
+    const uint64_t key_denom = static_cast<uint64_t>(problem->digits) * (problem->key_limbs) * 2;
+    // limb_bytes need to be divide by 2
+    // Input bytes consider two polynomials
+    problem->ct_limb_bytes = std::max<uint64_t>(1, CeilDivU64(CeilDivU64(problem->input_bytes, 2), ct_limb_denom));
+    problem->out_limb_bytes = std::max<uint64_t>(1, CeilDivU64(CeilDivU64(problem->output_bytes, 2), out_limb_denom));
+    problem->key_digit_limb_bytes = std::max<uint64_t>(1, CeilDivU64(problem->key_bytes, key_denom));
+}
 
-    // 计算参与卡中的最小 BRAM 容量（保守策略，规划按最小卡能力约束）。
-    // card_limit 用于防御：当 plan.cards 与 problem.cards 不一致时，只遍历有效交集。
+size_t EffectiveProblemCardLimit(
+    const ExecutionPlan& plan,
+    const KeySwitchProblem& problem) {
+
+    return std::min<size_t>(plan.assigned_cards.size(), problem.cards);
+}
+
+uint64_t ResolveMinCardBramCapacity(
+    const ExecutionPlan& plan,
+    const SystemState& state,
+    size_t card_limit,
+    uint64_t default_bram_capacity_bytes) {
+
     uint64_t min_bram_capacity = 0;
-    const size_t card_limit = std::min<size_t>(plan.assigned_cards.size(), problem.cards);
     for (size_t idx = 0; idx < card_limit; ++idx) {
         const CardId card_id = plan.assigned_cards[idx];
         if (card_id >= state.cards.size()) {
@@ -1427,36 +1437,76 @@ KeySwitchProblem KeySwitchExecutionModel::BuildProblem(
             min_bram_capacity = cap;
         }
     }
-    // 若状态里拿不到有效 BRAM 容量，回退到模型缺省值，保证可继续规划。
     if (min_bram_capacity == 0) {
-        min_bram_capacity = params_.default_bram_capacity_bytes;
+        min_bram_capacity = default_bram_capacity_bytes;
     }
-    problem.min_card_bram_capacity_bytes = min_bram_capacity;
-    // 可用预算 = 最小 BRAM * 可用比例，再做下界保护。
+    return min_bram_capacity;
+}
 
-    problem.bram_budget_bytes = std::max<uint64_t>(
+uint64_t ComputeBramBudgetBytes(
+    uint64_t min_bram_capacity,
+    double bram_usable_ratio) {
+
+    return std::max<uint64_t>(
         1,
         static_cast<uint64_t>(
-            std::floor(static_cast<double>(min_bram_capacity) * params_.tile_planner.bram_usable_ratio)));
+            std::floor(static_cast<double>(min_bram_capacity) * bram_usable_ratio)));
+}
 
-    // 判断是否命中驻留 key：
-    // 仅当所有参与卡都存在且 resident_user 与请求 user 一致时，才视为命中。
-    bool key_hit = true;
+bool ResolveProblemResidentKeyHit(
+    const Request& req,
+    const ExecutionPlan& plan,
+    const SystemState& state,
+    size_t card_limit) {
+
     for (size_t idx = 0; idx < card_limit; ++idx) {
         const CardId card_id = plan.assigned_cards[idx];
         if (card_id >= state.cards.size()) {
-            key_hit = false;
-            break;
+            return false;
         }
         const auto& card = state.cards.at(card_id);
         if (!card.resident_user.has_value() || card.resident_user.value() != req.user_id) {
-            key_hit = false;
-            break;
+            return false;
         }
     }
-    problem.key_resident_hit = key_hit;
+    return true;
+}
 
-    // 到这里问题描述已完整可用。
+} // namespace
+
+KeySwitchProblem KeySwitchExecutionModel::BuildProblem(
+    const Request& req,
+    const ExecutionPlan& plan,
+    const SystemState& state
+) const {
+
+    KeySwitchProblem problem;
+    InitializeProblemBase(req, params_.tile_planner, &problem);
+
+    if (plan.assigned_cards.empty()) {
+        problem.valid = false;
+        return problem;
+    }
+
+    ResolveProblemMethodAndCards(req, plan, &problem);
+    NormalizeProblemDimensions(req, &problem);
+    NormalizeProblemBytes(req, &problem);
+    DeriveProblemGranularityBytes(&problem);
+
+    const size_t card_limit = EffectiveProblemCardLimit(plan, problem);
+    const uint64_t min_bram_capacity = ResolveMinCardBramCapacity(
+        plan,
+        state,
+        card_limit,
+        params_.default_bram_capacity_bytes
+    );
+    problem.min_card_bram_capacity_bytes = min_bram_capacity;
+    problem.bram_budget_bytes = ComputeBramBudgetBytes(min_bram_capacity, params_.tile_planner.bram_usable_ratio);
+    problem.key_resident_hit = ResolveProblemResidentKeyHit(
+        req,
+        plan,
+        state,
+        card_limit);
     problem.valid = true;
     return problem;
 }

@@ -1,4 +1,4 @@
-/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake/CMakeFiles/keyaware_core.dir
-/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake/CMakeFiles/keyaware_sim.dir
-/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake/CMakeFiles/edit_cache.dir
-/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake/CMakeFiles/rebuild_cache.dir
+/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles/keyaware_core.dir
+/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles/keyaware_sim.dir
+/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles/edit_cache.dir
+/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles/rebuild_cache.dir

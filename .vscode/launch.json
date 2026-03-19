@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug keyaware_sim (Poseidon, single-card)",
+      "name": "Debug keyaware_sim (OLA, single-card)",
       "type": "lldb",
       "request": "launch",
       "program": "${workspaceFolder}/build-cmake/keyaware_sim",
@@ -14,7 +14,7 @@
         "--workload",
         "synthetic",
         "--ks-method",
-        "poseidon",
+        "ola",
         "--disable-multi-card",
         "--seed",
         "42",

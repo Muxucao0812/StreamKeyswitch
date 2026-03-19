@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 namespace {
 
@@ -10,10 +11,8 @@ uint32_t CeilDivU32(uint32_t a, uint32_t b) {
 }
 
 uint32_t SafeBconvParallelism(const HardwareConfig& config) {
-    const uint32_t array_parallelism = std::max<uint32_t>(
-        1,
-        config.bconv_array_height * config.bconv_array_width);
-    return std::max<uint32_t>(config.bconv_unit_count, array_parallelism);
+    // Xiangchen: 目前不考虑bconv单元之间的资源竞争，直接返回总的bconv单元数作为并行度上限。
+    return 0;
 }
 
 } // namespace
@@ -124,70 +123,29 @@ uint64_t HardwareModel::EstimateNttCycles(
 
     const uint32_t waves = WavesPerPoly(problem);
     uint64_t cycles = 0;
-    cycles += PhaseCycles(waves, 0, 1, 0, 1.0, num_limbs);
-    cycles += PhaseCycles(
-        waves,
-        /*startup_cycles=*/1,
-        std::max<uint32_t>(1, config_.spu_stream_delay_cycles),
-        /*drain_cycles=*/1,
-        /*wave_passes=*/1.0);
-    cycles += PhaseCycles(
-        waves,
+    cycles = PhaseCycles(
+        /*waves=*/waves,
         /*startup_cycles=*/0,
-        std::max<uint32_t>(1, config_.butterfly_delay_cycles),
-        /*drain_cycles=*/0,
-        /*wave_passes=*/8.0);
-    cycles += config_.intra_transpose_delay_cycles;
-    cycles += PhaseCycles(waves, 0, 1, 0, 1.0, num_limbs);
-    cycles += PhaseCycles(
-        waves,
-        /*startup_cycles=*/1,
-        std::max<uint32_t>(1, config_.spu_stream_delay_cycles),
-        /*drain_cycles=*/1,
-        /*wave_passes=*/1.0);
-    cycles += PhaseCycles(
-        waves,
-        /*startup_cycles=*/0,
-        std::max<uint32_t>(1, config_.butterfly_delay_cycles),
-        /*drain_cycles=*/0,
-        /*wave_passes=*/8.0);
-    cycles += config_.inter_transpose_delay_cycles;
+        /*per_wave_cycles=*/1, //Full Pipeline
+        /*drain_cycles=*/config_.butterfly_delay_cycles,
+        /*wave_passes=*/std::log2(problem.poly_modulus_degree),
+        /*num_limbs=*/num_limbs
+    );
+
+  
     return cycles;
 }
 
 uint64_t HardwareModel::EstimateInttCycles(
-    const KeySwitchProblem& problem, uint32_t num_limbs) const {
+    const KeySwitchProblem& problem, 
+    uint32_t num_limbs
+) const {
 
-    const uint32_t waves = WavesPerPoly(problem);
-    uint64_t cycles = 0;
-    cycles += PhaseCycles(
-        waves,
-        /*startup_cycles=*/1,
-        std::max<uint32_t>(1, config_.spu_stream_delay_cycles),
-        /*drain_cycles=*/1,
-        /*wave_passes=*/1.0);
-    cycles += PhaseCycles(
-        waves,
-        /*startup_cycles=*/0,
-        std::max<uint32_t>(1, config_.butterfly_delay_cycles),
-        /*drain_cycles=*/0,
-        /*wave_passes=*/8.0);
-    cycles += PhaseCycles(waves, 0, 1, 0, 1.0, num_limbs);
-    cycles += config_.intra_transpose_delay_cycles;
-    cycles += PhaseCycles(
-        waves,
-        /*startup_cycles=*/1,
-        std::max<uint32_t>(1, config_.spu_stream_delay_cycles),
-        /*drain_cycles=*/1,
-        /*wave_passes=*/1.0);
-    cycles += PhaseCycles(
-        waves,
-        /*startup_cycles=*/0,
-        std::max<uint32_t>(1, config_.butterfly_delay_cycles),
-        /*drain_cycles=*/0,
-        /*wave_passes=*/8.0);
-    cycles += PhaseCycles(waves, 0, 1, 0, 1.0, num_limbs);
-    cycles += config_.inter_transpose_delay_cycles;
+    auto cycles = HardwareModel::EstimateNttCycles(
+        problem,
+        num_limbs
+    );
+
     return cycles;
 }
 
@@ -222,17 +180,27 @@ uint64_t HardwareModel::EstimateEweSubCycles(
 }
 
 uint64_t HardwareModel::EstimateBconvCycles(
-    const KeySwitchProblem& problem, uint32_t num_output_limbs) const {
+    const KeySwitchProblem& problem, 
+    uint32_t num_input_limbs,
+    uint32_t num_output_limbs
+) const {
 
     // BConv = 矩阵乘法：l 个输入 limbs → k 个输出 limbs。
     // 硬件：256 lanes，每 lane 1 个模乘 + 1 个模加。
     // 每个 clock 处理 1 个输入 limb 的 1 个 wave（256 个系数）。
     // 产出 1 个输出 limb = l × waves 个 clock。
     // 产出 k 个输出 limb = k × l × waves 个 clock。
+
     const uint32_t waves = WavesPerPoly(problem);
-    const uint32_t l = std::max<uint32_t>(1, problem.limbs);
-    const uint32_t k = std::max<uint32_t>(1, num_output_limbs);
-    return static_cast<uint64_t>(k) * l * waves;
+    auto cycles = PhaseCycles(
+        /*waves=*/waves*num_output_limbs*num_input_limbs,
+        /*startup_cycles=*/std::max<uint32_t>(1, config_.bconv_mac_delay_cycles),
+        /*per_wave_cycles=*/1,
+        /*drain_cycles=*/0,
+        /*wave_passes=*/1.0,
+        /*num_limbs=*/SafeBconvParallelism(config_)
+    );
+    return cycles;
 }
 
 HardwareUnitConfig HardwareModel::MemoryConfig() const {

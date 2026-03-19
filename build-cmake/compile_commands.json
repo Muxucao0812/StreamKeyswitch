@@ -1,0 +1,122 @@
+[
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/common/experiment_config.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/common/experiment_config.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/common/experiment_config.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/common/config_loader.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/common/config_loader.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/common/config_loader.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/common/he_params_loader.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/common/he_params_loader.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/common/he_params_loader.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/model/workload.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/model/workload.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/model/workload.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/backend/hw/hardware_model.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/hw/hardware_model.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/backend/hw/hardware_model.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/backend/cycle_sim/arch.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_sim/arch.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/backend/cycle_sim/arch.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/backend/cycle_sim/driver.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_sim/driver.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/backend/cycle_sim/driver.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/backend/cycle_sim/lowering.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_sim/lowering.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/backend/cycle_sim/lowering.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/backend/step_graph_runtime.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/step_graph_runtime.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/backend/step_graph_runtime.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/backend/runtime_planner.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/runtime_planner.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/backend/runtime_planner.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/backend/model/keyswitch_execution_model.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/model/keyswitch_execution_model.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/backend/model/keyswitch_execution_model.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/backend/primitive_simulator.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/primitive_simulator.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/backend/primitive_simulator.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_ola.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_ola.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_poseidon.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_poseidon.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/scheduler/fifo_scheduler.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/scheduler/fifo_scheduler.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/scheduler/affinity_scheduler.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/scheduler/affinity_scheduler.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/scheduler/affinity_scheduler.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/scheduler/static_partition_scheduler.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/scheduler/static_partition_scheduler.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/scheduler/static_partition_scheduler.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/scheduler/score_scheduler.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/scheduler/score_scheduler.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/scheduler/score_scheduler.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/scheduler/pool_scheduler.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/scheduler/pool_scheduler.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/scheduler/pool_scheduler.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/scheduler/hierarchical_scheduler.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/scheduler/hierarchical_scheduler.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/scheduler/hierarchical_scheduler.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/sim/metrics.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/sim/metrics.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/sim/simulator.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/sim/simulator.cpp"
+},
+{
+  "directory": "/home/mxc/work/KeyAwareSwitch/build-cmake",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/home/mxc/work/KeyAwareSwitch/include -g -Wall -Wextra -Wpedantic -std=c++17 -o CMakeFiles/keyaware_sim.dir/src/main.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/main.cpp",
+  "file": "/home/mxc/work/KeyAwareSwitch/src/main.cpp"
+}
+]

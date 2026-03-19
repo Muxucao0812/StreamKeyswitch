@@ -24,190 +24,194 @@ CSVOutput: results/metrics_poseidon.csv
 DumpLogicalGraph: true
 DumpRuntimePlan: true
 =========================
-=== LoadInput: ct=1 l=23 bytes=24117248 ===
-  [group 0] load_input  kind=LoadHBM  limbs=23  instrs=23  per_limb_cycles=9849  total_cycles=226118  bytes=24117248  bram_live=24117248
-=== ModUp: l=23 k=8 input=24117248 output=32505856 ===
-  [group 1] modup_intt  kind=INTT  limbs=23  instrs=23  per_limb_cycles=22292  total_cycles=33556  bytes=24117248  bram_live=24117248
-  [group 2] modup_bconv  kind=BConv  limbs=8  instrs=8  per_limb_cycles=5888  total_cycles=47104  bytes=32505856  bram_live=32505856
-  [group 3] modup_ntt  kind=NTT  limbs=31  instrs=31  per_limb_cycles=22292  total_cycles=37652  bytes=32505856  bram_live=32505856
-  [group 4] modup_spill  kind=StoreHBM  limbs=31  instrs=31  per_limb_cycles=9849  total_cycles=304761  bytes=32505856  bram_live=0
-=== InnerProd: modup_limbs=31 key_limbs=31 accum_limbs=62 spilled=yes last=no ===
-  [group 5] innerprod_reload_modup  kind=LoadHBM  limbs=31  instrs=31  per_limb_cycles=9849  total_cycles=304761  bytes=32505856  bram_live=65011712
-  [group 6] innerprod_load_key  kind=LoadHBM  limbs=31  instrs=31  per_limb_cycles=9849  total_cycles=304761  bytes=32505856  bram_live=65011712
-  [group 7] innerprod_mul  kind=EweMul  limbs=62  instrs=62  per_limb_cycles=260  total_cycles=15876  bytes=0  bram_live=65011712
-  [group 8] innerprod_add  kind=EweAdd  limbs=62  instrs=62  per_limb_cycles=258  total_cycles=15874  bytes=0  bram_live=65011712
-  [group 9] innerprod_spill_accum  kind=StoreHBM  limbs=62  instrs=62  per_limb_cycles=9849  total_cycles=609503  bytes=65011712  bram_live=0
-=== LoadInput: ct=1 l=23 bytes=24117248 ===
-  [group 10] load_input  kind=LoadHBM  limbs=23  instrs=23  per_limb_cycles=9849  total_cycles=226118  bytes=24117248  bram_live=24117248
-=== ModUp: l=23 k=8 input=24117248 output=32505856 ===
-  [group 11] modup_intt  kind=INTT  limbs=23  instrs=23  per_limb_cycles=22292  total_cycles=33556  bytes=24117248  bram_live=24117248
-  [group 12] modup_bconv  kind=BConv  limbs=8  instrs=8  per_limb_cycles=5888  total_cycles=47104  bytes=32505856  bram_live=32505856
-  [group 13] modup_ntt  kind=NTT  limbs=31  instrs=31  per_limb_cycles=22292  total_cycles=37652  bytes=32505856  bram_live=32505856
-  [group 14] modup_spill  kind=StoreHBM  limbs=31  instrs=31  per_limb_cycles=9849  total_cycles=304761  bytes=32505856  bram_live=0
-=== InnerProd: modup_limbs=31 key_limbs=31 accum_limbs=62 spilled=yes last=no ===
-  [group 15] innerprod_reload_modup  kind=LoadHBM  limbs=31  instrs=31  per_limb_cycles=9849  total_cycles=304761  bytes=32505856  bram_live=65011712
-  [group 16] innerprod_load_key  kind=LoadHBM  limbs=31  instrs=31  per_limb_cycles=9849  total_cycles=304761  bytes=32505856  bram_live=65011712
-  [group 17] innerprod_mul  kind=EweMul  limbs=62  instrs=62  per_limb_cycles=260  total_cycles=15876  bytes=0  bram_live=65011712
-  [group 18] innerprod_add  kind=EweAdd  limbs=62  instrs=62  per_limb_cycles=258  total_cycles=15874  bytes=0  bram_live=65011712
-  [group 19] innerprod_spill_accum  kind=StoreHBM  limbs=62  instrs=62  per_limb_cycles=9849  total_cycles=609503  bytes=65011712  bram_live=0
-=== LoadInput: ct=1 l=23 bytes=24117248 ===
-  [group 20] load_input  kind=LoadHBM  limbs=23  instrs=23  per_limb_cycles=9849  total_cycles=226118  bytes=24117248  bram_live=24117248
-=== ModUp: l=23 k=8 input=24117248 output=32505856 ===
-  [group 21] modup_intt  kind=INTT  limbs=23  instrs=23  per_limb_cycles=22292  total_cycles=33556  bytes=24117248  bram_live=24117248
-  [group 22] modup_bconv  kind=BConv  limbs=8  instrs=8  per_limb_cycles=5888  total_cycles=47104  bytes=32505856  bram_live=32505856
-  [group 23] modup_ntt  kind=NTT  limbs=31  instrs=31  per_limb_cycles=22292  total_cycles=37652  bytes=32505856  bram_live=32505856
-  [group 24] modup_spill  kind=StoreHBM  limbs=31  instrs=31  per_limb_cycles=9849  total_cycles=304761  bytes=32505856  bram_live=0
-=== InnerProd: modup_limbs=31 key_limbs=31 accum_limbs=62 spilled=yes last=yes ===
-  [group 25] innerprod_reload_modup  kind=LoadHBM  limbs=31  instrs=31  per_limb_cycles=9849  total_cycles=304761  bytes=32505856  bram_live=65011712
-  [group 26] innerprod_load_key  kind=LoadHBM  limbs=31  instrs=31  per_limb_cycles=9849  total_cycles=304761  bytes=32505856  bram_live=65011712
-  [group 27] innerprod_mul  kind=EweMul  limbs=62  instrs=62  per_limb_cycles=260  total_cycles=15876  bytes=0  bram_live=65011712
-  [group 28] innerprod_add  kind=EweAdd  limbs=62  instrs=62  per_limb_cycles=258  total_cycles=15874  bytes=0  bram_live=65011712
-=== ModDown: p*l=46 p*k=16 accum_in_bram=yes ===
-  [group 29] moddown_intt  kind=INTT  limbs=16  instrs=16  per_limb_cycles=22292  total_cycles=29972  bytes=16777216  bram_live=16777216
-  [group 30] moddown_bconv  kind=BConv  limbs=46  instrs=46  per_limb_cycles=5888  total_cycles=270848  bytes=65011712  bram_live=65011712
-  [group 31] moddown_ntt  kind=NTT  limbs=46  instrs=46  per_limb_cycles=22292  total_cycles=45332  bytes=48234496  bram_live=48234496
-  [group 32] moddown_reload_2l  kind=LoadHBM  limbs=46  instrs=46  per_limb_cycles=9849  total_cycles=452217  bytes=48234496  bram_live=48234496
-  [group 33] moddown_subtract  kind=EweSub  limbs=46  instrs=46  per_limb_cycles=258  total_cycles=11778  bytes=48234496  bram_live=48234496
-  [group 34] moddown_store_output  kind=StoreHBM  limbs=46  instrs=46  per_limb_cycles=9849  total_cycles=452217  bytes=48234496  bram_live=0
+=== PoseidonLoadInput: ct=1 l=8 bytes=4194304 ===
+  [group 0] load_input  kind=LoadHBM  micro_ops=8  per_op_cycles=346  total_cycles=2640  bytes=4194304  bram_live=4194304
+=== PoseidonModUp: l=8 k=8 input=4194304 output=8388608 ===
+  [group 1] modup_intt  kind=INTT  micro_ops=8  per_op_cycles=4108  total_cycles=32780  bytes=4194304  bram_live=4194304
+  [group 2] modup_bconv  kind=BConv  micro_ops=64  per_op_cycles=276  total_cycles=16404  bytes=8388608  bram_live=8388608
+  [group 3] modup_ntt  kind=NTT  micro_ops=16  per_op_cycles=4108  total_cycles=65548  bytes=8388608  bram_live=8388608
+=== PoseidonInnerProd: modup_limbs=16 key_limbs=16 accum_limbs=32 spilled=no last=no ===
+  [group 4] innerprod_load_key_all  kind=LoadHBM  micro_ops=32  per_op_cycles=346  total_cycles=10504  bytes=16777216  bram_live=25165824
+  [group 5] innerprod_mul_all  kind=EweMul  micro_ops=32  per_op_cycles=260  total_cycles=8196  bytes=25165824  bram_live=41943040
+  [group 6] innerprod_spill_partial  kind=StoreHBM  micro_ops=32  per_op_cycles=346  total_cycles=10504  bytes=16777216  bram_live=0
+=== PoseidonLoadInput: ct=1 l=8 bytes=4194304 ===
+  [group 7] load_input  kind=LoadHBM  micro_ops=8  per_op_cycles=346  total_cycles=2640  bytes=4194304  bram_live=4194304
+=== PoseidonModUp: l=8 k=8 input=4194304 output=8388608 ===
+  [group 8] modup_intt  kind=INTT  micro_ops=8  per_op_cycles=4108  total_cycles=32780  bytes=4194304  bram_live=4194304
+  [group 9] modup_bconv  kind=BConv  micro_ops=64  per_op_cycles=276  total_cycles=16404  bytes=8388608  bram_live=8388608
+  [group 10] modup_ntt  kind=NTT  micro_ops=16  per_op_cycles=4108  total_cycles=65548  bytes=8388608  bram_live=8388608
+=== PoseidonInnerProd: modup_limbs=16 key_limbs=16 accum_limbs=32 spilled=no last=no ===
+  [group 11] innerprod_load_key_all  kind=LoadHBM  micro_ops=32  per_op_cycles=346  total_cycles=10504  bytes=16777216  bram_live=25165824
+  [group 12] innerprod_mul_all  kind=EweMul  micro_ops=32  per_op_cycles=260  total_cycles=8196  bytes=25165824  bram_live=41943040
+  [group 13] innerprod_spill_partial  kind=StoreHBM  micro_ops=32  per_op_cycles=346  total_cycles=10504  bytes=16777216  bram_live=0
+=== PoseidonLoadInput: ct=1 l=8 bytes=4194304 ===
+  [group 14] load_input  kind=LoadHBM  micro_ops=8  per_op_cycles=346  total_cycles=2640  bytes=4194304  bram_live=4194304
+=== PoseidonModUp: l=8 k=8 input=4194304 output=8388608 ===
+  [group 15] modup_intt  kind=INTT  micro_ops=8  per_op_cycles=4108  total_cycles=32780  bytes=4194304  bram_live=4194304
+  [group 16] modup_bconv  kind=BConv  micro_ops=64  per_op_cycles=276  total_cycles=16404  bytes=8388608  bram_live=8388608
+  [group 17] modup_ntt  kind=NTT  micro_ops=16  per_op_cycles=4108  total_cycles=65548  bytes=8388608  bram_live=8388608
+=== PoseidonInnerProd: modup_limbs=16 key_limbs=16 accum_limbs=32 spilled=no last=yes ===
+  [group 18] innerprod_load_key_all  kind=LoadHBM  micro_ops=32  per_op_cycles=346  total_cycles=10504  bytes=16777216  bram_live=25165824
+  [group 19] innerprod_mul_all  kind=EweMul  micro_ops=32  per_op_cycles=260  total_cycles=8196  bytes=25165824  bram_live=41943040
+=== PoseidonReduceCrossDigitAdd: accum_limbs=32 last_reduce=no accum_in_bram=yes ===
+  [group 20] reduce_reload_partial_rhs  kind=LoadHBM  micro_ops=32  per_op_cycles=346  total_cycles=10504  bytes=16777216  bram_live=33554432
+  [group 21] reduce_cross_digit_add  kind=EweAdd  micro_ops=32  per_op_cycles=258  total_cycles=8194  bytes=16777216  bram_live=16777216
+=== PoseidonReduceCrossDigitAdd: accum_limbs=32 last_reduce=yes accum_in_bram=yes ===
+  [group 22] reduce_reload_partial_rhs  kind=LoadHBM  micro_ops=32  per_op_cycles=346  total_cycles=10504  bytes=16777216  bram_live=33554432
+  [group 23] reduce_cross_digit_add  kind=EweAdd  micro_ops=32  per_op_cycles=258  total_cycles=8194  bytes=16777216  bram_live=16777216
+=== PoseidonModDown: p*l=46 p*k=16 accum_in_bram=yes ===
+  [group 24] moddown_spill_2l  kind=StoreHBM  micro_ops=1  per_op_cycles=15092  total_cycles=15092  bytes=24117248  bram_live=0
+  [group 25] moddown_intt  kind=INTT  micro_ops=16  per_op_cycles=4108  total_cycles=65548  bytes=8388608  bram_live=0
+  [group 26] moddown_bconv  kind=BConv  micro_ops=736  per_op_cycles=276  total_cycles=188436  bytes=32505856  bram_live=15728640
+  [group 27] moddown_ntt  kind=NTT  micro_ops=46  per_op_cycles=4108  total_cycles=188428  bytes=24117248  bram_live=15728640
+  [group 28] moddown_reload_2l  kind=LoadHBM  micro_ops=46  per_op_cycles=346  total_cycles=15092  bytes=24117248  bram_live=15728640
+  [group 29] moddown_subtract  kind=EweSub  micro_ops=46  per_op_cycles=258  total_cycles=11778  bytes=24117248  bram_live=15728640
+  [group 30] moddown_store_output  kind=StoreHBM  micro_ops=46  per_op_cycles=346  total_cycles=15092  bytes=24117248  bram_live=0
 
 ========== Detailed Execution Statistics ==========
 
 --- Summary ---
-Total cycles:           2864895
-Total latency (ns):     9549650
-Peak BRAM live (bytes): 51380224
-HBM read (bytes):       315621376
-HBM write (bytes):      275775488
-Dependency stalls:      361284 cycles
-Resource stalls:        2503611 cycles
-Instruction groups:     35
-Total instructions:     1276
+Total cycles:           262098
+Total latency (ns):     873660
+Peak BRAM live (bytes): 121634816
+HBM read (bytes):       120586240
+HBM write (bytes):      81788928
+Dependency stalls:      54766 cycles
+Resource stalls:        207332 cycles
+Instruction groups:     31
+Total instructions:     1609
 
 --- Cycle Breakdown by Instruction Kind ---
-  LoadHBM: cycles=768241 (26.8157%)  count=301  bytes=315621376
-  StoreHBM: cycles=669741 (23.3775%)  count=263  bytes=275775488
-  NTT: cycles=802519 (28.0122%)  count=139  bytes=145752064
-  INTT: cycles=490433 (17.1187%)  count=85  bytes=89128960
-  EweMul: cycles=12483 (0.435723%)  count=186  bytes=0
-  EweAdd: cycles=12387 (0.432372%)  count=186  bytes=0
-  EweSub: cycles=3097 (0.108102%)  count=46  bytes=48234496
-  BConv: cycles=105994 (3.69975%)  count=70  bytes=162529276
+  LoadHBM: cycles=20093 (7.66622%)  count=230  bytes=120586240
+  StoreHBM: cycles=24787 (9.45715%)  count=111  bytes=81788928
+  NTT: cycles=98602 (37.6203%)  count=94  bytes=49283072
+  INTT: cycles=41092 (15.6781%)  count=40  bytes=20971520
+  EweMul: cycles=6249 (2.38422%)  count=96  bytes=75497472
+  EweAdd: cycles=4134 (1.57727%)  count=64  bytes=33554432
+  EweSub: cycles=3097 (1.18162%)  count=46  bytes=24117248
+  BConv: cycles=64044 (24.4351%)  count=928  bytes=57671264
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=346  groups=3  instrs=24
+  modup_intt: kind=INTT  one_limb_cycles=4108  groups=3  instrs=24
+  modup_bconv: kind=BConv  one_limb_cycles=276  groups=3  instrs=192
+  modup_ntt: kind=NTT  one_limb_cycles=4108  groups=3  instrs=48
+  innerprod_load_key_all: kind=LoadHBM  one_limb_cycles=346  groups=3  instrs=96
+  innerprod_mul_all: kind=EweMul  one_limb_cycles=260  groups=3  instrs=96
+  innerprod_spill_partial: kind=StoreHBM  one_limb_cycles=346  groups=2  instrs=64
+  reduce_reload_partial_rhs: kind=LoadHBM  one_limb_cycles=346  groups=2  instrs=64
+  reduce_cross_digit_add: kind=EweAdd  one_limb_cycles=258  groups=2  instrs=64
+  moddown_spill_2l: kind=StoreHBM  one_limb_cycles=15092  groups=1  instrs=1
+  moddown_intt: kind=INTT  one_limb_cycles=4108  groups=1  instrs=16
+  moddown_bconv: kind=BConv  one_limb_cycles=276  groups=1  instrs=736
+  moddown_ntt: kind=NTT  one_limb_cycles=4108  groups=1  instrs=46
+  moddown_reload_2l: kind=LoadHBM  one_limb_cycles=346  groups=1  instrs=46
+  moddown_subtract: kind=EweSub  one_limb_cycles=258  groups=1  instrs=46
+  moddown_store_output: kind=StoreHBM  one_limb_cycles=346  groups=1  instrs=46
 
 --- Group Timeline ---
   ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
-   0  load_input                     0     59096      59096            0     24117248  24117248
-   1  modup_intt                 59096    192850     133754     24117248     24117248  24117248
-   2  modup_bconv               192850    204629      11779     24117248     32505856  32505856
-   3  modup_ntt                 204629    382967     178338     32505856     32505856  32505856
-   4  modup_spill               382967    461761      78794     32505856            0  32505856
-   5  innerprod_reload_modup    461761    540555      78794            0      1048576  32505856
-   6  innerprod_load_key        540555    619349      78794      1048576      2097152  32505856
-   7  innerprod_mul             619349    623510       4161      2097152      2097152  0
-   8  innerprod_add             623510    627639       4129      2097152      2097152  0
-   9  innerprod_spill_accum     627639    785224     157585      2097152            0  65011712
-  10  load_input                785224    844320      59096            0     24117248  24117248
-  11  modup_intt                844320    978074     133754     24117248     24117248  24117248
-  12  modup_bconv               978074    989853      11779     24117248     32505856  32505856
-  13  modup_ntt                 989853   1168191     178338     32505856     32505856  32505856
-  14  modup_spill              1168191   1246985      78794     32505856            0  32505856
-  15  innerprod_reload_modup   1246985   1325779      78794            0      1048576  32505856
-  16  innerprod_load_key       1325779   1404573      78794      1048576      2097152  32505856
-  17  innerprod_mul            1404573   1408734       4161      2097152      2097152  0
-  18  innerprod_add            1408734   1412863       4129      2097152      2097152  0
-  19  innerprod_spill_accum    1412863   1570448     157585      2097152            0  65011712
-  20  load_input               1570448   1629544      59096            0     24117248  24117248
-  21  modup_intt               1629544   1763298     133754     24117248     24117248  24117248
-  22  modup_bconv              1763298   1775077      11779     24117248     32505856  32505856
-  23  modup_ntt                1775077   1953415     178338     32505856     32505856  32505856
-  24  modup_spill              1953415   2032209      78794     32505856            0  32505856
-  25  innerprod_reload_modup   2032209   2111003      78794            0      1048576  32505856
-  26  innerprod_load_key       2111003   2189797      78794      1048576      2097152  32505856
-  27  innerprod_mul            2189797   2193958       4161      2097152      2097152  0
-  28  innerprod_add            2193958   2198087       4129      2097152      2097152  0
-  29  moddown_intt             2198087   2287258      89171      2097152      2097152  16777216
-  30  moddown_bconv            2287258   2357915      70657      2097152     50331648  65011712
-  31  moddown_ntt              2357915   2625420     267505     50331648     50331648  48234496
-  32  moddown_reload_2l        2625420   2743609     118189     50331648     51380224  48234496
-  33  moddown_subtract         2743609   2746706       3097     51380224     51380224  48234496
-  34  moddown_store_output     2746706   2864895     118189     51380224      3145728  48234496
+   0  load_input                     0       695        695            0      8388608  4194304
+   1  modup_intt                   695      8914       8219      8388608      8388608  4194304
+   2  modup_bconv                 8914     13333       4419      8388608     12582912  8388608
+   3  modup_ntt                  13333     29768      16435     12582912     12582912  8388608
+   4  innerprod_load_key_all     29768     32539       2771     12582912     29360128  16777216
+   5  innerprod_mul_all          32539     34622       2083     29360128     46137344  25165824
+   6  innerprod_spill_partial    34622     37393       2771     46137344     29360128  16777216
+   7  load_input                 37393     38088        695     29360128     37748736  4194304
+   8  modup_intt                 38088     46307       8219     37748736     37748736  4194304
+   9  modup_bconv                46307     50726       4419     37748736     41943040  8388608
+  10  modup_ntt                  50726     67161      16435     41943040     41943040  8388608
+  11  innerprod_load_key_all     67161     69932       2771     41943040     58720256  16777216
+  12  innerprod_mul_all          69932     72015       2083     58720256     75497472  25165824
+  13  innerprod_spill_partial    72015     74786       2771     75497472     58720256  16777216
+  14  load_input                 74786     75481        695     58720256     67108864  4194304
+  15  modup_intt                 75481     83700       8219     67108864     67108864  4194304
+  16  modup_bconv                83700     88119       4419     67108864     71303168  8388608
+  17  modup_ntt                  88119    104554      16435     71303168     71303168  8388608
+  18  innerprod_load_key_all    104554    107325       2771     71303168     88080384  16777216
+  19  innerprod_mul_all         107325    109408       2083     88080384    104857600  25165824
+  20  reduce_reload_partial_rhs  109408    112179       2771    104857600    121634816  16777216
+  21  reduce_cross_digit_add    112179    114246       2067    121634816    104857600  16777216
+  22  reduce_reload_partial_rhs  114246    117017       2771    104857600    121634816  16777216
+  23  reduce_cross_digit_add    117017    119084       2067    121634816    104857600  16777216
+  24  moddown_spill_2l          119084    134176      15092    104857600     80740352  24117248
+  25  moddown_intt              134176    150611      16435     80740352     80740352  8388608
+  26  moddown_bconv             150611    201398      50787     80740352     96468992  32505856
+  27  moddown_ntt               201398    250695      49297     96468992     96468992  24117248
+  28  moddown_reload_2l         250695    254848       4153     96468992     96468992  24117248
+  29  moddown_subtract          254848    257945       3097     96468992     96468992  24117248
+  30  moddown_store_output      257945    262098       4153     96468992     72351744  24117248
 
 --- BRAM Timeline (cycle, live_bytes) ---
 # cycle,bram_bytes
 0,0
 0,0
-59096,24117248
-59096,24117248
-192850,24117248
-192850,24117248
-204629,32505856
-204629,32505856
-382967,32505856
-382967,32505856
-461761,0
-461761,0
-540555,1048576
-540555,1048576
-619349,2097152
-619349,2097152
-623510,2097152
-623510,2097152
-627639,2097152
-627639,2097152
-785224,0
-785224,0
-844320,24117248
-844320,24117248
-978074,24117248
-978074,24117248
-989853,32505856
-989853,32505856
-1168191,32505856
-1168191,32505856
-1246985,0
-1246985,0
-1325779,1048576
-1325779,1048576
-1404573,2097152
-1404573,2097152
-1408734,2097152
-1408734,2097152
-1412863,2097152
-1412863,2097152
-1570448,0
-1570448,0
-1629544,24117248
-1629544,24117248
-1763298,24117248
-1763298,24117248
-1775077,32505856
-1775077,32505856
-1953415,32505856
-1953415,32505856
-2032209,0
-2032209,0
-2111003,1048576
-2111003,1048576
-2189797,2097152
-2189797,2097152
-2193958,2097152
-2193958,2097152
-2198087,2097152
-2198087,2097152
-2287258,2097152
-2287258,2097152
-2357915,50331648
-2357915,50331648
-2625420,50331648
-2625420,50331648
-2743609,51380224
-2743609,51380224
-2746706,51380224
-2746706,51380224
-2864895,3145728
+695,8388608
+695,8388608
+8914,8388608
+8914,8388608
+13333,12582912
+13333,12582912
+29768,12582912
+29768,12582912
+32539,29360128
+32539,29360128
+34622,46137344
+34622,46137344
+37393,29360128
+37393,29360128
+38088,37748736
+38088,37748736
+46307,37748736
+46307,37748736
+50726,41943040
+50726,41943040
+67161,41943040
+67161,41943040
+69932,58720256
+69932,58720256
+72015,75497472
+72015,75497472
+74786,58720256
+74786,58720256
+75481,67108864
+75481,67108864
+83700,67108864
+83700,67108864
+88119,71303168
+88119,71303168
+104554,71303168
+104554,71303168
+107325,88080384
+107325,88080384
+109408,104857600
+109408,104857600
+112179,121634816
+112179,121634816
+114246,104857600
+114246,104857600
+117017,121634816
+117017,121634816
+119084,104857600
+119084,104857600
+134176,80740352
+134176,80740352
+150611,80740352
+150611,80740352
+201398,96468992
+201398,96468992
+250695,96468992
+250695,96468992
+254848,96468992
+254848,96468992
+257945,96468992
+257945,96468992
+262098,72351744
 
 --- Transfer vs Compute ---
-Transfer: 1437982 cycles (50.1932%)
-Compute:  1426913 cycles (49.8068%)
+Transfer: 44880 cycles (17.1234%)
+Compute:  217218 cycles (82.8766%)
 ====================================================
 
 Scheduler=fifo
@@ -218,21 +222,21 @@ Seed=123
 NumCards=1
 === Request Metrics ===
 Completed requests: 1
-Mean latency(ns): 9549650.0000
-P95 latency(ns): 9549650
-P99 latency(ns): 9549650
-Max latency(ns): 9549650
+Mean latency(ns): 873660.0000
+P95 latency(ns): 873660
+P99 latency(ns): 873660
+Max latency(ns): 873660
 Mean queue time(ns): 0.0000
-Mean service time(ns): 9549650.0000
+Mean service time(ns): 873660.0000
 === User Metrics ===
-User 0: completed=1, mean_latency(ns)=9549650.0000, throughput(req/ns)=0.0000, reload_count=1
+User 0: completed=1, mean_latency(ns)=873660.0000, throughput(req/ns)=0.0000, reload_count=1
 === Card Metrics ===
 Card 0: utilization=1.0000, reload_count=1, served_requests=1
 === System Metrics ===
 Total throughput(req/ns): 0.0000
 Total reload count: 1
 Jain fairness index: 1.0000
-Simulation window(ns): [64, 9549714], duration=9549650
+Simulation window(ns): [23, 873683], duration=873660
 PoolConfigSource=built-in default
 TreeConfigSource=built-in default
 HEParamsSource=built-in default
