@@ -169,77 +169,54 @@ std::size_t StageIndex(StageType stage_type) {
     return 0;
 }
 
-void AddTransferTime(
-    TransferBreakdown* breakdown,
-    TileExecutionStepType step_type,
-    Time value) {
+StageType StageTypeOf(
+    CycleOpType type,
+    CycleInstructionKind kind) {
 
-    switch (step_type) {
-    case TileExecutionStepType::KeyLoadHostToHBM:
-        SaturatingAdd(&breakdown->key_host_to_hbm_time, value);
-        return;
-    case TileExecutionStepType::KeyLoadHBMToBRAM:
-    case TileExecutionStepType::KeyHBMToBRAM:
-        SaturatingAdd(&breakdown->key_hbm_to_bram_time, value);
-        return;
-    case TileExecutionStepType::InputHBMToBRAM:
-    case TileExecutionStepType::IntermediateHBMToBRAM:
-        SaturatingAdd(&breakdown->input_hbm_to_bram_time, value);
-        return;
-    case TileExecutionStepType::IntermediateBRAMToHBM:
-    case TileExecutionStepType::OutputBRAMToHBM:
-        SaturatingAdd(&breakdown->output_bram_to_hbm_time, value);
-        return;
-    default:
-        return;
+    if (kind == CycleInstructionKind::Decompose) {
+        return StageType::Decompose;
     }
+
+    switch (type) {
+    case CycleOpType::KeyLoad:
+        return StageType::KeyLoad;
+    case CycleOpType::DataLoad:
+    case CycleOpType::Spill:
+        return StageType::Dispatch;
+    case CycleOpType::NTT:
+    case CycleOpType::INTT:
+    case CycleOpType::BConv:
+        return StageType::BasisConvert;
+    case CycleOpType::Multiply:
+    case CycleOpType::Add:
+    case CycleOpType::Sub:
+        return StageType::Multiply;
+    case CycleOpType::InterCardComm:
+        return StageType::Merge;
+    }
+
+    return StageType::Dispatch;
 }
 
-void AddComputeTime(
-    PrimitiveComputeBreakdown* breakdown,
-    TileExecutionStepType step_type,
+void AddTransferTime(
+    TransferBreakdown* breakdown,
+    CycleOpType type,
+    CycleTransferPath transfer_path,
     Time value) {
 
-    switch (step_type) {
-    case TileExecutionStepType::DecomposeTile:
-        SaturatingAdd(&breakdown->transform_time, value);
+    switch (type) {
+    case CycleOpType::KeyLoad:
+        if (transfer_path == CycleTransferPath::HostToHBM) {
+            SaturatingAdd(&breakdown->key_host_to_hbm_time, value);
+        } else {
+            SaturatingAdd(&breakdown->key_hbm_to_bram_time, value);
+        }
         return;
-    case TileExecutionStepType::ModUpInttTile:
-    case TileExecutionStepType::ModDownInttTile:
-        SaturatingAdd(&breakdown->intt_time, value);
+    case CycleOpType::DataLoad:
+        SaturatingAdd(&breakdown->input_hbm_to_bram_time, value);
         return;
-    case TileExecutionStepType::ModUpBConvTile:
-    case TileExecutionStepType::ModDownBConvTile:
-        SaturatingAdd(&breakdown->bconv_time, value);
-        return;
-    case TileExecutionStepType::ModUpNttTile:
-    case TileExecutionStepType::ModDownNttTile:
-        SaturatingAdd(&breakdown->ntt_time, value);
-        return;
-    case TileExecutionStepType::CrossDigitReduceTile:
-        SaturatingAdd(&breakdown->accumulate_time, value);
-        return;
-    case TileExecutionStepType::FinalSubtractTile:
-        SaturatingAdd(&breakdown->subtract_time, value);
-        return;
-    case TileExecutionStepType::NttTile:
-        SaturatingAdd(&breakdown->ntt_time, value);
-        return;
-    case TileExecutionStepType::KSInnerProdTile:
-        SaturatingAdd(&breakdown->inner_product_time, value);
-        return;
-    case TileExecutionStepType::InttTile:
-        SaturatingAdd(&breakdown->intt_time, value);
-        return;
-    case TileExecutionStepType::AccumulateSubtractTile: {
-        const Time accumulate = value / 2;
-        const Time subtract = value - accumulate;
-        SaturatingAdd(&breakdown->accumulate_time, accumulate);
-        SaturatingAdd(&breakdown->subtract_time, subtract);
-        return;
-    }
-    case TileExecutionStepType::BasisConvertTile:
-        SaturatingAdd(&breakdown->bconv_time, value);
+    case CycleOpType::Spill:
+        SaturatingAdd(&breakdown->output_bram_to_hbm_time, value);
         return;
     default:
         return;
@@ -251,18 +228,33 @@ void AddCycleComputeTime(
     const CycleGroupTiming& timing,
     Time value) {
 
-    if (timing.source_step_type == TileExecutionStepType::AccumulateSubtractTile) {
-        if (timing.kind == CycleInstructionKind::EweAdd) {
-            SaturatingAdd(&breakdown->accumulate_time, value);
-            return;
-        }
-        if (timing.kind == CycleInstructionKind::EweSub) {
-            SaturatingAdd(&breakdown->subtract_time, value);
-            return;
-        }
+    if (timing.kind == CycleInstructionKind::Decompose) {
+        SaturatingAdd(&breakdown->transform_time, value);
+        return;
     }
 
-    AddComputeTime(breakdown, timing.source_step_type, value);
+    switch (timing.type) {
+    case CycleOpType::NTT:
+        SaturatingAdd(&breakdown->ntt_time, value);
+        return;
+    case CycleOpType::INTT:
+        SaturatingAdd(&breakdown->intt_time, value);
+        return;
+    case CycleOpType::BConv:
+        SaturatingAdd(&breakdown->bconv_time, value);
+        return;
+    case CycleOpType::Multiply:
+        SaturatingAdd(&breakdown->inner_product_time, value);
+        return;
+    case CycleOpType::Add:
+        SaturatingAdd(&breakdown->accumulate_time, value);
+        return;
+    case CycleOpType::Sub:
+        SaturatingAdd(&breakdown->subtract_time, value);
+        return;
+    default:
+        return;
+    }
 }
 
 ExecutionResult MakeFallbackResult(
@@ -712,11 +704,12 @@ ExecutionResult CycleBackend::CollectResult(
     for (const CycleGroupTiming& timing : sim_stats.group_timings) {
         const uint64_t duration_cycles = timing.DurationCycles();
         SaturatingAdd(
-            &stage_cycles[StageIndex(timing.stage_type)],
+            &stage_cycles[StageIndex(StageTypeOf(timing.type, timing.kind))],
             duration_cycles);
         AddTransferTime(
             &transfer_cycles,
-            timing.source_step_type,
+            timing.type,
+            timing.transfer_path,
             duration_cycles);
         AddCycleComputeTime(
             &compute_cycles,

@@ -28,8 +28,7 @@ CycleProgram BuildPoseidonProgram(
                        const std::string& name,
                        CycleInstructionKind kind,
                        CycleTransferPath transfer_path,
-                       TileExecutionStepType source_step_type,
-                       StageType stage_type,
+                       CycleOpType type,
                        uint64_t bytes,
                        uint32_t input_limbs,
                        uint32_t output_limbs,
@@ -37,8 +36,7 @@ CycleProgram BuildPoseidonProgram(
         CyclePrimitiveDesc desc;
         desc.name = name;
         desc.transfer_path = transfer_path;
-        desc.source_step_type = source_step_type;
-        desc.stage_type = stage_type;
+        desc.type = type;
         desc.bytes = bytes;
         desc.input_limbs = input_limbs;
         desc.output_limbs = output_limbs;
@@ -57,8 +55,7 @@ CycleProgram BuildPoseidonProgram(
             "load_input",
             CycleInstructionKind::LoadHBM,
             CycleTransferPath::HBMToSPM,
-            TileExecutionStepType::InputHBMToBRAM,
-            StageType::Dispatch,
+            CycleOpType::DataLoad,
             input_bram_bytes,
             digit_limb_now,
             0);
@@ -70,8 +67,7 @@ CycleProgram BuildPoseidonProgram(
             "modup_intt",
             CycleInstructionKind::INTT,
             CycleTransferPath::None,
-            TileExecutionStepType::ModUpInttTile,
-            StageType::BasisConvert,
+            CycleOpType::INTT,
             input_bram_bytes,
             digit_limb_now,
             0);
@@ -88,8 +84,7 @@ CycleProgram BuildPoseidonProgram(
             "modup_bconv",
             CycleInstructionKind::BConv,
             CycleTransferPath::None,
-            TileExecutionStepType::ModUpBConvTile,
-            StageType::BasisConvert,
+            CycleOpType::BConv,
             modup_output_bytes,
             digit_limb_now,
             problem.num_k);
@@ -101,8 +96,7 @@ CycleProgram BuildPoseidonProgram(
             "modup_ntt",
             CycleInstructionKind::NTT,
             CycleTransferPath::None,
-            TileExecutionStepType::ModUpNttTile,
-            StageType::BasisConvert,
+            CycleOpType::NTT,
             modup_output_bytes,
             lk,
             0);
@@ -119,8 +113,7 @@ CycleProgram BuildPoseidonProgram(
                 "modup_spill",
                 CycleInstructionKind::StoreHBM,
                 CycleTransferPath::SPMToHBM,
-                TileExecutionStepType::IntermediateBRAMToHBM,
-                StageType::Dispatch,
+                CycleOpType::Spill,
                 modup_output_bytes,
                 0,
                 lk);
@@ -136,8 +129,7 @@ CycleProgram BuildPoseidonProgram(
                 "innerprod_reload_modup_all",
                 CycleInstructionKind::LoadHBM,
                 CycleTransferPath::HBMToSPM,
-                TileExecutionStepType::IntermediateHBMToBRAM,
-                StageType::Multiply,
+                CycleOpType::DataLoad,
                 modup_output_bytes,
                 lk,
                 0);
@@ -153,8 +145,7 @@ CycleProgram BuildPoseidonProgram(
             "innerprod_load_key_all",
             CycleInstructionKind::LoadHBM,
             CycleTransferPath::HBMToSPM,
-            TileExecutionStepType::KeyHBMToBRAM,
-            StageType::KeyLoad,
+            CycleOpType::KeyLoad,
             total_key_bytes,
             p_lk,
             0);
@@ -170,8 +161,7 @@ CycleProgram BuildPoseidonProgram(
             "innerprod_mul_all",
             CycleInstructionKind::EweMul,
             CycleTransferPath::None,
-            TileExecutionStepType::KSInnerProdTile,
-            StageType::Multiply,
+            CycleOpType::Multiply,
             modup_output_bytes + total_key_bytes,
             p_lk,
             0);
@@ -186,8 +176,7 @@ CycleProgram BuildPoseidonProgram(
                 "innerprod_spill_partial",
                 CycleInstructionKind::StoreHBM,
                 CycleTransferPath::SPMToHBM,
-                TileExecutionStepType::IntermediateBRAMToHBM,
-                StageType::Dispatch,
+                CycleOpType::Spill,
                 accum_bytes,
                 0,
                 p_lk);
@@ -213,8 +202,7 @@ CycleProgram BuildPoseidonProgram(
                 "reduce_reload_accum_lhs",
                 CycleInstructionKind::LoadHBM,
                 CycleTransferPath::HBMToSPM,
-                TileExecutionStepType::IntermediateHBMToBRAM,
-                StageType::Multiply,
+                CycleOpType::DataLoad,
                 accum_bytes,
                 p_lk,
                 0);
@@ -229,8 +217,7 @@ CycleProgram BuildPoseidonProgram(
             "reduce_reload_partial_rhs",
             CycleInstructionKind::LoadHBM,
             CycleTransferPath::HBMToSPM,
-            TileExecutionStepType::IntermediateHBMToBRAM,
-            StageType::Multiply,
+            CycleOpType::DataLoad,
             accum_bytes,
             p_lk,
             0);
@@ -243,8 +230,7 @@ CycleProgram BuildPoseidonProgram(
             "reduce_cross_digit_add",
             CycleInstructionKind::EweAdd,
             CycleTransferPath::None,
-            TileExecutionStepType::CrossDigitReduceTile,
-            StageType::Merge,
+            CycleOpType::Add,
             accum_bytes,
             p_lk,
             0);
@@ -273,8 +259,7 @@ CycleProgram BuildPoseidonProgram(
             "moddown_spill_2l",
             CycleInstructionKind::StoreHBM,
             CycleTransferPath::SPMToHBM,
-            TileExecutionStepType::IntermediateBRAMToHBM,
-            StageType::Dispatch,
+            CycleOpType::Spill,
             two_l_bytes,
             0,
             p_l);
@@ -287,8 +272,7 @@ CycleProgram BuildPoseidonProgram(
             "moddown_reload_2k",
             CycleInstructionKind::LoadHBM,
             CycleTransferPath::HBMToSPM,
-            TileExecutionStepType::IntermediateHBMToBRAM,
-            StageType::BasisConvert,
+            CycleOpType::DataLoad,
             two_k_bytes,
             p_k,
             0);
@@ -301,8 +285,7 @@ CycleProgram BuildPoseidonProgram(
         "moddown_intt",
         CycleInstructionKind::INTT,
         CycleTransferPath::None,
-        TileExecutionStepType::ModDownInttTile,
-        StageType::BasisConvert,
+        CycleOpType::INTT,
         two_k_bytes,
         p_k,
         0);
@@ -316,8 +299,7 @@ CycleProgram BuildPoseidonProgram(
         "moddown_bconv",
         CycleInstructionKind::BConv,
         CycleTransferPath::None,
-        TileExecutionStepType::ModDownBConvTile,
-        StageType::BasisConvert,
+        CycleOpType::BConv,
         two_k_bytes + two_l_bytes,
         p_k,
         p_l);
@@ -329,8 +311,7 @@ CycleProgram BuildPoseidonProgram(
         "moddown_ntt",
         CycleInstructionKind::NTT,
         CycleTransferPath::None,
-        TileExecutionStepType::ModDownNttTile,
-        StageType::BasisConvert,
+        CycleOpType::NTT,
         two_l_bytes,
         p_l,
         0);
@@ -344,8 +325,7 @@ CycleProgram BuildPoseidonProgram(
         "moddown_reload_2l",
         CycleInstructionKind::LoadHBM,
         CycleTransferPath::HBMToSPM,
-        TileExecutionStepType::IntermediateHBMToBRAM,
-        StageType::Multiply,
+        CycleOpType::DataLoad,
         two_l_bytes,
         p_l,
         0);
@@ -357,8 +337,7 @@ CycleProgram BuildPoseidonProgram(
         "moddown_subtract",
         CycleInstructionKind::EweSub,
         CycleTransferPath::None,
-        TileExecutionStepType::FinalSubtractTile,
-        StageType::Multiply,
+        CycleOpType::Sub,
         two_l_bytes,
         p_l,
         0);
@@ -371,8 +350,7 @@ CycleProgram BuildPoseidonProgram(
         "moddown_store_output",
         CycleInstructionKind::StoreHBM,
         CycleTransferPath::SPMToHBM,
-        TileExecutionStepType::OutputBRAMToHBM,
-        StageType::Dispatch,
+        CycleOpType::Spill,
         two_l_bytes,
         0,
         p_l);

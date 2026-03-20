@@ -1,2 +1,2 @@
 scheduler,backend,workload,seed,num_users,num_cards,enable_multi_card,completed_requests,mean_latency,p95_latency,p99_latency,max_latency,total_throughput,total_reload_count,fairness_index,pool_config_source,tree_config_source,he_params_source,pool_config_mode,tree_config_mode,he_params_mode
-fifo,cycle_stub,synthetic,123,1,1,false,1,27544,27544,27544,27544,3.63055e-05,1,1,built-in default,built-in default,built-in default,built-in,built-in,built-in
+fifo,cycle_stub,synthetic,123,1,1,false,1,769137,769137,769137,769137,1.30016e-06,1,1,built-in default,built-in default,built-in default,built-in,built-in,built-in

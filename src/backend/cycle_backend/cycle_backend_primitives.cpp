@@ -129,8 +129,7 @@ uint32_t CyclePrimitiveEmitter::Emit(
     group.name = desc.name;
     group.kind = kind;
     group.transfer_path = desc.transfer_path;
-    group.source_step_type = desc.source_step_type;
-    group.stage_type = desc.stage_type;
+    group.type = desc.type;
     group.bytes = desc.bytes;
     group.work_items = desc.work_items;
     const auto deltas = bram_.FlushGroupDeltas();
@@ -144,8 +143,7 @@ uint32_t CyclePrimitiveEmitter::Emit(
         instr.group_id = group.id;
         instr.kind = kind;
         instr.transfer_path = desc.transfer_path;
-        instr.source_step_type = desc.source_step_type;
-        instr.stage_type = desc.stage_type;
+        instr.type = desc.type;
         instr.bytes = bytes_per_op;
         instr.work_items = work_per_op;
         instr.latency_cycles = per_op_cycles;

@@ -28,8 +28,7 @@ CycleProgram BuildFABProgram(
                        const std::string& name,
                        CycleInstructionKind kind,
                        CycleTransferPath transfer_path,
-                       TileExecutionStepType source_step_type,
-                       StageType stage_type,
+                       CycleOpType type,
                        uint64_t bytes,
                        uint32_t input_limbs,
                        uint32_t output_limbs,
@@ -37,8 +36,7 @@ CycleProgram BuildFABProgram(
         CyclePrimitiveDesc desc;
         desc.name = name;
         desc.transfer_path = transfer_path;
-        desc.source_step_type = source_step_type;
-        desc.stage_type = stage_type;
+        desc.type = type;
         desc.bytes = bytes;
         desc.input_limbs = input_limbs;
         desc.output_limbs = output_limbs;
@@ -56,8 +54,7 @@ CycleProgram BuildFABProgram(
         /*name*/"load_input",
         /*kind*/CycleInstructionKind::LoadHBM,
         /*transfer_path*/CycleTransferPath::HBMToSPM,
-        /*source_step_type*/TileExecutionStepType::InputHBMToBRAM,
-        /*stage_type*/StageType::Dispatch,
+        /*type*/CycleOpType::DataLoad,
         /*bytes*/static_cast<uint64_t>(ct_now) * p * digit_num * l * problem.ct_limb_bytes,
         /*input_limbs*/p * digit_num * l,
         0
@@ -74,8 +71,7 @@ CycleProgram BuildFABProgram(
                     /*name*/"load_evalkey",
                     /*kind*/CycleInstructionKind::LoadHBM,
                     /*transfer_path*/CycleTransferPath::HBMToSPM,
-                    /*source_step_type*/TileExecutionStepType::InputHBMToBRAM,
-                    /*stage_type*/StageType::Dispatch,
+                    /*type*/CycleOpType::DataLoad,
                     /*bytes*/static_cast<uint64_t>(problem.ct_limb_bytes),
                     /*input_limbs*/1,
                     /*output_limbs*/0
@@ -84,8 +80,7 @@ CycleProgram BuildFABProgram(
                     /*name*/"inner_product",
                     /*kind*/CycleInstructionKind::EweMul,
                     /*transfer_path*/CycleTransferPath::None,
-                    /*source_step_type*/TileExecutionStepType::KSInnerProdTile,
-                    /*stage_type*/StageType::Multiply,
+                    /*type*/CycleOpType::Multiply,
                     /*bytes*/0, // No data movement for compute op
                     /*input_limbs*/1,
                     /*output_limbs*/0 // one limb output for the inner product
@@ -97,8 +92,7 @@ CycleProgram BuildFABProgram(
                     /*name*/"reduce_and_spill",
                     /*kind*/CycleInstructionKind::EweAdd,
                     /*transfer_path*/CycleTransferPath::None,
-                    /*source_step_type*/TileExecutionStepType::CrossDigitReduceTile,
-                    /*stage_type*/StageType::Merge,
+                    /*type*/CycleOpType::Add,
                     /*bytes*/0, // No data movement for compute op
                     /*input_limbs*/1,
                     /*output_limbs*/0 // one limb output for the reduced result
@@ -109,8 +103,7 @@ CycleProgram BuildFABProgram(
                 /*name*/"Spill_InnerProduct_Result",
                 /*kind*/CycleInstructionKind::StoreHBM,
                 /*transfer_path*/CycleTransferPath::SPMToHBM,
-                /*source_step_type*/TileExecutionStepType::IntermediateBRAMToHBM,
-                /*stage_type*/StageType::Dispatch,
+                /*type*/CycleOpType::Spill,
                 /*bytes*/static_cast<uint64_t>(problem.ct_limb_bytes),
                 /*input_limbs*/0,
                 /*output_limbs*/1
@@ -129,8 +122,7 @@ CycleProgram BuildFABProgram(
             /*name*/"intt",
             /*kind*/CycleInstructionKind::INTT,
             /*transfer_path*/CycleTransferPath::None,
-            /*source_step_type*/TileExecutionStepType::ModUpInttTile,
-            /*stage_type*/StageType::BasisConvert,
+            /*type*/CycleOpType::INTT,
             /*bytes*/0, // No data movement for compute op
             /*input_limbs*/0,
             /*output_limbs*/0
@@ -141,8 +133,7 @@ CycleProgram BuildFABProgram(
             /*name*/"modup_bconv",
             /*kind*/CycleInstructionKind::BConv,
             /*transfer_path*/CycleTransferPath::None,
-            /*source_step_type*/TileExecutionStepType::ModUpBConvTile,
-            /*stage_type*/StageType::BasisConvert,
+            /*type*/CycleOpType::BConv,
             /*bytes*/static_cast<uint64_t>(problem.ct_limb_bytes) * (lk - l),
             /*input_limbs*/l,
             /*output_limbs*/(lk - l)
@@ -158,8 +149,7 @@ CycleProgram BuildFABProgram(
                     /*name*/"load_evalkey",
                     /*kind*/CycleInstructionKind::LoadHBM,
                     /*transfer_path*/CycleTransferPath::HBMToSPM,
-                    /*source_step_type*/TileExecutionStepType::KeyHBMToBRAM,
-                    /*stage_type*/StageType::KeyLoad,
+                    /*type*/CycleOpType::KeyLoad,
                     /*bytes*/static_cast<uint64_t>(problem.key_digit_limb_bytes),
                     /*input_limbs*/1,
                     /*output_limbs*/0
@@ -168,8 +158,7 @@ CycleProgram BuildFABProgram(
                     /*name*/"inner_product",
                     /*kind*/CycleInstructionKind::EweMul,
                     /*transfer_path*/CycleTransferPath::None,
-                    /*source_step_type*/TileExecutionStepType::KSInnerProdTile,
-                    /*stage_type*/StageType::Multiply,
+                    /*type*/CycleOpType::Multiply,
                     /*bytes*/0, // No data movement for compute op
                     /*input_limbs*/1,
                     /*output_limbs*/0 // one limb output for the inner product
@@ -184,8 +173,7 @@ CycleProgram BuildFABProgram(
                 /*name*/"reduce_and_spill",
                 /*kind*/CycleInstructionKind::EweAdd,
                 /*transfer_path*/CycleTransferPath::None,
-                /*source_step_type*/TileExecutionStepType::CrossDigitReduceTile,
-                /*stage_type*/StageType::Merge,
+                /*type*/CycleOpType::Add,
                 /*bytes*/0, // No data movement for compute op
                 /*input_limbs*/(lk - l) * 2,
                 /*output_limbs*/0 // one limb output for the reduced result

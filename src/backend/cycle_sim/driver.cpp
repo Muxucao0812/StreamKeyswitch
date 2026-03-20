@@ -286,8 +286,7 @@ CycleSimStats CycleDriver::Run(const CycleProgram& program) const {
         timing.group_id = group.id;
         timing.kind = group.kind;
         timing.transfer_path = group.transfer_path;
-        timing.source_step_type = group.source_step_type;
-        timing.stage_type = group.stage_type;
+        timing.type = group.type;
         timing.ct_tile_index = group.ct_tile_index;
         timing.limb_tile_index = group.limb_tile_index;
         timing.digit_tile_index = group.digit_tile_index;
@@ -308,13 +307,15 @@ CycleSimStats CycleDriver::Run(const CycleProgram& program) const {
         timing.live_bytes_after = group_runtime.live_bytes_after;
         stats.group_timings.push_back(timing);
 
+        const TileExecutionStepType fine_step_type = FineStepTypeOf(group.type);
+
         // 汇总总周期与分项周期统计。
         stats.total_cycles = std::max<uint64_t>(
             stats.total_cycles,
             group_runtime.finish_cycle);
         stats.instruction_cycles[ToIndex(group.kind)] += timing.DurationCycles();
-        stats.fine_step_cycles[ToIndex(group.source_step_type)] += timing.DurationCycles();
-        stats.fine_step_counts[ToIndex(group.source_step_type)] += 1;
+        stats.fine_step_cycles[ToIndex(fine_step_type)] += timing.DurationCycles();
+        stats.fine_step_counts[ToIndex(fine_step_type)] += 1;
 
         // 按传输路径累计 HBM 读写字节。
         switch (group.transfer_path) {
@@ -330,11 +331,11 @@ CycleSimStats CycleDriver::Run(const CycleProgram& program) const {
         }
 
         // 统计 spill/reload 字节与次数（用于 round-trip 估计）。
-        if (group.source_step_type == TileExecutionStepType::IntermediateBRAMToHBM) {
+        if (fine_step_type == TileExecutionStepType::IntermediateBRAMToHBM) {
             stats.spill_bytes += group.bytes;
             ++spill_count;
         }
-        if (group.source_step_type == TileExecutionStepType::IntermediateHBMToBRAM) {
+        if (fine_step_type == TileExecutionStepType::IntermediateHBMToBRAM) {
             stats.reload_bytes += group.bytes;
             ++reload_count;
         }

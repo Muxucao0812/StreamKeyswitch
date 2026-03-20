@@ -24,8 +24,7 @@ CycleProgram BuildFastProgram(
                        const std::string& name,
                        CycleInstructionKind kind,
                        CycleTransferPath transfer_path,
-                       TileExecutionStepType source_step_type,
-                       StageType stage_type,
+                       CycleOpType type,
                        uint64_t bytes,
                        uint32_t input_limbs,
                        uint32_t output_limbs,
@@ -33,8 +32,7 @@ CycleProgram BuildFastProgram(
         CyclePrimitiveDesc desc;
         desc.name = name;
         desc.transfer_path = transfer_path;
-        desc.source_step_type = source_step_type;
-        desc.stage_type = stage_type;
+        desc.type = type;
         desc.bytes = bytes;
         desc.input_limbs = input_limbs;
         desc.output_limbs = output_limbs;
@@ -53,8 +51,7 @@ CycleProgram BuildFastProgram(
         "load_input",
         CycleInstructionKind::LoadHBM,
         CycleTransferPath::HBMToSPM,
-        TileExecutionStepType::InputHBMToBRAM,
-        StageType::Dispatch,
+        CycleOpType::DataLoad,
         static_cast<uint64_t>(ct_now) * p * digit_num * l * problem.ct_limb_bytes,
         p * digit_num * l,
         0);
@@ -62,8 +59,19 @@ CycleProgram BuildFastProgram(
         return CycleProgram{};
     }
 
+    // Step 2: INTT for all limbs
+    std::cout << "Step 2: INTT for all limbs" << std::endl;
+    emit_op(
+        /*name*/"intt_all_limbs",
+        /*kind*/CycleInstructionKind::INTT,
+        /*transfer_path*/CycleTransferPath::None,
+        /*type*/CycleOpType::INTT,
+        /*bytes*/0,
+        /*input_limbs*/0,
+        /*output_limbs*/0
+    );
+
     builder.program.estimated_peak_live_bytes = builder.bram.Peak();
     return std::move(builder.program);
 
 }
-

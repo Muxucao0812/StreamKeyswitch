@@ -48,8 +48,7 @@ CycleProgram BuildOLAProgram(
                        const std::string& name,
                        CycleInstructionKind kind,
                        CycleTransferPath transfer_path,
-                       TileExecutionStepType source_step_type,
-                       StageType stage_type,
+                       CycleOpType type,
                        uint64_t bytes,
                        uint32_t input_limbs,
                        uint32_t output_limbs,
@@ -57,8 +56,7 @@ CycleProgram BuildOLAProgram(
         CyclePrimitiveDesc desc;
         desc.name = name;
         desc.transfer_path = transfer_path;
-        desc.source_step_type = source_step_type;
-        desc.stage_type = stage_type;
+        desc.type = type;
         desc.bytes = bytes;
         desc.input_limbs = input_limbs;
         desc.output_limbs = output_limbs;
@@ -89,8 +87,7 @@ CycleProgram BuildOLAProgram(
             "ola_spill_digit_stub",
             CycleInstructionKind::StoreHBM,
             CycleTransferPath::SPMToHBM,
-            TileExecutionStepType::IntermediateBRAMToHBM,
-            StageType::Dispatch,
+            CycleOpType::Spill,
             bytes,
             0,
             ciphertext_limbs_from_bytes(bytes));
@@ -118,8 +115,7 @@ CycleProgram BuildOLAProgram(
                 "ola_spill_digit_stub",
                 CycleInstructionKind::StoreHBM,
                 CycleTransferPath::SPMToHBM,
-                TileExecutionStepType::IntermediateBRAMToHBM,
-                StageType::Dispatch,
+                CycleOpType::Spill,
                 bytes,
                 0,
                 ciphertext_limbs_from_bytes(bytes));
@@ -172,8 +168,7 @@ CycleProgram BuildOLAProgram(
             "ola_reload_digit_stub",
             CycleInstructionKind::LoadHBM,
             CycleTransferPath::HBMToSPM,
-            TileExecutionStepType::IntermediateHBMToBRAM,
-            StageType::Dispatch,
+            CycleOpType::DataLoad,
             bytes,
             ciphertext_limbs_from_bytes(bytes),
             0);
@@ -200,8 +195,7 @@ CycleProgram BuildOLAProgram(
             "load_input",
             CycleInstructionKind::LoadHBM,
             CycleTransferPath::HBMToSPM,
-            TileExecutionStepType::InputHBMToBRAM,
-            StageType::Dispatch,
+            CycleOpType::DataLoad,
             input_bytes,
             std::max<uint32_t>(1, limb_now),
             0);
@@ -228,8 +222,7 @@ CycleProgram BuildOLAProgram(
             "ola_intt_digits_stub",
             CycleInstructionKind::INTT,
             CycleTransferPath::None,
-            TileExecutionStepType::ModUpInttTile,
-            StageType::Decompose,
+            CycleOpType::INTT,
             intt_bytes,
             ciphertext_limbs_from_bytes(intt_bytes),
             0);
@@ -275,8 +268,7 @@ CycleProgram BuildOLAProgram(
             "ola_bconv_digits_stub",
             CycleInstructionKind::BConv,
             CycleTransferPath::None,
-            TileExecutionStepType::ModUpBConvTile,
-            StageType::BasisConvert,
+            CycleOpType::BConv,
             bconv_output_bytes,
             problem.digit_limbs,
             problem.num_k);
@@ -304,8 +296,7 @@ CycleProgram BuildOLAProgram(
             "ola_ntt_digits_stub",
             CycleInstructionKind::NTT,
             CycleTransferPath::None,
-            TileExecutionStepType::ModUpNttTile,
-            StageType::BasisConvert,
+            CycleOpType::NTT,
             ntt_bytes,
             ciphertext_limbs_from_bytes(ntt_bytes),
             0);
@@ -363,8 +354,7 @@ CycleProgram BuildOLAProgram(
             "ola_innerprod_load_key_stub",
             CycleInstructionKind::LoadHBM,
             CycleTransferPath::HBMToSPM,
-            TileExecutionStepType::KeyHBMToBRAM,
-            StageType::KeyLoad,
+            CycleOpType::KeyLoad,
             total_key_bytes,
             p_lk,
             0);
@@ -392,8 +382,7 @@ CycleProgram BuildOLAProgram(
             "ola_innerprod_mul_stub",
             CycleInstructionKind::EweMul,
             CycleTransferPath::None,
-            TileExecutionStepType::KSInnerProdTile,
-            StageType::Multiply,
+            CycleOpType::Multiply,
             digit_bytes[digit_idx] + total_key_bytes,
             p_lk,
             0);
@@ -412,8 +401,7 @@ CycleProgram BuildOLAProgram(
             "ola_innerprod_accumulate_stub",
             CycleInstructionKind::EweAdd,
             CycleTransferPath::None,
-            TileExecutionStepType::CrossDigitReduceTile,
-            StageType::Merge,
+            CycleOpType::Add,
             partial_bytes,
             p_lk,
             0);
@@ -434,8 +422,7 @@ CycleProgram BuildOLAProgram(
             "ola_intt_digits_stub",
             CycleInstructionKind::INTT,
             CycleTransferPath::None,
-            TileExecutionStepType::ModUpInttTile,
-            StageType::Decompose,
+            CycleOpType::INTT,
             intt_bytes,
             ciphertext_limbs_from_bytes(intt_bytes),
             0);
@@ -456,8 +443,7 @@ CycleProgram BuildOLAProgram(
             "ola_spill_poly_stub",
             CycleInstructionKind::StoreHBM,
             CycleTransferPath::SPMToHBM,
-            TileExecutionStepType::IntermediateBRAMToHBM,
-            StageType::Dispatch,
+            CycleOpType::Spill,
             bytes,
             problem.limbs,
             0);
@@ -477,8 +463,7 @@ CycleProgram BuildOLAProgram(
             "ola_modup_stub",
             CycleInstructionKind::BConv,
             CycleTransferPath::None,
-            TileExecutionStepType::ModUpBConvTile,
-            StageType::BasisConvert,
+            CycleOpType::BConv,
             modup_bytes,
             problem.digit_limbs,
             problem.num_k);
@@ -503,8 +488,7 @@ CycleProgram BuildOLAProgram(
             "ola_ntt_digits_stub",
             CycleInstructionKind::NTT,
             CycleTransferPath::None,
-            TileExecutionStepType::ModUpNttTile,
-            StageType::BasisConvert,
+            CycleOpType::NTT,
             ntt_bytes,
             ciphertext_limbs_from_bytes(ntt_bytes),
             0);
@@ -528,8 +512,7 @@ CycleProgram BuildOLAProgram(
             "ola_reduce_cross_digit_stub",
             CycleInstructionKind::EweAdd,
             CycleTransferPath::None,
-            TileExecutionStepType::CrossDigitReduceTile,
-            StageType::Merge,
+            CycleOpType::Add,
             accum_bytes,
             problem.polys * problem.key_limbs,
             0);

@@ -29,6 +29,87 @@ bool IsInterCardStepType(TileExecutionStepType step_type) {
     }
 }
 
+bool IsKeyLoadStepType(TileExecutionStepType step_type) {
+    switch (step_type) {
+    case TileExecutionStepType::KeyLoadHostToHBM:
+    case TileExecutionStepType::KeyLoadHBMToBRAM:
+    case TileExecutionStepType::KeyHBMToBRAM:
+        return true;
+    default:
+        return false;
+    }
+}
+
+CycleOpType InferCycleOpType(
+    const TileExecutionStep& step,
+    CycleInstructionKind kind,
+    CycleTransferPath transfer_path) {
+
+    switch (kind) {
+    case CycleInstructionKind::LoadHBM:
+        return IsKeyLoadStepType(step.type)
+            ? CycleOpType::KeyLoad
+            : CycleOpType::DataLoad;
+
+    case CycleInstructionKind::StoreHBM:
+        return CycleOpType::Spill;
+
+    case CycleInstructionKind::NTT:
+    case CycleInstructionKind::NTTLoad:
+    case CycleInstructionKind::NTTButterflyLocal:
+    case CycleInstructionKind::NTTTranspose1:
+    case CycleInstructionKind::NTTButterflyGlobal:
+    case CycleInstructionKind::NTTTranspose2:
+    case CycleInstructionKind::NTTStore:
+        return CycleOpType::NTT;
+
+    case CycleInstructionKind::INTT:
+    case CycleInstructionKind::INTTLoad:
+    case CycleInstructionKind::INTTButterflyLocal:
+    case CycleInstructionKind::INTTTranspose1:
+    case CycleInstructionKind::INTTButterflyGlobal:
+    case CycleInstructionKind::INTTTranspose2:
+    case CycleInstructionKind::INTTStore:
+        return CycleOpType::INTT;
+
+    case CycleInstructionKind::BConv:
+    case CycleInstructionKind::BConvLoad:
+    case CycleInstructionKind::BConvMAC:
+    case CycleInstructionKind::BConvReduce:
+    case CycleInstructionKind::BConvStore:
+    case CycleInstructionKind::Decompose:
+        // Legacy decompose is folded into the transform/basis-convert bucket.
+        return CycleOpType::BConv;
+
+    case CycleInstructionKind::EweMul:
+        return CycleOpType::Multiply;
+
+    case CycleInstructionKind::EweAdd:
+        return IsInterCardStepType(step.type)
+            ? CycleOpType::InterCardComm
+            : CycleOpType::Add;
+
+    case CycleInstructionKind::EweSub:
+        return CycleOpType::Sub;
+
+    case CycleInstructionKind::InterCardSend:
+    case CycleInstructionKind::InterCardRecv:
+    case CycleInstructionKind::InterCardReduce:
+        return CycleOpType::InterCardComm;
+    }
+
+    if (transfer_path == CycleTransferPath::SPMToHBM) {
+        return CycleOpType::Spill;
+    }
+    if (transfer_path == CycleTransferPath::HBMToSPM
+        || transfer_path == CycleTransferPath::HostToHBM) {
+        return IsKeyLoadStepType(step.type)
+            ? CycleOpType::KeyLoad
+            : CycleOpType::DataLoad;
+    }
+    return CycleOpType::Multiply;
+}
+
 bool IsSharedSingleBoardMethod(KeySwitchMethod method) {
     switch (method) {
     case KeySwitchMethod::Poseidon:
@@ -275,13 +356,14 @@ uint32_t AppendGroup(
         return std::numeric_limits<uint32_t>::max();
     }
 
+    const CycleOpType cycle_type = InferCycleOpType(step, kind, transfer_path);
+
     CycleInstructionGroup group;
     group.id = static_cast<uint32_t>(program->groups.size());
     group.name = group_name;
     group.kind = kind;
     group.transfer_path = transfer_path;
-    group.source_step_type = step.type;
-    group.stage_type = step.stage_type;
+    group.type = cycle_type;
     group.ct_tile_index = step.ct_tile_index;
     group.limb_tile_index = step.limb_tile_index;
     group.digit_tile_index = step.digit_tile_index;
@@ -323,8 +405,7 @@ uint32_t AppendGroup(
         instruction.group_id = group.id;
         instruction.kind = kind;
         instruction.transfer_path = transfer_path;
-        instruction.source_step_type = step.type;
-        instruction.stage_type = step.stage_type;
+        instruction.type = cycle_type;
         instruction.ct_tile_index = step.ct_tile_index;
         instruction.limb_tile_index = step.limb_tile_index;
         instruction.digit_tile_index = step.digit_tile_index;

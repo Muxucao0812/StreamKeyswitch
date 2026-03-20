@@ -10,8 +10,7 @@ struct CycleGroupTiming {
     uint32_t group_id = 0;
     CycleInstructionKind kind = CycleInstructionKind::LoadHBM;
     CycleTransferPath transfer_path = CycleTransferPath::None;
-    TileExecutionStepType source_step_type = TileExecutionStepType::InputHBMToBRAM;
-    StageType stage_type = StageType::Dispatch;
+    CycleOpType type = CycleOpType::DataLoad;
     uint32_t ct_tile_index = 0;
     uint32_t limb_tile_index = 0;
     uint32_t digit_tile_index = 0;

@@ -33,6 +33,11 @@ set(KEYAWARE_CORE_SOURCES
     src/backend/cycle_backend/cycle_backend.cpp
     src/backend/cycle_backend/cycle_backend_primitives.cpp
     src/backend/cycle_backend/cycle_backend_fab.cpp
+    src/backend/cycle_backend/cycle_backend_fast.cpp
+    src/backend/cycle_backend/cycle_backend_hera.cpp
+    src/backend/cycle_backend/cycle_backend_digital_centric.cpp
+    src/backend/cycle_backend/cycle_backend_output_centric.cpp
+    src/backend/cycle_backend/cycle_backend_max_parrallel.cpp
     src/backend/cycle_backend/cycle_backend_ola.cpp
     src/backend/cycle_backend/cycle_backend_poseidon.cpp
     src/scheduler/fifo_scheduler.cpp

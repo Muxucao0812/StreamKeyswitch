@@ -12,8 +12,7 @@
 struct CyclePrimitiveDesc {
     std::string name;
     CycleTransferPath transfer_path = CycleTransferPath::None;
-    TileExecutionStepType source_step_type = TileExecutionStepType::InputHBMToBRAM;
-    StageType stage_type = StageType::Dispatch;
+    CycleOpType type = CycleOpType::DataLoad;
     uint64_t bytes = 0;
     uint32_t input_limbs = 0;
     uint32_t output_limbs = 0;

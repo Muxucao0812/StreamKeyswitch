@@ -49,6 +49,45 @@ enum class CycleTransferPath : uint8_t {
     SPMToHBM
 };
 
+enum class CycleOpType : uint8_t {
+    DataLoad = 0,
+    KeyLoad,
+    Spill,
+    NTT,
+    INTT,
+    BConv,
+    Multiply,
+    Add,
+    Sub,
+    InterCardComm
+};
+
+inline TileExecutionStepType FineStepTypeOf(CycleOpType type) {
+    switch (type) {
+    case CycleOpType::DataLoad:
+        return TileExecutionStepType::InputHBMToBRAM;
+    case CycleOpType::KeyLoad:
+        return TileExecutionStepType::KeyHBMToBRAM;
+    case CycleOpType::Spill:
+        return TileExecutionStepType::IntermediateBRAMToHBM;
+    case CycleOpType::NTT:
+        return TileExecutionStepType::NttTile;
+    case CycleOpType::INTT:
+        return TileExecutionStepType::InttTile;
+    case CycleOpType::BConv:
+        return TileExecutionStepType::BasisConvertTile;
+    case CycleOpType::Multiply:
+        return TileExecutionStepType::KSInnerProdTile;
+    case CycleOpType::Add:
+        return TileExecutionStepType::CrossDigitReduceTile;
+    case CycleOpType::Sub:
+        return TileExecutionStepType::FinalSubtractTile;
+    case CycleOpType::InterCardComm:
+        return TileExecutionStepType::InterCardCommTile;
+    }
+    return TileExecutionStepType::InputHBMToBRAM;
+}
+
 constexpr std::size_t kCycleInstructionKindCount = 28;
 
 enum class ResourceClass : uint8_t {
@@ -220,8 +259,7 @@ struct CycleInstruction {
     uint32_t group_id = 0;
     CycleInstructionKind kind = CycleInstructionKind::LoadHBM;
     CycleTransferPath transfer_path = CycleTransferPath::None;
-    TileExecutionStepType source_step_type = TileExecutionStepType::InputHBMToBRAM;
-    StageType stage_type = StageType::Dispatch;
+    CycleOpType type = CycleOpType::DataLoad;
     uint32_t ct_tile_index = 0;
     uint32_t limb_tile_index = 0;
     uint32_t digit_tile_index = 0;
@@ -240,8 +278,7 @@ struct CycleInstructionGroup {
     std::string name;
     CycleInstructionKind kind = CycleInstructionKind::LoadHBM;
     CycleTransferPath transfer_path = CycleTransferPath::None;
-    TileExecutionStepType source_step_type = TileExecutionStepType::InputHBMToBRAM;
-    StageType stage_type = StageType::Dispatch;
+    CycleOpType type = CycleOpType::DataLoad;
     uint32_t ct_tile_index = 0;
     uint32_t limb_tile_index = 0;
     uint32_t digit_tile_index = 0;

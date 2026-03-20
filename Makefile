@@ -7,7 +7,7 @@ BUILD_DIR := build
 RESULTS_DIR := results
 
 MODE ?= release
-METHODS ?=  fast 
+METHODS ?=  poseidon ola fab fast
 PROFILE_METHODS ?= poseidon ola fab fast
 RUN_SEED ?= 123
 RUN_NUM_CARDS ?= 1

@@ -1346,8 +1346,8 @@ void TestCyclePrimitiveEmitterMicroOpRules(testfw::TestContext& ctx) {
         "primitive_micro_ops");
 
     CyclePrimitiveDesc desc;
-    desc.stage_type = StageType::Dispatch;
     desc.transfer_path = CycleTransferPath::HBMToSPM;
+    desc.type = CycleOpType::DataLoad;
 
     desc.name = "load";
     desc.bytes = 500;
@@ -1361,6 +1361,7 @@ void TestCyclePrimitiveEmitterMicroOpRules(testfw::TestContext& ctx) {
 
     desc.name = "store";
     desc.transfer_path = CycleTransferPath::SPMToHBM;
+    desc.type = CycleOpType::Spill;
     desc.bytes = 700;
     desc.input_limbs = 0;
     desc.output_limbs = 7;
@@ -1372,7 +1373,7 @@ void TestCyclePrimitiveEmitterMicroOpRules(testfw::TestContext& ctx) {
 
     desc.name = "ntt";
     desc.transfer_path = CycleTransferPath::None;
-    desc.stage_type = StageType::BasisConvert;
+    desc.type = CycleOpType::NTT;
     desc.bytes = 300;
     desc.input_limbs = 3;
     desc.output_limbs = 0;
@@ -1383,6 +1384,7 @@ void TestCyclePrimitiveEmitterMicroOpRules(testfw::TestContext& ctx) {
         static_cast<std::size_t>(3));
 
     desc.name = "intt";
+    desc.type = CycleOpType::INTT;
     desc.bytes = 200;
     desc.input_limbs = 2;
     emitter.EmitINTT(desc);
@@ -1392,7 +1394,7 @@ void TestCyclePrimitiveEmitterMicroOpRules(testfw::TestContext& ctx) {
         static_cast<std::size_t>(2));
 
     desc.name = "mul";
-    desc.stage_type = StageType::Multiply;
+    desc.type = CycleOpType::Multiply;
     desc.bytes = 400;
     desc.input_limbs = 4;
     emitter.EmitEweMul(desc);
@@ -1402,6 +1404,7 @@ void TestCyclePrimitiveEmitterMicroOpRules(testfw::TestContext& ctx) {
         static_cast<std::size_t>(4));
 
     desc.name = "add";
+    desc.type = CycleOpType::Add;
     desc.bytes = 600;
     desc.input_limbs = 6;
     emitter.EmitEweAdd(desc);
@@ -1411,6 +1414,7 @@ void TestCyclePrimitiveEmitterMicroOpRules(testfw::TestContext& ctx) {
         static_cast<std::size_t>(6));
 
     desc.name = "sub";
+    desc.type = CycleOpType::Sub;
     desc.bytes = 800;
     desc.input_limbs = 8;
     emitter.EmitEweSub(desc);
@@ -1420,7 +1424,7 @@ void TestCyclePrimitiveEmitterMicroOpRules(testfw::TestContext& ctx) {
         static_cast<std::size_t>(8));
 
     desc.name = "bconv";
-    desc.stage_type = StageType::BasisConvert;
+    desc.type = CycleOpType::BConv;
     desc.bytes = 1200;
     desc.input_limbs = 3;
     desc.output_limbs = 4;
@@ -1459,8 +1463,7 @@ void TestCyclePrimitiveEmitterMemoryReplayConsistency(testfw::TestContext& ctx) 
 
     CyclePrimitiveDesc desc;
     desc.transfer_path = CycleTransferPath::HBMToSPM;
-    desc.source_step_type = TileExecutionStepType::InputHBMToBRAM;
-    desc.stage_type = StageType::Dispatch;
+    desc.type = CycleOpType::DataLoad;
 
     emitter.Bram().AcquireOnIssue(256);
     desc.name = "load_chunk";
@@ -1472,8 +1475,7 @@ void TestCyclePrimitiveEmitterMemoryReplayConsistency(testfw::TestContext& ctx) 
     emitter.Bram().AcquireOnComplete(128);
     desc.name = "bconv_chunk";
     desc.transfer_path = CycleTransferPath::None;
-    desc.source_step_type = TileExecutionStepType::ModUpBConvTile;
-    desc.stage_type = StageType::BasisConvert;
+    desc.type = CycleOpType::BConv;
     desc.bytes = 384;
     desc.input_limbs = 4;
     desc.output_limbs = 2;
@@ -1482,8 +1484,7 @@ void TestCyclePrimitiveEmitterMemoryReplayConsistency(testfw::TestContext& ctx) 
     emitter.Bram().ReleaseOnComplete(384);
     desc.name = "store_chunk";
     desc.transfer_path = CycleTransferPath::SPMToHBM;
-    desc.source_step_type = TileExecutionStepType::OutputBRAMToHBM;
-    desc.stage_type = StageType::Dispatch;
+    desc.type = CycleOpType::Spill;
     desc.bytes = 384;
     desc.input_limbs = 0;
     desc.output_limbs = 6;
