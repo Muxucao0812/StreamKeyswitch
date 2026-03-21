@@ -1,0 +1,132 @@
+=== Experiment Config ===
+Scheduler: fifo
+Backend: cycle_stub
+Workload: synthetic
+KeySwitchMethod: output_centric
+Seed: 123
+NumCards: 1
+NumUsers: 1
+EnableMultiCard: false
+SyntheticRequestsPerUser: 1
+SyntheticInterArrival: 300
+SyntheticStartTime: 0
+BurstBursts: 4
+BurstRequestsPerUserPerBurst: 2
+BurstIntraGap: 20
+BurstInterGap: 1200
+BurstStartTime: 0
+BurstLevel: 1
+NumPools: 1
+PoolConfigSource: built-in default
+TreeConfigSource: built-in default
+HEParamsSource: built-in default
+CSVOutput: results/metrics_output_centric.csv
+DumpLogicalGraph: true
+DumpRuntimePlan: true
+=========================
+Building Output-Centric program with ct 1, p 2, digit_num 3, l 23, lk 31
+Step 1: load the two input digits to BRAM, total bytes: 2097152
+Emitted group 0: load_digit_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
+Emitted group 1: load_digit_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=4194304
+Step 2: INTT for the two digits
+Emitted group 2: intt_digit_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
+Emitted group 3: intt_digit_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
+Step 3: BConv for two digit to generate the last digit limbs
+Emitted group 4: bconv_digit_0, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
+Emitted group 5: bconv_digit_1, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=6291456
+Step 4: For two digits, NTT for new generated limbs
+Emitted group 6: ntt_digit_0, kind=3, bytes=2097152, work_items=2097152, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8388608
+Emitted group 7: ntt_digit_1, kind=3, bytes=2097152, work_items=2097152, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8388608
+Step 5: For each digit, load the 2 * digit_limbs eval key to BRAM
+Emitted group 8: load_eval_key_digit_0_part_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=10485760
+Emitted group 9: load_eval_key_digit_0_part_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=12582912
+Emitted group 10: load_eval_key_digit_1_part_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=14680064
+Emitted group 11: load_eval_key_digit_1_part_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=16777216
+Emitted group 12: load_eval_key_digit_2_part_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=18874368
+Emitted group 13: load_eval_key_digit_2_part_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=20971520
+Step 6: For each digit, Multiply and accumulate the partial results for each digit with digit_limbs limbs
+Emitted group 14: mul_acc_digit_0_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=20971520
+Emitted group 15: mul_acc_digit_1_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=20971520
+Emitted group 16: acc_digit_1_part_0, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=20971520
+Emitted group 17: mul_acc_digit_2_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=18874368
+Emitted group 18: acc_digit_2_part_0, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=18874368
+Emitted group 19: mul_acc_digit_0_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
+Emitted group 20: mul_acc_digit_1_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
+Emitted group 21: acc_digit_1_part_1, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=16777216
+Emitted group 22: mul_acc_digit_2_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=14680064
+Emitted group 23: acc_digit_2_part_1, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=14680064
+Step 7: Send the accumulated results with digit_limbs limbs for each digit back to HBM
+Emitted group 24: store_acc_result_digit_part_0, kind=1, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=12582912
+Emitted group 25: store_acc_result_digit_part_1, kind=1, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=10485760
+Step 8: Load the last digit with digit_limbs limbs to BRAM, and INTT
+Emitted group 26: load_last_digit, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=8388608
+Emitted group 27: intt_last_digit, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=10485760
+Step 9: BConv for the two digits and NTT
+Emitted group 28: bconv_last_digit_0, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=10485760
+Emitted group 29: ntt_last_digit_0, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=12582912
+Emitted group 30: bconv_last_digit_1, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=12582912
+Emitted group 31: ntt_last_digit_1, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=14680064
+Step 10: For each digit, load the corresponding eval key
+Emitted group 32: load_eval_key_for_last_digit_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=16777216
+Emitted group 33: load_eval_key_for_last_digit_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=18874368
+Emitted group 34: load_eval_key_for_last_digit_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=20971520
+Emitted group 35: load_eval_key_for_last_digit_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=23068672
+Emitted group 36: load_eval_key_for_last_digit_2, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=25165824
+Emitted group 37: load_eval_key_for_last_digit_2, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=27262976
+Step 11: For each digit, Multiply and accumulate the partial results for each digit with digit_limbs limbs, and store the accumulated result back to HBM
+Emitted group 38: mul_acc_last_digit_0_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=27262976
+Emitted group 39: mul_acc_last_digit_1_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=27262976
+Emitted group 40: acc_last_digit_1_part_0, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=27262976
+Emitted group 41: mul_acc_last_digit_2_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=25165824
+Emitted group 42: acc_last_digit_2_part_0, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=25165824
+Emitted group 43: mul_acc_last_digit_0_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=23068672
+Emitted group 44: mul_acc_last_digit_1_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=23068672
+Emitted group 45: acc_last_digit_1_part_1, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=23068672
+Emitted group 46: mul_acc_last_digit_2_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=20971520
+Emitted group 47: acc_last_digit_2_part_1, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=20971520
+Step 12: Send the accumulated results with digit_limbs limbs for each digit back to HBM
+Emitted group 48: store_acc_result_last_digit_part_0, kind=1, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=18874368
+Emitted group 49: store_acc_result_last_digit_part_1, kind=1, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=16777216
+Step 13: Repeat BConv, NTT, Mul-Acc for the last digit with digit_limbs limbs for l/digit_limbs times, and store the final result with l limbs back to HBM
+Emitted group 50: bconv_last_digit_0_full, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=14680064
+Emitted group 51: ntt_last_digit_0_full, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=16777216
+Emitted group 52: bconv_last_digit_1_full, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=16777216
+Emitted group 53: ntt_last_digit_1_full, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=18874368
+For each digit, load the corresponding eval key for the full digit limbs, and do mul-acc for l/digit_limbs times
+Emitted group 54: load_eval_key_for_full_last_digit_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=20971520
+Emitted group 55: load_eval_key_for_full_last_digit_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=23068672
+Emitted group 56: load_eval_key_for_full_last_digit_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=25165824
+Emitted group 57: load_eval_key_for_full_last_digit_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=27262976
+Emitted group 58: load_eval_key_for_full_last_digit_2, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=29360128
+Emitted group 59: load_eval_key_for_full_last_digit_2, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=31457280
+[keyswitch] request=0 status=fallback fallback_used=1 method_degraded=0 unsupported_method=0 unsupported_config=0 compatibility_fallback=0 requested_method=OutputCentric effective_method=OutputCentric reason=tile_plan_invalid
+Scheduler=fifo
+Backend=cycle_stub
+RuntimeBackend=cycle_stub
+Workload=synthetic
+Seed=123
+NumCards=1
+=== Request Metrics ===
+Completed requests: 1
+Mean latency(ns): 0.0000
+P95 latency(ns): 0
+P99 latency(ns): 0
+Max latency(ns): 0
+Mean queue time(ns): 0.0000
+Mean service time(ns): 0.0000
+=== User Metrics ===
+User 0: completed=1, mean_latency(ns)=0.0000, throughput(req/ns)=0.0000, reload_count=1
+=== Card Metrics ===
+Card 0: utilization=0.0000, reload_count=1, served_requests=1
+=== System Metrics ===
+Total throughput(req/ns): 0.0000
+Total reload count: 1
+Jain fairness index: 0.0000
+Simulation window(ns): [23, 23], duration=0
+PoolConfigSource=built-in default
+TreeConfigSource=built-in default
+HEParamsSource=built-in default
+=== CycleBackend Method Dispatch Stats ===
+EstimateCalls=1
+CycleFallbackCount=1
+CSVOutput=results/metrics_output_centric.csv
