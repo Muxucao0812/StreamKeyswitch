@@ -234,7 +234,7 @@ std::string BuildUsageText(const std::string& program_name) {
         << "  --pool-config <path>                  External pool config file.\n"
         << "  --tree-config <path>                  External resource-tree config file.\n"
         << "  --he-params <path>                    HE parameter file for workload derivation.\n"
-        << "  --ks-method <poseidon|fab|fast|ola|hera|cinnamon>\n"
+        << "  --ks-method <poseidon|fab|fast|ola|hera|cinnamon|max_parallel|digit_centric|output_centric>\n"
         << "                                        Keyswitch execution method for generated requests.\n"
         << "  --csv-output <path>                   Append run metrics to CSV file.\n"
         << "  --dump-logical-graph                  Print the shared single-board logical graph for the first request.\n"
@@ -557,7 +557,7 @@ ParseExperimentConfigResult ParseExperimentConfig(int argc, char** argv) {
                 if (!ParseKeySwitchMethod(value_text, &method)) {
                     result.error_message =
                         "Invalid --ks-method: " + value_text
-                        + " (expected poseidon|fab|fast|ola|hera|cinnamon)";
+                        + " (expected poseidon|fab|fast|ola|hera|cinnamon|max_parallel|digit_centric|output_centric)";
                     return result;
                 }
                 config.keyswitch_method = method;

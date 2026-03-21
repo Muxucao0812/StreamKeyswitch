@@ -14,7 +14,7 @@ struct HEParams {
     uint32_t num_rns_limbs = 23;
     uint32_t num_digits = 3;
     uint32_t key_component_count = 2;
-    uint32_t bytes_per_coeff = 8;
+    uint32_t bytes_per_coeff = 4;
     uint32_t key_storage_divisor = 1;
 
     // Xiangchen: This bandwidth should be pcie bandwidth

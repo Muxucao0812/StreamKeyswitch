@@ -7,8 +7,10 @@ BUILD_DIR := build
 RESULTS_DIR := results
 
 MODE ?= release
-METHODS ?=  poseidon ola fab fast
-PROFILE_METHODS ?= poseidon ola fab fast
+# METHODS ?= poseidon ola fab fast hera cinnamon max_parallel digit_centric output_centric
+METHODS ?= output_centric
+# PROFILE_METHODS ?= poseidon ola fab fast hera cinnamon max_parallel digit_centric output_centric
+PROFILE_METHODS ?= output_centric
 RUN_SEED ?= 123
 RUN_NUM_CARDS ?= 1
 RUN_NUM_USERS ?= 1

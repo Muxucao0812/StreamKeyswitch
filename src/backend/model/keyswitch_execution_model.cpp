@@ -1375,7 +1375,7 @@ void NormalizeProblemDimensions(
         problem->digits = std::max<uint32_t>(1, req.ks_profile.num_digits);
         problem->num_k = CeilDivU32(problem->limbs + 1, problem->digits);
         problem->digit_limbs = problem->num_k;
-        problem->key_limbs = problem->digit_limbs + problem->num_k;
+        problem->key_limbs = problem->limbs + problem->num_k;
         problem->polys = std::max<uint32_t>(1, req.ks_profile.num_polys);
         problem->poly_modulus_degree = std::max<uint32_t>(1, req.ks_profile.poly_modulus_degree);
     }

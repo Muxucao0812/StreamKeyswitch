@@ -104,7 +104,7 @@ uint32_t CyclePrimitiveEmitter::Emit(
     const CyclePrimitiveDesc& desc) {
 
     const uint32_t micro_ops = MicroOps(kind, desc.input_limbs, desc.output_limbs);
-
+    
     const uint64_t bytes_per_op =
         (micro_ops > 0) ? (desc.bytes / micro_ops) : desc.bytes;
     const uint64_t work_per_op =

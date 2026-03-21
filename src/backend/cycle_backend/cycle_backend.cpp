@@ -4,9 +4,9 @@
 #include "backend/cycle_backend/cycle_backend_fab.h"
 #include "backend/cycle_backend/cycle_backend_fast.h"
 #include "backend/cycle_backend/cycle_backend_hera.h"
-#include "backend/cycle_backend/cycle_backend_digital_centric.h"
+#include "backend/cycle_backend/cycle_backend_digit_centric.h"
 #include "backend/cycle_backend/cycle_backend_output_centric.h"
-#include "backend/cycle_backend/cycle_backend_max_parrallel.h"
+#include "backend/cycle_backend/cycle_backend_max_parallel.h"
 #include "backend/cycle_sim/driver.h"
 
 #include <algorithm>

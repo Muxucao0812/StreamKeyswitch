@@ -8,6 +8,7 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <iostream>
 
 struct CyclePrimitiveDesc {
     std::string name;
