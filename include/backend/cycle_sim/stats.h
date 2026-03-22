@@ -46,6 +46,8 @@ struct CycleComponentStats {
 
 struct CycleSimStats {
     uint64_t total_cycles = 0;
+    uint64_t inter_card_comm_cycles = 0;
+    uint64_t inter_card_comm_bytes = 0;
     uint64_t hbm_read_bytes = 0;
     uint64_t hbm_write_bytes = 0;
     uint64_t hbm_round_trips = 0;

@@ -8,216 +8,339 @@
 #include <string>
 #include <vector>
 
-namespace {
-
-uint64_t ScaleBytesByRatio(
-    uint64_t total_bytes,
-    uint32_t part,
-    uint32_t whole) {
-
-    if (total_bytes == 0) {
-        return 0;
-    }
-    const uint32_t safe_whole = std::max<uint32_t>(1, whole);
-    const __uint128_t numer =
-        static_cast<__uint128_t>(total_bytes) * static_cast<__uint128_t>(part)
-        + static_cast<__uint128_t>(safe_whole - 1);
-    const __uint128_t scaled_128 = numer / static_cast<__uint128_t>(safe_whole);
-    if (scaled_128 > static_cast<__uint128_t>(std::numeric_limits<uint64_t>::max())) {
-        return std::numeric_limits<uint64_t>::max();
-    }
-    return std::max<uint64_t>(1, static_cast<uint64_t>(scaled_128));
-}
-
-uint32_t Emit(
-    CycleProgramBuilder* builder,
-    const std::string& name,
-    CycleInstructionKind kind,
-    CycleTransferPath transfer_path,
-    CycleOpType type,
-    uint64_t bytes,
-    uint64_t work_items,
-    const std::vector<uint32_t>& deps) {
-
-    CyclePrimitiveDesc desc;
-    desc.name = name;
-    desc.transfer_path = transfer_path;
-    desc.type = type;
-    desc.bytes = bytes;
-    desc.input_limbs = 1;
-    desc.output_limbs = 1;
-    desc.work_items = work_items;
-    desc.deps = deps;
-    return builder->EmitPrimitive(kind, desc);
-}
-
-} // namespace
-
 CycleProgram BuildCinnamonOutputAggregationProgram(
     const KeySwitchProblem& problem,
-    const HardwareModel& hardware) {
-
-    if (!problem.valid
-        || !IsCinnamonMethod(problem.method)
-        || problem.multi_board_mode != MultiBoardMode::OutputAggregation
-        || problem.active_cards <= 1
-        || problem.partition_strategy != PartitionStrategy::ByDigit
-        || problem.key_placement != KeyPlacement::ShardedByPartition
-        || problem.collective_strategy != CollectiveStrategy::GatherToRoot) {
-        return CycleProgram{};
-    }
+    const HardwareModel& hardware
+) {
 
     CycleProgramBuilder builder(
         problem,
         hardware,
         problem.method,
-        "cinnamon_output_aggregation_keyswitch");
-
+        "cinnamon_output_aggregation_keyswitch"
+    );
+    
     const uint32_t active_cards = std::max<uint32_t>(1, problem.active_cards);
-    const std::vector<DigitShard>& shards = problem.digit_shards;
-    if (shards.size() != active_cards) {
-        return CycleProgram{};
+    const uint32_t ct_now = problem.ciphertexts;
+    const uint32_t p = problem.polys;
+    const uint32_t digit_num = problem.digits;
+    const uint32_t digit_limbs = problem.digit_limbs; // number of limbs
+    const uint32_t l = problem.limbs;
+    const uint32_t k = problem.num_k;
+    const uint32_t lk = problem.key_limbs; // number of limbs in the key
+
+    std::cout << "Building Cinnamon Output Aggregation program with" 
+            << ",active_cards " << active_cards 
+            << ",ct " << ct_now
+            << ", p " << p
+            << ", digit_num " << digit_num
+            << ", digit_limbs " << digit_limbs
+            << ", l " << l
+            << ", lk " << lk
+            << std::endl;
+
+    auto emit_op = [&builder](
+                       const std::string& name,
+                       CycleInstructionKind kind,
+                       CycleTransferPath transfer_path,
+                       CycleOpType type,
+                       uint64_t bytes,
+                       uint32_t input_limbs,
+                       uint32_t output_limbs,
+                       uint64_t work_items = 0) {
+        CyclePrimitiveDesc desc;
+        desc.name = name;
+        desc.transfer_path = transfer_path;
+        desc.type = type;
+        desc.bytes = bytes;
+        desc.input_limbs = input_limbs;
+        desc.output_limbs = output_limbs;
+        desc.work_items = work_items;
+        desc.deps = builder.Deps();
+        return builder.EmitPrimitive(kind, desc);
+    };
+
+    // Send all digit_limbs to other cards
+    for (uint32_t card_idx = 1; card_idx < active_cards; card_idx++) {
+        emit_op(
+            /*name*/"send_digit_limbs_card_" + std::to_string(card_idx+1),
+            /*kind*/CycleInstructionKind::InterCardSend,
+            /*transfer_path*/CycleTransferPath::HBMToHBM,
+            /*type*/CycleOpType::InterCardComm,
+             /*bytes*/static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes,
+            /*input_limbs*/digit_limbs,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * digit_limbs
+        );
+    }
+    builder.bram.AcquireOnIssue(
+        static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes
+    );
+
+    // INTT
+    emit_op(
+        /*name*/"ntt_input",
+        /*kind*/CycleInstructionKind::NTT,
+        /*transfer_path*/CycleTransferPath::None,
+        /*type*/CycleOpType::NTT,
+         /*bytes*/static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes,
+        /*input_limbs*/digit_limbs,
+        /*output_limbs*/0,
+        /*work_items*/static_cast<uint64_t>(ct_now) * digit_limbs
+    );
+    builder.bram.AcquireOnIssue(
+        static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes
+    );
+    builder.bram.ReleaseOnIssue(
+        static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes
+    );
+
+    // BConv
+    emit_op(
+        /*name*/"bconv_input",
+        /*kind*/CycleInstructionKind::BConv,
+        /*transfer_path*/CycleTransferPath::None,
+        /*type*/CycleOpType::BConv,
+         /*bytes*/static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes,
+        /*input_limbs*/digit_limbs,
+        /*output_limbs*/(lk-digit_limbs),
+         /*work_items*/static_cast<uint64_t>(ct_now) * digit_limbs
+    );
+    builder.bram.AcquireOnIssue(
+        static_cast<uint64_t>(ct_now) * (lk-digit_limbs) * problem.ct_limb_bytes
+    );
+    if (!builder.Ok()) {
+        std::cerr << "Failed to acquire BRAM for bconv of input" << std::endl;
+        return CycleProgram();
     }
 
-    std::vector<uint32_t> card_terminal(active_cards, std::numeric_limits<uint32_t>::max());
-    for (uint32_t card_idx = 0; card_idx < active_cards; ++card_idx) {
-        const DigitShard& shard = shards[card_idx];
-        const uint64_t shard_input_bytes = ScaleBytesByRatio(problem.input_bytes, shard.count, problem.digits);
-        const uint64_t shard_key_bytes = ScaleBytesByRatio(problem.key_bytes, shard.count, problem.digits);
-        const uint64_t shard_work_items =
-            std::max<uint64_t>(1, static_cast<uint64_t>(problem.ciphertexts) * shard.count);
-        const uint64_t transform_bytes =
-            std::max<uint64_t>(problem.ct_limb_bytes, static_cast<uint64_t>(shard.count) * problem.ct_limb_bytes);
 
-        const uint32_t input_load = Emit(
-            &builder,
-            "load_input_card_" + std::to_string(card_idx),
-            CycleInstructionKind::LoadHBM,
-            CycleTransferPath::HBMToSPM,
-            CycleOpType::DataLoad,
-            shard_input_bytes,
-            shard_work_items,
-            {});
+    // NTT for the result in digit form
+    emit_op(
+        /*name*/"ntt_digit_result",
+        /*kind*/CycleInstructionKind::NTT,
+        /*transfer_path*/CycleTransferPath::None,
+        /*type*/CycleOpType::NTT,
+        /*bytes*/static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes,
+        /*input_limbs*/lk, 
+        /*output_limbs*/0,
+        /*work_items*/static_cast<uint64_t>(ct_now) * lk
+    );
+    builder.bram.AcquireOnIssue(
+        static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+    );
+    builder.bram.ReleaseOnIssue(
+        static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+    );
 
-        const uint32_t key_load = Emit(
-            &builder,
-            "load_key_card_" + std::to_string(card_idx),
-            CycleInstructionKind::LoadHBM,
-            CycleTransferPath::HBMToSPM,
-            CycleOpType::KeyLoad,
-            shard_key_bytes,
-            shard_work_items,
-            {});
+    // Load 2*l limbs eval keys
+    for (uint32_t i = 0; i < p; i++) {
+        emit_op(
+            /*name*/"load_eval_keys_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::LoadHBM,
+            /*transfer_path*/CycleTransferPath::HBMToSPM,
+             /*type*/CycleOpType::DataLoad,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.bram.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        if (!builder.Ok()) {
+            std::cerr << "Failed to acquire BRAM for loading eval keys for p " << i << std::endl;
+            return CycleProgram();
+        }
+    }
 
-        const uint32_t intt = Emit(
-            &builder,
-            "intt_card_" + std::to_string(card_idx),
-            CycleInstructionKind::INTT,
-            CycleTransferPath::None,
-            CycleOpType::INTT,
-            transform_bytes,
-            shard_work_items,
-            {input_load, key_load});
+    // Multiply in eval form for each digit, can be done in parallel across digits and polys
+    for (uint32_t i = 0; i < p; i++) {
+        emit_op(
+            /*name*/"mul_eval_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::EweMul,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::Multiply,
+            /*bytes*/static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes,
+            /*input_limbs*/lk,
+            /*output_limbs*/lk,
+             /*work_items*/static_cast<uint64_t>(ct_now) * lk
+        );
+        builder.bram.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+        );
+        builder.bram.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+        );
 
-        const uint32_t bconv = Emit(
-            &builder,
-            "bconv_card_" + std::to_string(card_idx),
-            CycleInstructionKind::BConv,
-            CycleTransferPath::None,
-            CycleOpType::BConv,
-            transform_bytes,
-            shard_work_items,
-            {intt});
+        builder.bram.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+        );
+     
+        if (!builder.Ok()) {
+            std::cerr << "Failed to acquire/release BRAM for multiplication of digit " << i << std::endl;
+            return CycleProgram();
+        }
+    }
 
-        const uint32_t ntt = Emit(
-            &builder,
-            "ntt_card_" + std::to_string(card_idx),
-            CycleInstructionKind::NTT,
-            CycleTransferPath::None,
-            CycleOpType::NTT,
-            transform_bytes,
-            shard_work_items,
-            {bconv});
+    // INTT for 2*k limbs after multiplication
+    for (uint32_t i = 0; i < p; i++) {
+        emit_op(
+            /*name*/"ntt_after_mul_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::INTT,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::INTT,
+            /*bytes*/static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes,
+            /*input_limbs*/k,
+            /*output_limbs*/0,
+             /*work_items*/static_cast<uint64_t>(ct_now) * k
+        );
+        builder.bram.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes
+        );
+        builder.bram.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes
+        );
+        if (!builder.Ok()) {
+            std::cerr << "Failed to acquire/release BRAM for INTT after multiplication of digit " << i << std::endl;
+            return CycleProgram();
+        }
+    }
 
-        uint32_t terminal = Emit(
-            &builder,
-            "mul_card_" + std::to_string(card_idx),
-            CycleInstructionKind::EweMul,
-            CycleTransferPath::None,
-            CycleOpType::Multiply,
-            std::max(problem.output_bytes, transform_bytes),
-            std::max<uint64_t>(1, static_cast<uint64_t>(problem.polys) * shard_work_items),
-            {ntt, key_load});
+    // BConv for 2*k limbs with 2*l limbs eval keys to get the result in digit form
+    for (uint32_t i = 0; i < p; i++) {
+        emit_op(
+            /*name*/"bconv_after_mul_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::BConv,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::BConv,
+            /*bytes*/static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes,
+            /*input_limbs*/k,
+            /*output_limbs*/l,
+             /*work_items*/static_cast<uint64_t>(ct_now) * k
+        );
+        builder.bram.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.bram.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes
+        );
+        if (!builder.Ok()) {
+            std::cerr << "Failed to acquire/release BRAM for BConv after multiplication of digit " << i << std::endl;
+            return CycleProgram();
+        }
+    }
 
-        if (shard.count > 1) {
-            terminal = Emit(
-                &builder,
-                "local_reduce_card_" + std::to_string(card_idx),
-                CycleInstructionKind::EweAdd,
-                CycleTransferPath::None,
-                CycleOpType::Add,
-                problem.output_bytes,
-                std::max<uint64_t>(1, static_cast<uint64_t>(shard.count - 1) * problem.polys),
-                {terminal});
+    // NTT 
+    for (uint32_t i = 0; i < p; i++) {
+        emit_op(
+            /*name*/"ntt_after_bconv_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::NTT,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::NTT,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/0,
+             /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.bram.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.bram.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        if (!builder.Ok()) {
+            std::cerr << "Failed to acquire/release BRAM for NTT after BConv of digit " << i << std::endl;
+            return CycleProgram();
+        }
+    }
+
+    // Subtract
+    for (uint32_t i = 0; i < p; i++) {
+        emit_op(
+            /*name*/"sub_after_bconv_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::EweSub,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::Sub,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/l,
+             /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.bram.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.bram.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.bram.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        if (!builder.Ok()) {
+            std::cerr << "Failed to acquire/release BRAM for subtraction after BConv of digit " << i << std::endl;
+            return CycleProgram();
+        }
+    }
+
+    // Sync across cards to ensure all previous ops are done before next steps
+    for (uint32_t card_idx = 1; card_idx < active_cards; card_idx++) {
+        emit_op(
+            /*name*/"recv_digit_limbs_card_" + std::to_string(card_idx+1),
+            /*kind*/CycleInstructionKind::InterCardRecv,
+            /*transfer_path*/CycleTransferPath::HBMToHBM,
+            /*type*/CycleOpType::InterCardComm,
+             /*bytes*/static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/0
+        );
+    }
+
+    // Load from HBM and Add
+    for (uint32_t i = 1; i < digit_num; i++) {
+        emit_op(
+            /*name*/"load_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::LoadHBM,
+            /*transfer_path*/CycleTransferPath::HBMToSPM,
+             /*type*/CycleOpType::DataLoad,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.bram.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        if (!builder.Ok()) {
+            std::cerr << "Failed to acquire BRAM for loading digit " << i << std::endl;
+            return CycleProgram();
         }
 
-        card_terminal[card_idx] = terminal;
+        emit_op(
+            /*name*/"add_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::EweAdd,
+            /*transfer_path*/CycleTransferPath::None,
+             /*type*/CycleOpType::Add,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/l,
+             /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.bram.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.bram.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.bram.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        if (!builder.Ok()) {
+            std::cerr << "Failed to acquire/release BRAM for addition of digit " << i << std::endl;
+            return CycleProgram();
+        }
     }
 
-    std::vector<uint32_t> reduce_deps;
-    reduce_deps.reserve(active_cards);
-    reduce_deps.push_back(card_terminal[0]);
-    for (uint32_t card_idx = 1; card_idx < active_cards; ++card_idx) {
-        const uint32_t send_group = Emit(
-            &builder,
-            "partial_send_card_" + std::to_string(card_idx),
-            CycleInstructionKind::InterCardSend,
-            CycleTransferPath::None,
-            CycleOpType::InterCardComm,
-            problem.output_bytes,
-            1,
-            {card_terminal[card_idx]});
-        const uint32_t recv_group = Emit(
-            &builder,
-            "partial_recv_card_" + std::to_string(card_idx),
-            CycleInstructionKind::InterCardRecv,
-            CycleTransferPath::None,
-            CycleOpType::InterCardComm,
-            problem.output_bytes,
-            1,
-            {send_group});
-        reduce_deps.push_back(recv_group);
-    }
+    builder.program.estimated_peak_live_bytes = builder.bram.Peak();
+    return std::move(builder.program);
 
-    const uint32_t reduce_group = Emit(
-        &builder,
-        "root_reduce",
-        CycleInstructionKind::InterCardReduce,
-        CycleTransferPath::None,
-        CycleOpType::InterCardComm,
-        static_cast<uint64_t>(active_cards) * problem.output_bytes,
-        active_cards,
-        reduce_deps);
-
-    const uint32_t barrier_group = Emit(
-        &builder,
-        "root_barrier",
-        CycleInstructionKind::InterCardSend,
-        CycleTransferPath::None,
-        CycleOpType::InterCardComm,
-        0,
-        0,
-        {reduce_group});
-
-    Emit(
-        &builder,
-        "store_output",
-        CycleInstructionKind::StoreHBM,
-        CycleTransferPath::SPMToHBM,
-        CycleOpType::Spill,
-        problem.output_bytes,
-        problem.ciphertexts,
-        {barrier_group});
-
-    return builder.Ok() ? builder.program : CycleProgram{};
 }

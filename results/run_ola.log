@@ -260,7 +260,7 @@ Card 0: utilization=1.0000, reload_count=1, served_requests=1
 Total throughput(req/ns): 0.0000
 Total reload count: 1
 Jain fairness index: 1.0000
-Simulation window(ns): [64, 1206028], duration=1205964
+Simulation window(ns): [23, 1205987], duration=1205964
 PoolConfigSource=built-in default
 TreeConfigSource=built-in default
 HEParamsSource=built-in default

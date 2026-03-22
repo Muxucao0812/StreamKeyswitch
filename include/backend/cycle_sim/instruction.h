@@ -46,7 +46,8 @@ enum class CycleTransferPath : uint8_t {
     None = 0,
     HostToHBM,
     HBMToSPM,
-    SPMToHBM
+    SPMToHBM,
+    HBMToHBM
 };
 
 enum class CycleOpType : uint8_t {

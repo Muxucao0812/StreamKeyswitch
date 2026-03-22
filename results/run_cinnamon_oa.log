@@ -25,4 +25,190 @@ CSVOutput: results/metrics_cinnamon_oa.csv
 DumpLogicalGraph: true
 DumpRuntimePlan: true
 =========================
- The program is not generated
+Building Cinnamon Output Aggregation program with,active_cards 3,ct 1, p 2, digit_num 3, digit_limbs 8, l 23, lk 31
+Emitted group 0: send_digit_limbs_card_2, kind=25, bytes=2097152, work_items=8, micro_ops=1, est_cycles/op=78674, total_est_cycles=78674, bram_live=0
+Emitted group 1: send_digit_limbs_card_3, kind=25, bytes=2097152, work_items=8, micro_ops=1, est_cycles/op=78674, total_est_cycles=78674, bram_live=0
+Emitted group 2: ntt_input, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=2097152
+Emitted group 3: bconv_input, kind=8, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=2097152
+Emitted group 4: ntt_digit_result, kind=3, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=8126464
+Emitted group 5: load_eval_keys_0, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=8126464
+Emitted group 6: load_eval_keys_1, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=14155776
+Emitted group 7: mul_eval_digit_0, kind=5, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=260, total_est_cycles=7940, bram_live=20185088
+Emitted group 8: mul_eval_digit_1, kind=5, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=260, total_est_cycles=7940, bram_live=12058624
+Emitted group 9: ntt_after_mul_digit_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=3932160
+Emitted group 10: ntt_after_mul_digit_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=3932160
+Emitted group 11: bconv_after_mul_digit_0, kind=8, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=3932160
+Emitted group 12: bconv_after_mul_digit_1, kind=8, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=7864320
+Emitted group 13: ntt_after_bconv_digit_0, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=11796480
+Emitted group 14: ntt_after_bconv_digit_1, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=11796480
+Emitted group 15: sub_after_bconv_digit_0, kind=7, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=258, total_est_cycles=5890, bram_live=11796480
+Emitted group 16: sub_after_bconv_digit_1, kind=7, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=258, total_est_cycles=5890, bram_live=5767168
+Emitted group 17: recv_digit_limbs_card_2, kind=26, bytes=2097152, work_items=0, micro_ops=1, est_cycles/op=78674, total_est_cycles=78674, bram_live=0
+Emitted group 18: recv_digit_limbs_card_3, kind=26, bytes=2097152, work_items=0, micro_ops=1, est_cycles/op=78674, total_est_cycles=78674, bram_live=0
+Emitted group 19: load_digit_1, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=0
+Emitted group 20: add_digit_1, kind=6, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=258, total_est_cycles=5890, bram_live=6029312
+Emitted group 21: load_digit_2, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=0
+Emitted group 22: add_digit_2, kind=6, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=258, total_est_cycles=5890, bram_live=6029312
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           474356
+Total latency (ns):     1581187
+Peak BRAM live (bytes): 20185088
+HBM read (bytes):       24117248
+HBM write (bytes):      0
+Dependency stalls:      342452 cycles
+Resource stalls:        131904 cycles
+Instruction groups:     23
+Total instructions:     903
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=4376 (0.922514%)  count=92  bytes=24117248
+  NTT: cycles=90385 (19.0543%)  count=85  bytes=22282240
+  INTT: cycles=16438 (3.46533%)  count=16  bytes=4194304
+  EweMul: cycles=4164 (0.877822%)  count=62  bytes=16252928
+  EweAdd: cycles=3100 (0.653518%)  count=46  bytes=12058624
+  EweSub: cycles=3100 (0.653518%)  count=46  bytes=12058624
+  BConv: cycles=38097 (8.03131%)  count=552  bytes=6291144
+  InterCardSend: cycles=157348 (33.1709%)  count=2  bytes=4194304
+  InterCardRecv: cycles=157348 (33.1709%)  count=2  bytes=4194304
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  send_digit_limbs_card_2: kind=InterCardSend  one_limb_cycles=78674  groups=1  instrs=1
+  send_digit_limbs_card_3: kind=InterCardSend  one_limb_cycles=78674  groups=1  instrs=1
+  ntt_input: kind=NTT  one_limb_cycles=4108  groups=1  instrs=8
+  bconv_input: kind=BConv  one_limb_cycles=276  groups=1  instrs=184
+  ntt_digit_result: kind=NTT  one_limb_cycles=4108  groups=1  instrs=31
+  load_eval_keys_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=23
+  load_eval_keys_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=23
+  mul_eval_digit_0: kind=EweMul  one_limb_cycles=260  groups=1  instrs=31
+  mul_eval_digit_1: kind=EweMul  one_limb_cycles=260  groups=1  instrs=31
+  ntt_after_mul_digit_0: kind=INTT  one_limb_cycles=4108  groups=1  instrs=8
+  ntt_after_mul_digit_1: kind=INTT  one_limb_cycles=4108  groups=1  instrs=8
+  bconv_after_mul_digit_0: kind=BConv  one_limb_cycles=276  groups=1  instrs=184
+  bconv_after_mul_digit_1: kind=BConv  one_limb_cycles=276  groups=1  instrs=184
+  ntt_after_bconv_digit_0: kind=NTT  one_limb_cycles=4108  groups=1  instrs=23
+  ntt_after_bconv_digit_1: kind=NTT  one_limb_cycles=4108  groups=1  instrs=23
+  sub_after_bconv_digit_0: kind=EweSub  one_limb_cycles=258  groups=1  instrs=23
+  sub_after_bconv_digit_1: kind=EweSub  one_limb_cycles=258  groups=1  instrs=23
+  recv_digit_limbs_card_2: kind=InterCardRecv  one_limb_cycles=78674  groups=1  instrs=1
+  recv_digit_limbs_card_3: kind=InterCardRecv  one_limb_cycles=78674  groups=1  instrs=1
+  load_digit_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=23
+  add_digit_1: kind=EweAdd  one_limb_cycles=258  groups=1  instrs=23
+  load_digit_2: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=23
+  add_digit_2: kind=EweAdd  one_limb_cycles=258  groups=1  instrs=23
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  send_digit_limbs_card_2        0     78674      78674            0            0  2097152
+   1  send_digit_limbs_card_3    78674    157348      78674            0            0  2097152
+   2  ntt_input                 157348    165567       8219            0      2097152  2097152
+   3  bconv_input               165567    178266      12699      2097152      2097152  2097152
+   4  ntt_digit_result          178266    211132      32866      2097152      8126464  8126464
+   5  load_eval_keys_0          211132    212226       1094      8126464      8126464  6029312
+   6  load_eval_keys_1          212226    213320       1094      8126464     14155776  6029312
+   7  mul_eval_digit_0          213320    215402       2082     14155776     20185088  8126464
+   8  mul_eval_digit_1          215402    217484       2082     20185088     12058624  8126464
+   9  ntt_after_mul_digit_0     217484    225703       8219     12058624      3932160  2097152
+  10  ntt_after_mul_digit_1     225703    233922       8219      3932160      3932160  2097152
+  11  bconv_after_mul_digit_0   233922    246621      12699      3932160      3932160  2097152
+  12  bconv_after_mul_digit_1   246621    259320      12699      3932160      7864320  2097152
+  13  ntt_after_bconv_digit_0   259320    283970      24650      7864320     11796480  6029312
+  14  ntt_after_bconv_digit_1   283970    308620      24650     11796480     11796480  6029312
+  15  sub_after_bconv_digit_0   308620    310170       1550     11796480     11796480  6029312
+  16  sub_after_bconv_digit_1   310170    311720       1550     11796480      5767168  6029312
+  17  recv_digit_limbs_card_2   311720    390394      78674      5767168            0  2097152
+  18  recv_digit_limbs_card_3   390394    469068      78674            0            0  2097152
+  19  load_digit_1              469068    470162       1094            0            0  6029312
+  20  add_digit_1               470162    471712       1550            0      6029312  6029312
+  21  load_digit_2              471712    472806       1094      6029312            0  6029312
+  22  add_digit_2               472806    474356       1550            0      6029312  6029312
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+78674,0
+78674,0
+157348,0
+157348,0
+165567,2097152
+165567,2097152
+178266,2097152
+178266,2097152
+211132,8126464
+211132,8126464
+212226,8126464
+212226,8126464
+213320,14155776
+213320,14155776
+215402,20185088
+215402,20185088
+217484,12058624
+217484,12058624
+225703,3932160
+225703,3932160
+233922,3932160
+233922,3932160
+246621,3932160
+246621,3932160
+259320,7864320
+259320,7864320
+283970,11796480
+283970,11796480
+308620,11796480
+308620,11796480
+310170,11796480
+310170,11796480
+311720,5767168
+311720,5767168
+390394,0
+390394,0
+469068,0
+469068,0
+470162,0
+470162,0
+471712,6029312
+471712,6029312
+472806,0
+472806,0
+474356,6029312
+
+--- Transfer vs Compute ---
+Transfer: 319072 cycles (67.2642%)
+Compute:  155284 cycles (32.7358%)
+====================================================
+
+Scheduler=fifo
+Backend=cycle_stub
+RuntimeBackend=cycle_stub
+Workload=synthetic
+Seed=123
+NumCards=3
+=== Request Metrics ===
+Completed requests: 1
+Mean latency(ns): 1581187.0000
+P95 latency(ns): 1581187
+P99 latency(ns): 1581187
+Max latency(ns): 1581187
+Mean queue time(ns): 0.0000
+Mean service time(ns): 1581187.0000
+=== User Metrics ===
+User 0: completed=1, mean_latency(ns)=1581187.0000, throughput(req/ns)=0.0000, reload_count=3
+=== Card Metrics ===
+Card 0: utilization=1.0000, reload_count=1, served_requests=1
+Card 1: utilization=1.0000, reload_count=1, served_requests=1
+Card 2: utilization=1.0000, reload_count=1, served_requests=1
+=== System Metrics ===
+Total throughput(req/ns): 0.0000
+Total reload count: 3
+Jain fairness index: 1.0000
+Simulation window(ns): [23, 1581210], duration=1581187
+PoolConfigSource=built-in default
+TreeConfigSource=built-in default
+HEParamsSource=built-in default
+=== CycleBackend Method Dispatch Stats ===
+EstimateCalls=1
+CycleFallbackCount=0
+CSVOutput=results/metrics_cinnamon_oa.csv

@@ -13,7 +13,8 @@ CycleProgram BuildDigitalCentricProgram(
         problem,
         hardware,
         KeySwitchMethod::DigitCentric,
-        "digital_centric_keyswitch");
+        "digital_centric_keyswitch"
+    );
 
     const uint32_t ct_now = problem.ciphertexts;
     const uint32_t p = problem.polys;
