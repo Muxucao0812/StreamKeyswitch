@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <iosfwd>
+#include <string>
 #include <unordered_set>
 
 struct CycleLoweringResult;
@@ -44,7 +45,10 @@ private:
         const Request& req,
         const ExecutionPlan& plan,
         const SystemState& state,
-        KeySwitchMethod method) const;
+        KeySwitchMethod method,
+        KeySwitchExecution* execution,
+        KeySwitchFallbackReason* fallback_reason,
+        std::string* fallback_reason_message) const;
 
     // 阶段 2：运行 cycle 级仿真。
     CycleSimStats Simulate(const CycleProgram& program) const;

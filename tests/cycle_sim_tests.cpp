@@ -156,6 +156,19 @@ bool HasInterCardSteps(const std::vector<TileExecutionStep>& steps) {
     return false;
 }
 
+std::size_t CountStepType(
+    const std::vector<TileExecutionStep>& steps,
+    TileExecutionStepType target_type) {
+
+    std::size_t count = 0;
+    for (const TileExecutionStep& step : steps) {
+        if (step.type == target_type) {
+            ++count;
+        }
+    }
+    return count;
+}
+
 struct LiveReplayResult {
     bool underflow = false;
     uint64_t peak_live = 0;
@@ -1156,22 +1169,167 @@ void TestAutoSingleCardStillMapsToPoseidon(testfw::TestContext& ctx) {
     EXPECT_TRUE(ctx, result.total_latency > 0);
 }
 
-void TestCinnamonRemainsUnsupported(testfw::TestContext& ctx) {
-    const SystemState state = MakeState(/*num_cards=*/1);
-    const ExecutionPlan plan = MakePlan(/*request_id=*/23, /*num_cards=*/1);
+void TestCinnamonByDigitOutputAggregation(testfw::TestContext& ctx) {
+    const SystemState state = MakeState(/*num_cards=*/3);
+    const ExecutionPlan plan = MakePlan(/*request_id=*/23, /*num_cards=*/3);
 
     Request req = MakePoseidonRequest(
         /*request_id=*/23,
         /*user_id=*/23,
-        /*ciphertexts=*/1,
-        /*digits=*/1,
-        /*limbs=*/1,
-        /*polys=*/1,
+        /*ciphertexts=*/2,
+        /*digits=*/3,
+        /*limbs=*/6,
+        /*polys=*/2,
         /*poly_degree=*/1024,
-        /*input_bytes=*/4096,
-        /*output_bytes=*/4096,
-        /*key_bytes=*/1024);
+        /*input_bytes=*/24576,
+        /*output_bytes=*/24576,
+        /*key_bytes=*/12288);
     req.ks_profile.method = KeySwitchMethod::Cinnamon;
+    req.ks_profile.partition = PartitionStrategy::ByDigit;
+    req.ks_profile.collective = CollectiveStrategy::GatherToRoot;
+    req.ks_profile.key_placement = KeyPlacement::ShardedByPartition;
+    req.ks_profile.multi_board_mode = MultiBoardMode::OutputAggregation;
+    req.ks_profile.scale_out_cards = 3;
+    req.ks_profile.enable_inter_card_merge = true;
+    req.ks_profile.allow_cross_card_reduce = true;
+    req.ks_profile.allow_local_moddown = true;
+
+    KeySwitchExecutionModel model;
+    const KeySwitchExecution execution = model.Build(req, plan, state);
+    EXPECT_TRUE(ctx, execution.valid);
+    EXPECT_TRUE(ctx, !execution.fallback_used);
+    EXPECT_TRUE(ctx, !execution.method_degraded);
+    EXPECT_TRUE(ctx, execution.method == KeySwitchMethod::Cinnamon);
+    EXPECT_TRUE(ctx, execution.requested_method == KeySwitchMethod::Cinnamon);
+    EXPECT_TRUE(ctx, execution.effective_method == KeySwitchMethod::Cinnamon);
+    EXPECT_TRUE(ctx, execution.partition_strategy == PartitionStrategy::ByDigit);
+    EXPECT_TRUE(ctx, execution.key_placement == KeyPlacement::ShardedByPartition);
+    EXPECT_TRUE(ctx, execution.collective_strategy == CollectiveStrategy::GatherToRoot);
+    EXPECT_TRUE(ctx, execution.multi_board_mode == MultiBoardMode::OutputAggregation);
+    EXPECT_TRUE(ctx, execution.active_cards == 3);
+    EXPECT_TRUE(ctx, CountStepType(execution.steps, TileExecutionStepType::InterCardSendStep) > 0);
+    EXPECT_TRUE(ctx, CountStepType(execution.steps, TileExecutionStepType::InterCardRecvStep) > 0);
+    EXPECT_TRUE(ctx, CountStepType(execution.steps, TileExecutionStepType::InterCardReduceStep) > 0);
+    EXPECT_TRUE(ctx, CountStepType(execution.steps, TileExecutionStepType::BarrierStep) > 0);
+
+    CycleBackend backend;
+    const ExecutionResult result = backend.Estimate(req, plan, state);
+    EXPECT_TRUE(ctx, !result.fallback_used);
+    EXPECT_TRUE(ctx, !result.method_degraded);
+    EXPECT_TRUE(ctx, result.requested_method == KeySwitchMethod::Cinnamon);
+    EXPECT_TRUE(ctx, result.effective_method == KeySwitchMethod::Cinnamon);
+    EXPECT_TRUE(ctx, result.total_latency > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_send_time > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_recv_time > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_reduce_time > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_barrier_time > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_send_bytes > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_recv_bytes > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_reduce_bytes > 0);
+}
+
+void TestCinnamonByDigitInputBroadcast(testfw::TestContext& ctx) {
+    const SystemState state = MakeState(/*num_cards=*/3);
+    const ExecutionPlan plan = MakePlan(/*request_id=*/230, /*num_cards=*/3);
+
+    Request req = MakePoseidonRequest(
+        /*request_id=*/230,
+        /*user_id=*/230,
+        /*ciphertexts=*/2,
+        /*digits=*/3,
+        /*limbs=*/6,
+        /*polys=*/2,
+        /*poly_degree=*/1024,
+        /*input_bytes=*/24576,
+        /*output_bytes=*/24576,
+        /*key_bytes=*/12288);
+    req.ks_profile.method = KeySwitchMethod::Cinnamon;
+    req.ks_profile.partition = PartitionStrategy::ByDigit;
+    req.ks_profile.collective = CollectiveStrategy::GatherToRoot;
+    req.ks_profile.key_placement = KeyPlacement::ShardedByPartition;
+    req.ks_profile.multi_board_mode = MultiBoardMode::InputBroadcast;
+    req.ks_profile.scale_out_cards = 3;
+    req.ks_profile.enable_inter_card_merge = true;
+    req.ks_profile.allow_cross_card_reduce = true;
+    req.ks_profile.allow_local_moddown = true;
+
+    KeySwitchExecutionModel model;
+    const KeySwitchExecution execution = model.Build(req, plan, state);
+    EXPECT_TRUE(ctx, execution.valid);
+    EXPECT_TRUE(ctx, !execution.fallback_used);
+    EXPECT_TRUE(ctx, !execution.method_degraded);
+    EXPECT_TRUE(ctx, execution.method == KeySwitchMethod::Cinnamon);
+    EXPECT_TRUE(ctx, execution.requested_method == KeySwitchMethod::Cinnamon);
+    EXPECT_TRUE(ctx, execution.effective_method == KeySwitchMethod::Cinnamon);
+    EXPECT_TRUE(ctx, execution.partition_strategy == PartitionStrategy::ByDigit);
+    EXPECT_TRUE(ctx, execution.key_placement == KeyPlacement::ShardedByPartition);
+    EXPECT_TRUE(ctx, execution.collective_strategy == CollectiveStrategy::GatherToRoot);
+    EXPECT_TRUE(ctx, execution.multi_board_mode == MultiBoardMode::InputBroadcast);
+    EXPECT_TRUE(ctx, execution.active_cards == 3);
+    EXPECT_TRUE(ctx, CountStepType(execution.steps, TileExecutionStepType::InterCardSendStep) > 0);
+    EXPECT_TRUE(ctx, CountStepType(execution.steps, TileExecutionStepType::InterCardRecvStep) > 0);
+    EXPECT_TRUE(ctx, CountStepType(execution.steps, TileExecutionStepType::InterCardReduceStep) > 0);
+    EXPECT_TRUE(ctx, CountStepType(execution.steps, TileExecutionStepType::BarrierStep) > 0);
+
+    bool has_broadcast_send = false;
+    bool has_broadcast_recv = false;
+    const int32_t root_card = static_cast<int32_t>(plan.assigned_cards.front());
+    for (const TileExecutionStep& step : execution.steps) {
+        if (step.bytes != req.ks_profile.input_bytes) {
+            continue;
+        }
+        if (step.src_card != root_card || step.dst_card == root_card) {
+            continue;
+        }
+        if (step.type == TileExecutionStepType::InterCardSendStep) {
+            has_broadcast_send = true;
+        } else if (step.type == TileExecutionStepType::InterCardRecvStep) {
+            has_broadcast_recv = true;
+        }
+    }
+    EXPECT_TRUE(ctx, has_broadcast_send);
+    EXPECT_TRUE(ctx, has_broadcast_recv);
+
+    CycleBackend backend;
+    const ExecutionResult result = backend.Estimate(req, plan, state);
+    EXPECT_TRUE(ctx, !result.fallback_used);
+    EXPECT_TRUE(ctx, !result.method_degraded);
+    EXPECT_TRUE(ctx, result.requested_method == KeySwitchMethod::Cinnamon);
+    EXPECT_TRUE(ctx, result.effective_method == KeySwitchMethod::Cinnamon);
+    EXPECT_TRUE(ctx, result.total_latency > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_send_time > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_recv_time > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_reduce_time > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_barrier_time > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_send_bytes > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_recv_bytes > 0);
+    EXPECT_TRUE(ctx, result.communication_breakdown.inter_card_reduce_bytes > 0);
+}
+
+void TestCinnamonSingleCardDegradesToOutputCentric(testfw::TestContext& ctx) {
+    const SystemState state = MakeState(/*num_cards=*/1);
+    const ExecutionPlan plan = MakePlan(/*request_id=*/24, /*num_cards=*/1);
+
+    Request req = MakePoseidonRequest(
+        /*request_id=*/24,
+        /*user_id=*/23,
+        /*ciphertexts=*/2,
+        /*digits=*/3,
+        /*limbs=*/6,
+        /*polys=*/2,
+        /*poly_degree=*/1024,
+        /*input_bytes=*/24576,
+        /*output_bytes=*/24576,
+        /*key_bytes=*/12288);
+    req.ks_profile.method = KeySwitchMethod::Cinnamon;
+    req.ks_profile.partition = PartitionStrategy::ByDigit;
+    req.ks_profile.collective = CollectiveStrategy::GatherToRoot;
+    req.ks_profile.key_placement = KeyPlacement::ShardedByPartition;
+    req.ks_profile.multi_board_mode = MultiBoardMode::OutputAggregation;
+    req.ks_profile.scale_out_cards = 3;
+    req.ks_profile.enable_inter_card_merge = true;
+    req.ks_profile.allow_cross_card_reduce = true;
+    req.ks_profile.allow_local_moddown = true;
 
     KeySwitchExecutionModel model;
     const KeySwitchExecution execution = model.Build(req, plan, state);
@@ -1179,18 +1337,54 @@ void TestCinnamonRemainsUnsupported(testfw::TestContext& ctx) {
     EXPECT_TRUE(ctx, !execution.fallback_used);
     EXPECT_TRUE(ctx, execution.method_degraded);
     EXPECT_TRUE(ctx, execution.degraded_reason == KeySwitchFallbackReason::DegradedToSingleBoard);
-    EXPECT_TRUE(ctx, execution.method == KeySwitchMethod::Poseidon);
     EXPECT_TRUE(ctx, execution.requested_method == KeySwitchMethod::Cinnamon);
-    EXPECT_TRUE(ctx, execution.effective_method == KeySwitchMethod::Poseidon);
+    EXPECT_TRUE(ctx, execution.effective_method == KeySwitchMethod::OutputCentric);
 
     CycleBackend backend;
     const ExecutionResult result = backend.Estimate(req, plan, state);
     EXPECT_TRUE(ctx, !result.fallback_used);
     EXPECT_TRUE(ctx, result.method_degraded);
+    EXPECT_TRUE(ctx, result.degraded_to_single_board);
     EXPECT_TRUE(ctx, result.degraded_reason == KeySwitchFallbackReason::DegradedToSingleBoard);
     EXPECT_TRUE(ctx, result.requested_method == KeySwitchMethod::Cinnamon);
-    EXPECT_TRUE(ctx, result.effective_method == KeySwitchMethod::Poseidon);
+    EXPECT_TRUE(ctx, result.effective_method == KeySwitchMethod::OutputCentric);
     EXPECT_TRUE(ctx, result.total_latency > 0);
+}
+
+void TestCinnamonRejectsInvalidConfig(testfw::TestContext& ctx) {
+    const SystemState state = MakeState(/*num_cards=*/3);
+    const ExecutionPlan plan = MakePlan(/*request_id=*/25, /*num_cards=*/3);
+
+    Request req = MakePoseidonRequest(
+        /*request_id=*/25,
+        /*user_id=*/29,
+        /*ciphertexts=*/2,
+        /*digits=*/3,
+        /*limbs=*/6,
+        /*polys=*/2,
+        /*poly_degree=*/1024,
+        /*input_bytes=*/24576,
+        /*output_bytes=*/24576,
+        /*key_bytes=*/12288);
+    req.ks_profile.method = KeySwitchMethod::Cinnamon;
+    req.ks_profile.partition = PartitionStrategy::ByLimb;
+    req.ks_profile.collective = CollectiveStrategy::GatherToRoot;
+    req.ks_profile.key_placement = KeyPlacement::ShardedByPartition;
+    req.ks_profile.scale_out_cards = 3;
+    req.ks_profile.enable_inter_card_merge = true;
+    req.ks_profile.allow_cross_card_reduce = true;
+    req.ks_profile.allow_local_moddown = true;
+
+    KeySwitchExecutionModel model;
+    const KeySwitchExecution execution = model.Build(req, plan, state);
+    EXPECT_TRUE(ctx, !execution.valid);
+    EXPECT_TRUE(ctx, execution.fallback_used);
+    EXPECT_TRUE(ctx, execution.fallback_reason == KeySwitchFallbackReason::UnsupportedConfig);
+
+    CycleBackend backend;
+    const ExecutionResult result = backend.Estimate(req, plan, state);
+    EXPECT_TRUE(ctx, result.fallback_used);
+    EXPECT_TRUE(ctx, result.fallback_reason == KeySwitchFallbackReason::UnsupportedConfig);
 }
 
 void TestBuiltInScaleSingleBoardNoLongerFallsBack(testfw::TestContext& ctx) {
@@ -1585,7 +1779,10 @@ int main() {
     TestDynamicRuntimeLifetimeAccounting(ctx);
     TestDynamicRuntimePipelineOverlap(ctx);
     TestAutoSingleCardStillMapsToPoseidon(ctx);
-    TestCinnamonRemainsUnsupported(ctx);
+    TestCinnamonByDigitOutputAggregation(ctx);
+    TestCinnamonByDigitInputBroadcast(ctx);
+    TestCinnamonSingleCardDegradesToOutputCentric(ctx);
+    TestCinnamonRejectsInvalidConfig(ctx);
     TestBuiltInScaleSingleBoardNoLongerFallsBack(ctx);
     TestProblemSizeMonotonicity(ctx);
     TestHardwareScalingMonotonicity(ctx);

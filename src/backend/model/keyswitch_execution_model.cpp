@@ -5,10 +5,12 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstddef>
 #include <limits>
+#include <iostream>
 #include <ostream>
 #include <sstream>
-#include <iostream>
+#include <unordered_map>
 
 namespace {
 
@@ -50,8 +52,8 @@ PartitionStrategy ResolvePartition(
     if (requested != PartitionStrategy::Auto) {
         return requested;
     }
-    return (method == KeySwitchMethod::Cinnamon)
-        ? PartitionStrategy::ByLimb
+    return IsCinnamonMethod(method)
+        ? PartitionStrategy::ByDigit
         : PartitionStrategy::None;
 }
 
@@ -62,7 +64,7 @@ CollectiveStrategy ResolveCollective(
     if (requested != CollectiveStrategy::Auto) {
         return requested;
     }
-    return (method == KeySwitchMethod::Cinnamon)
+    return IsCinnamonMethod(method)
         ? CollectiveStrategy::GatherToRoot
         : CollectiveStrategy::None;
 }
@@ -74,9 +76,24 @@ KeyPlacement ResolveKeyPlacement(
     if (requested != KeyPlacement::Auto) {
         return requested;
     }
-    return (method == KeySwitchMethod::Cinnamon)
-        ? KeyPlacement::ReplicatedPerCard
+    return IsCinnamonMethod(method)
+        ? KeyPlacement::ShardedByPartition
         : KeyPlacement::StreamFromHBM;
+}
+
+MultiBoardMode ResolveMultiBoardMode(
+    MultiBoardMode requested,
+    KeySwitchMethod method) {
+
+    if (requested != MultiBoardMode::Auto) {
+        return requested;
+    }
+    const MultiBoardMode forced_mode = ForcedMultiBoardModeForMethod(method);
+    if (forced_mode != MultiBoardMode::Auto) {
+        return forced_mode;
+    }
+    return IsCinnamonMethod(method) ? MultiBoardMode::OutputAggregation
+                                    : MultiBoardMode::Sequential;
 }
 
 KeySwitchExecution UnsupportedConfig(
@@ -108,54 +125,30 @@ uint32_t EffectiveScaleOutCards(
     return std::max<uint32_t>(1, std::min<uint32_t>(hint, assigned));
 }
 
-struct LimbShard {
+struct DigitShard {
     uint32_t begin = 0;
     uint32_t count = 0;
 };
 
-std::vector<LimbShard> BuildLimbShards(
-    uint32_t total_limbs,
+std::vector<DigitShard> BuildDigitShards(
+    uint32_t total_digits,
     uint32_t cards) {
 
-    std::vector<LimbShard> shards;
-    const uint32_t safe_limbs = std::max<uint32_t>(1, total_limbs);
-    const uint32_t safe_cards = std::max<uint32_t>(1, std::min<uint32_t>(cards, safe_limbs));
+    std::vector<DigitShard> shards;
+    const uint32_t safe_digits = std::max<uint32_t>(1, total_digits);
+    const uint32_t safe_cards = std::max<uint32_t>(1, std::min<uint32_t>(cards, safe_digits));
     shards.reserve(safe_cards);
     for (uint32_t idx = 0; idx < safe_cards; ++idx) {
         const uint32_t begin = static_cast<uint32_t>(
-            (static_cast<uint64_t>(idx) * safe_limbs) / safe_cards);
+            (static_cast<uint64_t>(idx) * safe_digits) / safe_cards);
         const uint32_t end = static_cast<uint32_t>(
-            (static_cast<uint64_t>(idx + 1) * safe_limbs) / safe_cards);
-        LimbShard shard;
+            (static_cast<uint64_t>(idx + 1) * safe_digits) / safe_cards);
+        DigitShard shard;
         shard.begin = begin;
         shard.count = end - begin;
         shards.push_back(shard);
     }
     return shards;
-}
-
-bool IsInterCardStepType(TileExecutionStepType step_type) {
-    switch (step_type) {
-    case TileExecutionStepType::InterCardSendStep:
-    case TileExecutionStepType::InterCardRecvStep:
-    case TileExecutionStepType::InterCardReduceStep:
-    case TileExecutionStepType::BarrierStep:
-    case TileExecutionStepType::InterCardCommTile:
-    case TileExecutionStepType::InterCardBarrier:
-    case TileExecutionStepType::Merge:
-        return true;
-    default:
-        return false;
-    }
-}
-
-bool ContainsInterCardSteps(const std::vector<TileExecutionStep>& steps) {
-    for (const TileExecutionStep& step : steps) {
-        if (IsInterCardStepType(step.type)) {
-            return true;
-        }
-    }
-    return false;
 }
 
 uint64_t ScaleBytesByRatio(
@@ -206,15 +199,6 @@ IntermediateStorageLevel StorageForConnection(
         return IntermediateStorageLevel::HBM;
     }
     return fallback_level;
-}
-
-std::vector<uint32_t> IterationOrder(uint32_t count) {
-    std::vector<uint32_t> order;
-    order.reserve(count);
-    for (uint32_t idx = 0; idx < count; ++idx) {
-        order.push_back(idx);
-    }
-    return order;
 }
 
 std::vector<StageConnectionMode> FallbackOrderForConnection(
@@ -1358,27 +1342,41 @@ void ResolveProblemMethodAndCards(
     problem->method = ResolveKeySwitchMethodForAssignedCards(
         req.ks_profile.method,
         assigned_cards);
-    problem->cards = (problem->method == KeySwitchMethod::Cinnamon) ? assigned_cards : 1;
+    problem->multi_board_mode =
+        ResolveMultiBoardMode(req.ks_profile.multi_board_mode, problem->method);
+    problem->partition_strategy =
+        ResolvePartition(req.ks_profile.partition, problem->method);
+    problem->key_placement =
+        ResolveKeyPlacement(req.ks_profile.key_placement, problem->method);
+    problem->collective_strategy =
+        ResolveCollective(req.ks_profile.collective, problem->method);
+
+    if (IsCinnamonMethod(problem->method)) {
+        const uint32_t total_digits = std::max<uint32_t>(1, req.ks_profile.num_digits);
+        const uint32_t scale_out_cards = EffectiveScaleOutCards(req, plan);
+        problem->active_cards = std::max<uint32_t>(
+            1,
+            std::min<uint32_t>(total_digits, scale_out_cards));
+        problem->cards = problem->active_cards;
+        return;
+    }
+
+    problem->active_cards = 1;
+    problem->cards = 1;
 }
 
 void NormalizeProblemDimensions(
     const Request& req,
     KeySwitchProblem* problem) {
 
-    if (problem->method == KeySwitchMethod::Cinnamon) {
-        // Xiangchen: raise not implement and exit
-        std::cerr << "Cinnamon method is not implemented yet." << std::endl;
-        std::exit(1);
-    } else {
-        problem->ciphertexts = std::max<uint32_t>(1, req.ks_profile.num_ciphertexts);
-        problem->limbs = std::max<uint32_t>(1, req.ks_profile.num_rns_limbs);
-        problem->digits = std::max<uint32_t>(1, req.ks_profile.num_digits);
-        problem->num_k = CeilDivU32(problem->limbs + 1, problem->digits);
-        problem->digit_limbs = problem->num_k;
-        problem->key_limbs = problem->limbs + problem->num_k;
-        problem->polys = std::max<uint32_t>(1, req.ks_profile.num_polys);
-        problem->poly_modulus_degree = std::max<uint32_t>(1, req.ks_profile.poly_modulus_degree);
-    }
+    problem->ciphertexts = std::max<uint32_t>(1, req.ks_profile.num_ciphertexts);
+    problem->limbs = std::max<uint32_t>(1, req.ks_profile.num_rns_limbs);
+    problem->digits = std::max<uint32_t>(1, req.ks_profile.num_digits);
+    problem->num_k = CeilDivU32(problem->limbs + 1, problem->digits);
+    problem->digit_limbs = problem->num_k;
+    problem->key_limbs = problem->limbs + problem->num_k;
+    problem->polys = std::max<uint32_t>(1, req.ks_profile.num_polys);
+    problem->poly_modulus_degree = std::max<uint32_t>(1, req.ks_profile.poly_modulus_degree);
 
 }
 
@@ -1386,14 +1384,9 @@ void NormalizeProblemBytes(
     const Request& req,
     KeySwitchProblem* problem) {
 
-    if (problem->method == KeySwitchMethod::Cinnamon) {
-        std::cerr << "Cinnamon method is not implemented yet." << std::endl;
-        std::exit(1);
-    } else {
-        problem->input_bytes = std::max<uint64_t>(1, req.ks_profile.input_bytes);
-        problem->output_bytes = std::max<uint64_t>(1, req.ks_profile.output_bytes);
-        problem->key_bytes = std::max<uint64_t>(1, req.ks_profile.key_bytes);
-    }
+    problem->input_bytes = std::max<uint64_t>(1, req.ks_profile.input_bytes);
+    problem->output_bytes = std::max<uint64_t>(1, req.ks_profile.output_bytes);
+    problem->key_bytes = std::max<uint64_t>(1, req.ks_profile.key_bytes);
 }
 
 void DeriveProblemGranularityBytes(
@@ -1939,431 +1932,6 @@ void KeySwitchExecutionModel::FinalizeExecution(
         + execution.out_bram_to_hbm_bytes;
 }
 
-KeySwitchExecution KeySwitchExecutionModel::BuildWithMode(
-    const Request& req,
-    const ExecutionPlan& plan,
-    const SystemState& state,
-    bool allow_inter_card_steps) const {
-
-    // 该函数是 keyswitch 执行图的主构建入口，负责把请求映射为一组有依赖关系的 TileExecutionStep。
-    // 关键流程：
-    // 1) 解析问题规模（BuildProblem）并做早期失败返回；
-    // 2) 调用 TilePlanner 决定 tile 切分与 key 常驻策略；
-    // 3) 逐个 ct/limb/digit 生成 ModUp -> InnerProd -> Reduction -> ModDown 子图；
-    // 4) 可选追加多卡 merge/reduce/barrier 步骤；
-    // 5) 汇总峰值缓存与流量统计。
-    KeySwitchExecution execution;
-    execution.problem = BuildProblem(req, plan, state);
-    execution.method = execution.problem.method;
-    execution.working_set_bytes = execution.problem.working_set_bytes;
-    execution.key_resident_hit = execution.problem.key_resident_hit;
-
-    // 没有有效问题（例如没有可用卡）时直接返回 fallback，后续不生成任何步骤。
-    if (!execution.problem.valid) {
-        execution.fallback_used = true;
-        execution.fallback_reason = KeySwitchFallbackReason::NoAssignedCard;
-        return execution;
-    }
-
-    // 根据 method 解析执行策略（stage 连接方式、是否支持 overlap 等），并给出 tile 方案。
-    execution.policy = ResolveMethodPolicy(execution.problem.method);
-    execution.tile_plan = planner_.Plan(execution.problem);
-    // tile 规划失败时退化为非 tiled 的流量估计路径，保证上层仍能拿到可解释的结果。
-    if (!execution.tile_plan.valid) {
-        execution.fallback_used = true;
-        execution.fallback_reason = KeySwitchFallbackReason::TilePlanInvalid;
-        execution.tile_count = 1;
-        execution.ct_hbm_to_bram_bytes = execution.problem.input_bytes;
-        execution.out_bram_to_hbm_bytes = execution.problem.output_bytes;
-        if (!execution.problem.key_resident_hit) {
-            execution.key_host_to_hbm_bytes = execution.problem.key_bytes;
-        }
-        return execution;
-    }
-
-    execution.valid = true;
-    execution.tiled_execution = true;
-    execution.key_persistent_bram = execution.tile_plan.key_persistent;
-    execution.tile_count = execution.tile_plan.total_tile_count;
-    execution.tile_cost = execution.tile_plan.cost;
-
-    // BuildContext 在构建期间维护 step_id 递增。
-    BuildContext ctx;
-    ctx.execution = &execution;
-
-    uint64_t host_key_step_id = 0;
-    // key 不在驻留缓存命中时，先补一条 Host->HBM 的 key 预载步骤。
-    if (!execution.problem.key_resident_hit) {
-        TileExecutionStep host_key_step;
-        host_key_step.type = TileExecutionStepType::KeyLoadHostToHBM;
-        host_key_step.stage_type = StageType::KeyLoad;
-        host_key_step.bytes = execution.problem.key_bytes;
-        host_key_step.input_bytes = execution.problem.key_bytes;
-        host_key_step.output_bytes = execution.problem.key_bytes;
-        host_key_step.input_storage = IntermediateStorageLevel::HBM;
-        host_key_step.output_storage = IntermediateStorageLevel::HBM;
-        host_key_step.key_hit = false;
-        host_key_step.key_persistent = false;
-        host_key_step_id = AppendStep(&ctx, host_key_step);
-        execution.key_host_to_hbm_bytes += execution.problem.key_bytes;
-    }
-
-    uint64_t persistent_key_step_id = 0;
-    // 若 tile 方案允许 key 常驻，则只搬运一次 HBM->BRAM，后续所有 inner-prod 共享该 key。
-    if (execution.tile_plan.key_persistent) {
-        TileExecutionStep persistent_key;
-        persistent_key.type = TileExecutionStepType::KeyHBMToBRAM;
-        persistent_key.stage_type = StageType::KeyLoad;
-        persistent_key.bytes = execution.problem.key_bytes;
-        persistent_key.input_bytes = execution.problem.key_bytes;
-        persistent_key.output_bytes = execution.problem.key_bytes;
-        persistent_key.input_storage = IntermediateStorageLevel::HBM;
-        persistent_key.output_storage = IntermediateStorageLevel::BRAM;
-        persistent_key.key_hit = true;
-        persistent_key.key_persistent = true;
-        if (host_key_step_id != 0) {
-            persistent_key.depends_on = {host_key_step_id};
-        }
-        persistent_key_step_id = AppendStep(&ctx, persistent_key);
-        execution.key_hbm_to_bram_bytes += execution.problem.key_bytes;
-    }
-
-    const uint32_t ct_tiles = std::max<uint32_t>(1, execution.tile_plan.ct_tiles);
-    const uint32_t limb_tiles = std::max<uint32_t>(1, execution.tile_plan.limb_tiles);
-    const uint32_t digit_tiles = std::max<uint32_t>(1, execution.tile_plan.digit_tiles);
-    const std::vector<uint32_t> limb_order = IterationOrder(limb_tiles);
-    const std::vector<uint32_t> digit_order = IterationOrder(digit_tiles);
-
-    // 外层按 ct tile 遍历：每个 ct tile 内独立构建一套 limb/digit 子图。
-    for (uint32_t ct_idx = 0; ct_idx < ct_tiles; ++ct_idx) {
-        const uint32_t ct_remain =
-            execution.problem.ciphertexts - ct_idx * execution.tile_plan.ct_tile;
-        const uint32_t ct_now = std::min<uint32_t>(execution.tile_plan.ct_tile, ct_remain);
-
-        // input_step_by_limb: 每个 limb tile 只需要一次输入搬运（HBM->BRAM），避免重复加载。
-        std::vector<uint64_t> input_step_by_limb(limb_tiles, 0);
-        // inner_terminal: 记录每个 (limb,digit) inner-prod 子图末端 step_id，
-        // 供后续 reduction 汇聚时建立依赖。
-        std::vector<std::vector<uint64_t>> inner_terminal(
-            limb_tiles,
-            std::vector<uint64_t>(digit_tiles, 0));
-
-        auto ensure_input_step = [&](uint32_t limb_idx) {
-            // 同一 ct tile 下，同一 limb tile 的输入数据只加载一次。
-            if (input_step_by_limb[limb_idx] != 0) {
-                return input_step_by_limb[limb_idx];
-            }
-            const uint32_t limb_remain =
-                execution.problem.limbs - limb_idx * execution.tile_plan.limb_tile;
-            const uint32_t limb_now = std::min<uint32_t>(execution.tile_plan.limb_tile, limb_remain);
-            // 输入块大小 = 当前 ct 数 * 当前 limb 数 * 单 limb 密文字节数。
-            const uint64_t ct_chunk_bytes =
-                static_cast<uint64_t>(ct_now) * limb_now * execution.problem.ct_limb_bytes;
-            TileExecutionStep input_step;
-            input_step.type = TileExecutionStepType::InputHBMToBRAM;
-            input_step.stage_type = StageType::Dispatch;
-            input_step.ct_tile_index = ct_idx;
-            input_step.limb_tile_index = limb_idx;
-            input_step.tile_idx = ct_idx;
-            input_step.limb_idx = limb_idx;
-            input_step.bytes = ct_chunk_bytes;
-            input_step.input_bytes = ct_chunk_bytes;
-            input_step.output_bytes = ct_chunk_bytes;
-            input_step.input_storage = IntermediateStorageLevel::HBM;
-            input_step.output_storage = IntermediateStorageLevel::BRAM;
-            input_step.key_hit = execution.problem.key_resident_hit;
-            input_step.key_persistent = execution.tile_plan.key_persistent;
-            input_step_by_limb[limb_idx] = AppendStep(&ctx, input_step);
-            execution.ct_hbm_to_bram_bytes += ct_chunk_bytes;
-            return input_step_by_limb[limb_idx];
-        };
-
-        // 为一个 (limb_idx, digit_idx) 对构建完整前半段：
-        // Input(按需) -> ModUp 子图 -> (按策略连接) -> KeyLoad(按需) -> InnerProd 子图。
-        auto build_for_pair = [&](uint32_t limb_idx, uint32_t digit_idx) {
-            const uint32_t limb_remain =
-                execution.problem.limbs - limb_idx * execution.tile_plan.limb_tile;
-            const uint32_t limb_now = std::min<uint32_t>(execution.tile_plan.limb_tile, limb_remain);
-            const uint32_t digit_remain =
-                execution.problem.digits - digit_idx * execution.tile_plan.digit_tile;
-            const uint32_t digit_now = std::min<uint32_t>(execution.tile_plan.digit_tile, digit_remain);
-            const uint32_t key_limb_now = limb_now + KeyExtraLimbsForTile(
-                limb_idx,
-                execution.tile_plan.limb_tile,
-                execution.problem.limbs,
-                execution.problem.num_k);
-
-            // 每个 pair 的数据规模与计算量估算，后续填入各子图 step 的 bytes/work_items。
-            const uint64_t ct_chunk_bytes =
-                static_cast<uint64_t>(ct_now) * limb_now * execution.problem.ct_limb_bytes;
-            const uint64_t key_chunk_bytes =
-                static_cast<uint64_t>(key_limb_now) * digit_now * execution.problem.key_digit_limb_bytes;
-            const uint64_t decompose_work =
-                static_cast<uint64_t>(ct_now)
-                * static_cast<uint64_t>(digit_now)
-                * static_cast<uint64_t>(limb_now)
-                * static_cast<uint64_t>(execution.problem.poly_modulus_degree);
-            const uint64_t inner_work =
-                decompose_work * static_cast<uint64_t>(execution.problem.polys);
-
-            std::vector<uint64_t> modup_deps = {ensure_input_step(limb_idx)};
-            const std::vector<uint64_t> modup_ids = BuildModUpSubgraph(
-                &ctx,
-                ct_idx,
-                limb_idx,
-                digit_idx,
-                ct_chunk_bytes,
-                decompose_work,
-                execution.policy,
-                modup_deps);
-
-            // 依据策略在 ModUp 与 InnerProd 之间插入直连/缓冲/落盘重载步骤。
-            std::vector<uint64_t> inner_deps = ConnectSubgraphsWithPolicy(
-                &ctx,
-                ct_idx,
-                limb_idx,
-                digit_idx,
-                execution.policy.modup_to_innerprod,
-                ct_chunk_bytes,
-                {modup_ids.back()});
-
-            // key 常驻模式：依赖一次全局 key 预载。
-            // 非常驻模式：每个 (limb,digit) 单独插入 HBM->BRAM key 加载步骤。
-            if (execution.tile_plan.key_persistent && persistent_key_step_id != 0) {
-                AddDependencyId(&inner_deps, persistent_key_step_id);
-            } else {
-                TileExecutionStep key_step;
-                key_step.type = TileExecutionStepType::KeyHBMToBRAM;
-                key_step.stage_type = StageType::KeyLoad;
-                key_step.ct_tile_index = ct_idx;
-                key_step.limb_tile_index = limb_idx;
-                key_step.digit_tile_index = digit_idx;
-                key_step.tile_idx = ct_idx;
-                key_step.limb_idx = limb_idx;
-                key_step.digit_idx = digit_idx;
-                key_step.bytes = key_chunk_bytes;
-                key_step.input_bytes = key_chunk_bytes;
-                key_step.output_bytes = key_chunk_bytes;
-                key_step.input_storage = IntermediateStorageLevel::HBM;
-                key_step.output_storage = IntermediateStorageLevel::BRAM;
-                key_step.key_hit = true;
-                key_step.key_persistent = false;
-                if (host_key_step_id != 0) {
-                    key_step.depends_on = {host_key_step_id};
-                }
-                const uint64_t key_step_id = AppendStep(&ctx, key_step);
-                execution.key_hbm_to_bram_bytes += key_chunk_bytes;
-                AddDependencyId(&inner_deps, key_step_id);
-            }
-
-            const std::vector<uint64_t> inner_ids = BuildInnerProdSubgraph(
-                &ctx,
-                ct_idx,
-                limb_idx,
-                digit_idx,
-                key_chunk_bytes,
-                inner_work,
-                execution.policy,
-                inner_deps);
-
-            // 记录 inner-prod 末端，用于后续 reduction 汇聚依赖。
-            inner_terminal[limb_idx][digit_idx] = inner_ids.back();
-        };
-
-        // 执行顺序由策略决定：
-        // - Digit 粒度或偏好 digit 局部性：digit 外层、limb 内层；
-        // - 否则 limb 外层、digit 内层。
-        // 该顺序会影响 key/input 复用机会与中间缓冲峰值。
-        if (execution.policy.granularity == KeySwitchProcessingGranularity::Digit) {
-            for (uint32_t digit_idx : digit_order) {
-                for (uint32_t limb_idx : limb_order) {
-                    build_for_pair(limb_idx, digit_idx);
-                }
-            }
-        } else {
-            for (uint32_t limb_idx : limb_order) {
-                for (uint32_t digit_idx : digit_order) {
-                    build_for_pair(limb_idx, digit_idx);
-                }
-            }
-        }
-
-        // 对每个 limb 汇聚所有 digit 的 inner-prod 结果，再执行 moddown 并写回输出。
-        for (uint32_t limb_idx : limb_order) {
-            const uint32_t limb_remain =
-                execution.problem.limbs - limb_idx * execution.tile_plan.limb_tile;
-            const uint32_t limb_now = std::min<uint32_t>(execution.tile_plan.limb_tile, limb_remain);
-            const uint64_t out_bytes =
-                static_cast<uint64_t>(ct_now) * limb_now * execution.problem.out_limb_bytes;
-            const uint64_t moddown_input_bytes = execution.policy.supports_moddown_shortcut
-                ? std::max<uint64_t>(1, out_bytes / 2)
-                : out_bytes;
-            const uint64_t reduction_work =
-                static_cast<uint64_t>(ct_now)
-                * static_cast<uint64_t>(limb_now)
-                * static_cast<uint64_t>(execution.problem.poly_modulus_degree);
-
-            uint64_t reduction_terminal = 0;
-            if (execution.policy.supports_partial_reduction_overlap) {
-                // 支持部分重叠时：按 digit 串行累计 reduction，
-                // 每次都依赖上一轮 reduction 末端，降低瞬时并发峰值。
-                for (uint32_t digit_idx : digit_order) {
-                    std::vector<uint64_t> deps = ConnectSubgraphsWithPolicy(
-                        &ctx,
-                        ct_idx,
-                        limb_idx,
-                        digit_idx,
-                        execution.policy.innerprod_to_reduction,
-                        out_bytes,
-                        {inner_terminal[limb_idx][digit_idx]});
-                    AddDependencyId(&deps, reduction_terminal);
-                    const std::vector<uint64_t> reduce_ids = BuildReductionSubgraph(
-                        &ctx,
-                        ct_idx,
-                        limb_idx,
-                        reduction_work,
-                        execution.policy,
-                        deps);
-                    reduction_terminal = reduce_ids.back();
-                }
-            } else {
-                // 不支持重叠时：先收集全部 digit 依赖，再一次性做 reduction。
-                std::vector<uint64_t> deps;
-                for (uint32_t digit_idx : digit_order) {
-                    const std::vector<uint64_t> conn = ConnectSubgraphsWithPolicy(
-                        &ctx,
-                        ct_idx,
-                        limb_idx,
-                        digit_idx,
-                        execution.policy.innerprod_to_reduction,
-                        out_bytes,
-                        {inner_terminal[limb_idx][digit_idx]});
-                    for (uint64_t dep : conn) {
-                        AddDependencyId(&deps, dep);
-                    }
-                }
-                const std::vector<uint64_t> reduce_ids = BuildReductionSubgraph(
-                    &ctx,
-                    ct_idx,
-                    limb_idx,
-                    reduction_work,
-                    execution.policy,
-                    deps);
-                reduction_terminal = reduce_ids.back();
-            }
-
-            // Reduction -> ModDown 的连接仍由策略控制（是否直连或插中间缓冲）。
-            const std::vector<uint64_t> moddown_deps = ConnectSubgraphsWithPolicy(
-                &ctx,
-                ct_idx,
-                limb_idx,
-                /*digit_idx=*/0,
-                execution.policy.reduction_to_moddown,
-                moddown_input_bytes,
-                {reduction_terminal});
-            const uint64_t moddown_work =
-                static_cast<uint64_t>(ct_now)
-                * static_cast<uint64_t>(limb_now)
-                * static_cast<uint64_t>(execution.problem.polys)
-                * static_cast<uint64_t>(execution.problem.poly_modulus_degree);
-            const std::vector<uint64_t> moddown_ids = BuildModDownSubgraph(
-                &ctx,
-                ct_idx,
-                limb_idx,
-                out_bytes,
-                moddown_work,
-                execution.policy,
-                moddown_deps);
-
-            // 输出 tile 写回 HBM，作为该 limb tile 的终点步骤。
-            TileExecutionStep output;
-            output.type = TileExecutionStepType::OutputBRAMToHBM;
-            output.stage_type = StageType::Dispatch;
-            output.ct_tile_index = ct_idx;
-            output.limb_tile_index = limb_idx;
-            output.tile_idx = ct_idx;
-            output.limb_idx = limb_idx;
-            output.bytes = out_bytes;
-            output.input_bytes = out_bytes;
-            output.output_bytes = out_bytes;
-            output.input_storage = IntermediateStorageLevel::BRAM;
-            output.output_storage = IntermediateStorageLevel::HBM;
-            output.depends_on = {moddown_ids.back()};
-            output.key_hit = execution.problem.key_resident_hit;
-            output.key_persistent = execution.tile_plan.key_persistent;
-            AppendStep(&ctx, output);
-            execution.out_bram_to_hbm_bytes += out_bytes;
-        }
-    }
-
-    // 可选的多卡收敛步骤：
-    // 在单卡计算 DAG 后追加 peer->root 的 send/recv，随后 root 做 reduce 与 barrier。
-    // 这些步骤主要用于建模卡间通信与同步开销，不改变单卡内部的计算子图。
-    if (allow_inter_card_steps && execution.problem.cards > 1) {
-        const uint32_t active_cards = static_cast<uint32_t>(
-            std::min<size_t>(
-                plan.assigned_cards.size(),
-                std::max<uint32_t>(1, execution.problem.cards)));
-        if (active_cards > 1) {
-            const CardId root_card = plan.assigned_cards.front();
-            const uint64_t per_peer_bytes = CeilDivU64(
-                req.ks_profile.output_bytes,
-                std::max<uint32_t>(1, active_cards));
-            const uint32_t sync_group = 1;
-
-            for (uint32_t card_idx = 1; card_idx < active_cards; ++card_idx) {
-                const CardId peer_card = plan.assigned_cards[card_idx];
-
-                // peer 卡把分片结果发往 root 卡。
-                TileExecutionStep send_step;
-                send_step.type = TileExecutionStepType::InterCardSendStep;
-                send_step.stage_type = StageType::Merge;
-                send_step.bytes = per_peer_bytes;
-                send_step.src_card = static_cast<int32_t>(peer_card);
-                send_step.dst_card = static_cast<int32_t>(root_card);
-                send_step.sync_group = sync_group;
-                AppendStep(&ctx, send_step);
-
-                // root 卡接收 peer 卡数据。
-                TileExecutionStep recv_step;
-                recv_step.type = TileExecutionStepType::InterCardRecvStep;
-                recv_step.stage_type = StageType::Merge;
-                recv_step.bytes = per_peer_bytes;
-                recv_step.src_card = static_cast<int32_t>(peer_card);
-                recv_step.dst_card = static_cast<int32_t>(root_card);
-                recv_step.sync_group = sync_group;
-                AppendStep(&ctx, recv_step);
-            }
-
-            // root 卡对全部输入执行归并规约。
-            TileExecutionStep reduce_step;
-            reduce_step.type = TileExecutionStepType::InterCardReduceStep;
-            reduce_step.stage_type = StageType::Merge;
-            reduce_step.bytes = req.ks_profile.output_bytes;
-            reduce_step.src_card = static_cast<int32_t>(root_card);
-            reduce_step.dst_card = static_cast<int32_t>(root_card);
-            reduce_step.fan_in = active_cards;
-            reduce_step.sync_group = sync_group;
-            AppendStep(&ctx, reduce_step);
-
-            // 最后 barrier，确保 merge 阶段所有参与卡完成同步。
-            TileExecutionStep barrier_step;
-            barrier_step.type = TileExecutionStepType::BarrierStep;
-            barrier_step.stage_type = StageType::Merge;
-            barrier_step.src_card = static_cast<int32_t>(root_card);
-            barrier_step.dst_card = static_cast<int32_t>(root_card);
-            barrier_step.work_items = active_cards;
-            barrier_step.fan_in = active_cards;
-            barrier_step.sync_group = sync_group;
-            barrier_step.barrier_group = sync_group;
-            AppendStep(&ctx, barrier_step);
-        }
-    }
-
-    // 收尾：把构建过程中累计的峰值与流量字段写回 execution。
-    FinalizeExecution(&ctx);
-    return execution;
-}
 KeySwitchExecution KeySwitchExecutionModel::Build(
     const Request& req,
     const ExecutionPlan& plan,
@@ -2409,7 +1977,9 @@ KeySwitchExecution KeySwitchExecutionModel::BuildByMethod(
     switch (resolved_method) {
     // 多卡
     case KeySwitchMethod::Cinnamon:
-        return BuildCinnamon(req, plan, state);
+    case KeySwitchMethod::CinnamonIB:
+    case KeySwitchMethod::CinnamonOA:
+        return BuildCinnamon(req, plan, state, resolved_method);
     
     // 单卡
     case KeySwitchMethod::Poseidon:
@@ -2417,6 +1987,9 @@ KeySwitchExecution KeySwitchExecutionModel::BuildByMethod(
     case KeySwitchMethod::FAB:
     case KeySwitchMethod::FAST:
     case KeySwitchMethod::HERA:
+    case KeySwitchMethod::DigitCentric:
+    case KeySwitchMethod::OutputCentric:
+    case KeySwitchMethod::MaxParallel:
         return BuildSharedSingleBoardMethod(req, plan, state, resolved_method);
 
     case KeySwitchMethod::Auto:
@@ -2607,13 +2180,18 @@ KeySwitchExecution KeySwitchExecutionModel::BuildSingleBoard(
 KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
     const Request& req,
     const ExecutionPlan& plan,
-    const SystemState& state) const {
+    const SystemState& state,
+    KeySwitchMethod method) const {
+
+    const KeySwitchMethod cinnamon_method =
+        (method == KeySwitchMethod::Auto) ? KeySwitchMethod::CinnamonOA : method;
+    const MultiBoardMode forced_mode = ForcedMultiBoardModeForMethod(cinnamon_method);
 
     if (plan.assigned_cards.empty()) {
         KeySwitchExecution no_card;
-        no_card.method = KeySwitchMethod::Cinnamon;
+        no_card.method = cinnamon_method;
         no_card.requested_method = req.ks_profile.method;
-        no_card.effective_method = KeySwitchMethod::Cinnamon;
+        no_card.effective_method = cinnamon_method;
         no_card.fallback_used = true;
         no_card.fallback_reason = KeySwitchFallbackReason::NoAssignedCard;
         no_card.valid = false;
@@ -2622,86 +2200,111 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
     }
 
     if (!req.ks_profile.allow_local_moddown) {
-        return UnsupportedConfig(KeySwitchMethod::Cinnamon);
+        return UnsupportedConfig(cinnamon_method);
     }
 
-    const uint32_t effective_cards = EffectiveScaleOutCards(req, plan);
-    if (effective_cards <= 1) {
+    const uint32_t total_digits = std::max<uint32_t>(1, req.ks_profile.num_digits);
+    const uint32_t scale_out_cards = EffectiveScaleOutCards(req, plan);
+    const uint32_t active_cards = std::max<uint32_t>(
+        1,
+        std::min<uint32_t>(total_digits, scale_out_cards));
+    if (active_cards <= 1) {
         // Explicit policy: auto-degrade to single-board when only one card is available.
         Request single_req = req;
         single_req.ks_profile.partition = PartitionStrategy::None;
         single_req.ks_profile.collective = CollectiveStrategy::None;
         single_req.ks_profile.key_placement = KeyPlacement::StreamFromHBM;
+        single_req.ks_profile.scale_out_cards = 1;
+        single_req.ks_profile.enable_inter_card_merge = false;
+        single_req.ks_profile.allow_cross_card_reduce = false;
         KeySwitchExecution degraded = BuildSharedSingleBoardPhysical(
             single_req,
             plan,
             state,
-            kSingleBoardBaseMethod);
+            KeySwitchMethod::OutputCentric);
         if (!degraded.fallback_used) {
             degraded.method_degraded = true;
             degraded.degraded_reason = KeySwitchFallbackReason::DegradedToSingleBoard;
             degraded.fallback_reason = KeySwitchFallbackReason::None;
         }
         degraded.requested_method = req.ks_profile.method;
-        degraded.effective_method = kSingleBoardBaseMethod;
+        degraded.effective_method = KeySwitchMethod::OutputCentric;
         return degraded;
     }
 
+    const MultiBoardMode multi_board_mode =
+        (forced_mode != MultiBoardMode::Auto)
+        ? forced_mode
+        : ResolveMultiBoardMode(req.ks_profile.multi_board_mode, cinnamon_method);
+    if (multi_board_mode != MultiBoardMode::OutputAggregation
+        && multi_board_mode != MultiBoardMode::InputBroadcast) {
+        return UnsupportedConfig(cinnamon_method);
+    }
+
     const PartitionStrategy partition =
-        ResolvePartition(req.ks_profile.partition, KeySwitchMethod::Cinnamon);
-    if (partition != PartitionStrategy::ByLimb) {
-        return UnsupportedConfig(KeySwitchMethod::Cinnamon);
+        ResolvePartition(req.ks_profile.partition, cinnamon_method);
+    if (partition != PartitionStrategy::ByDigit) {
+        return UnsupportedConfig(cinnamon_method);
     }
 
     const CollectiveStrategy collective =
-        ResolveCollective(req.ks_profile.collective, KeySwitchMethod::Cinnamon);
+        ResolveCollective(req.ks_profile.collective, cinnamon_method);
     if (collective != CollectiveStrategy::GatherToRoot) {
-        return UnsupportedConfig(KeySwitchMethod::Cinnamon);
+        return UnsupportedConfig(cinnamon_method);
     }
 
     const KeyPlacement key_placement =
-        ResolveKeyPlacement(req.ks_profile.key_placement, KeySwitchMethod::Cinnamon);
-    // Cinnamon MVP: only replicated key placement is supported in this path.
-    if (key_placement != KeyPlacement::ReplicatedPerCard) {
-        return UnsupportedConfig(KeySwitchMethod::Cinnamon);
+        ResolveKeyPlacement(req.ks_profile.key_placement, cinnamon_method);
+    if (key_placement != KeyPlacement::ShardedByPartition) {
+        return UnsupportedConfig(cinnamon_method);
     }
 
     if (!req.ks_profile.enable_inter_card_merge) {
-        return UnsupportedConfig(KeySwitchMethod::Cinnamon);
+        return UnsupportedConfig(cinnamon_method);
     }
     if (!req.ks_profile.allow_cross_card_reduce) {
-        return UnsupportedConfig(KeySwitchMethod::Cinnamon);
+        return UnsupportedConfig(cinnamon_method);
     }
 
     ExecutionPlan scale_plan = plan;
-    if (scale_plan.assigned_cards.size() > effective_cards) {
-        scale_plan.assigned_cards.resize(effective_cards);
+    if (scale_plan.assigned_cards.size() > active_cards) {
+        scale_plan.assigned_cards.resize(active_cards);
     }
 
     Request scale_req = req;
-    scale_req.ks_profile.method = KeySwitchMethod::Cinnamon;
+    scale_req.ks_profile.method = cinnamon_method;
     scale_req.ks_profile.partition = partition;
     scale_req.ks_profile.key_placement = key_placement;
     scale_req.ks_profile.collective = collective;
-    scale_req.ks_profile.scale_out_cards = effective_cards;
+    scale_req.ks_profile.multi_board_mode = multi_board_mode;
+    scale_req.ks_profile.scale_out_cards = active_cards;
 
     KeySwitchExecution execution;
     execution.valid = true;
     execution.tiled_execution = true;
-    execution.method = KeySwitchMethod::Cinnamon;
+    execution.method = cinnamon_method;
     execution.requested_method = req.ks_profile.method;
-    execution.effective_method = KeySwitchMethod::Cinnamon;
+    execution.effective_method = cinnamon_method;
     execution.method_degraded = false;
     execution.degraded_reason = KeySwitchFallbackReason::None;
+    execution.multi_board_mode = multi_board_mode;
+    execution.partition_strategy = partition;
+    execution.key_placement = key_placement;
+    execution.collective_strategy = collective;
+    execution.active_cards = active_cards;
     execution.problem = BuildProblem(scale_req, scale_plan, state);
-    execution.problem.method = KeySwitchMethod::Cinnamon;
-    execution.problem.cards = effective_cards;
+    execution.problem.method = cinnamon_method;
+    execution.problem.multi_board_mode = multi_board_mode;
+    execution.problem.partition_strategy = partition;
+    execution.problem.key_placement = key_placement;
+    execution.problem.collective_strategy = collective;
+    execution.problem.active_cards = active_cards;
+    execution.problem.cards = active_cards;
     execution.working_set_bytes = 0;
     execution.key_resident_hit = true;
     execution.key_persistent_bram = true;
 
-    const uint32_t total_limbs = std::max<uint32_t>(1, req.ks_profile.num_rns_limbs);
-    const std::vector<LimbShard> shards = BuildLimbShards(total_limbs, effective_cards);
+    const std::vector<DigitShard> shards = BuildDigitShards(total_digits, active_cards);
     if (shards.empty()) {
         execution.fallback_used = true;
         execution.fallback_reason = KeySwitchFallbackReason::TilePlanInvalid;
@@ -2710,16 +2313,60 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
     }
 
     std::vector<uint64_t> partial_bytes(shards.size(), 0);
+    std::vector<uint64_t> card_terminal_step(shards.size(), 0);
+    std::vector<uint64_t> broadcast_ready_step(shards.size(), 0);
     bool local_plan_initialized = false;
+    uint64_t next_step_id = 1;
+
+    if (multi_board_mode == MultiBoardMode::InputBroadcast && active_cards > 1) {
+        const CardId root_card = scale_plan.assigned_cards.front();
+        const uint32_t sync_group = 2;
+        for (uint32_t card_idx = 1; card_idx < active_cards; ++card_idx) {
+            const CardId peer_card = scale_plan.assigned_cards[card_idx];
+
+            TileExecutionStep send_step;
+            send_step.step_id = next_step_id++;
+            send_step.type = TileExecutionStepType::InterCardSendStep;
+            send_step.stage_type = StageType::Dispatch;
+            send_step.bytes = req.ks_profile.input_bytes;
+            send_step.work_items = 1;
+            send_step.src_card = static_cast<int32_t>(root_card);
+            send_step.dst_card = static_cast<int32_t>(peer_card);
+            send_step.fan_in = 2;
+            send_step.sync_group = sync_group;
+            send_step.key_hit = execution.key_resident_hit;
+            send_step.key_persistent = execution.key_persistent_bram;
+            const uint64_t send_step_id = send_step.step_id;
+            execution.steps.push_back(std::move(send_step));
+
+            TileExecutionStep recv_step;
+            recv_step.step_id = next_step_id++;
+            recv_step.type = TileExecutionStepType::InterCardRecvStep;
+            recv_step.stage_type = StageType::Dispatch;
+            recv_step.bytes = req.ks_profile.input_bytes;
+            recv_step.work_items = 1;
+            recv_step.src_card = static_cast<int32_t>(root_card);
+            recv_step.dst_card = static_cast<int32_t>(peer_card);
+            recv_step.fan_in = 2;
+            recv_step.sync_group = sync_group;
+            recv_step.key_hit = execution.key_resident_hit;
+            recv_step.key_persistent = execution.key_persistent_bram;
+            recv_step.depends_on = {send_step_id};
+            const uint64_t recv_step_id = recv_step.step_id;
+            execution.steps.push_back(std::move(recv_step));
+
+            broadcast_ready_step[card_idx] = recv_step_id;
+        }
+    }
 
     for (uint32_t card_idx = 0; card_idx < static_cast<uint32_t>(shards.size()); ++card_idx) {
-        const LimbShard& shard = shards[card_idx];
+        const DigitShard& shard = shards[card_idx];
         if (shard.count == 0) {
             continue;
         }
 
         Request local_req = req;
-        local_req.ks_profile.method = KeySwitchMethod::Auto;
+        local_req.ks_profile.method = KeySwitchMethod::OutputCentric;
         local_req.ks_profile.partition = PartitionStrategy::None;
         local_req.ks_profile.collective = CollectiveStrategy::None;
         local_req.ks_profile.key_placement = KeyPlacement::StreamFromHBM;
@@ -2727,17 +2374,20 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
         local_req.ks_profile.enable_inter_card_merge = false;
         local_req.ks_profile.allow_cross_card_reduce = false;
 
-        local_req.ks_profile.num_rns_limbs = shard.count;
-        local_req.ks_profile.input_bytes = ScaleBytesByRatio(
-            req.ks_profile.input_bytes,
+        local_req.ks_profile.num_digits = shard.count;
+        if (multi_board_mode == MultiBoardMode::InputBroadcast) {
+            local_req.ks_profile.input_bytes = req.ks_profile.input_bytes;
+        } else {
+            local_req.ks_profile.input_bytes = ScaleBytesByRatio(
+                req.ks_profile.input_bytes,
+                shard.count,
+                total_digits);
+        }
+        local_req.ks_profile.output_bytes = req.ks_profile.output_bytes;
+        local_req.ks_profile.key_bytes = ScaleBytesByRatio(
+            req.ks_profile.key_bytes,
             shard.count,
-            total_limbs);
-        local_req.ks_profile.output_bytes = ScaleBytesByRatio(
-            req.ks_profile.output_bytes,
-            shard.count,
-            total_limbs);
-        // Replicated-per-card key placement for MVP.
-        local_req.ks_profile.key_bytes = req.ks_profile.key_bytes;
+            total_digits);
 
         ExecutionPlan local_plan;
         local_plan.request_id = plan.request_id;
@@ -2747,16 +2397,16 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
             local_req,
             local_plan,
             state,
-            kSingleBoardBaseMethod);
+            KeySwitchMethod::OutputCentric);
         if (!local.valid) {
             // Do not fallback to generic BuildWithMode() path.
             // Keep Cinnamon semantics explicit and explainable.
-            KeySwitchExecution failed = UnsupportedConfig(KeySwitchMethod::Cinnamon);
+            KeySwitchExecution failed = UnsupportedConfig(cinnamon_method);
             failed.requested_method = req.ks_profile.method;
-            failed.effective_method = KeySwitchMethod::Cinnamon;
+            failed.effective_method = cinnamon_method;
             failed.problem = execution.problem;
-            failed.problem.method = KeySwitchMethod::Cinnamon;
-            failed.problem.cards = effective_cards;
+            failed.problem.method = cinnamon_method;
+            failed.problem.cards = active_cards;
             failed.fallback_reason = (local.fallback_reason == KeySwitchFallbackReason::None)
                 ? KeySwitchFallbackReason::UnsupportedConfig
                 : local.fallback_reason;
@@ -2792,6 +2442,8 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
 
         uint64_t local_partial_bytes = 0;
         const CardId local_card = local_plan.assigned_cards.front();
+        const uint64_t local_pre_dep = broadcast_ready_step[card_idx];
+        std::unordered_map<uint64_t, uint64_t> step_id_remap;
         for (const TileExecutionStep& step : local.steps) {
             if (step.type == TileExecutionStepType::OutputBRAMToHBM) {
                 local_partial_bytes += step.bytes;
@@ -2800,8 +2452,24 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
             TileExecutionStep local_step = step;
             // Tag local shard steps with owning card so CycleBackend can emit
             // per-card local primitives for Cinnamon traces.
+            const uint64_t new_step_id = next_step_id++;
+            step_id_remap[step.step_id] = new_step_id;
+            local_step.step_id = new_step_id;
+            std::vector<uint64_t> remapped_deps;
+            remapped_deps.reserve(step.depends_on.size());
+            for (uint64_t dep_step_id : step.depends_on) {
+                const auto dep_it = step_id_remap.find(dep_step_id);
+                if (dep_it != step_id_remap.end()) {
+                    remapped_deps.push_back(dep_it->second);
+                }
+            }
+            if (local_pre_dep != 0) {
+                AddDependencyId(&remapped_deps, local_pre_dep);
+            }
+            local_step.depends_on = std::move(remapped_deps);
             local_step.src_card = static_cast<int32_t>(local_card);
             local_step.dst_card = static_cast<int32_t>(local_card);
+            card_terminal_step[card_idx] = local_step.step_id;
             execution.steps.push_back(std::move(local_step));
         }
         if (local_partial_bytes == 0) {
@@ -2813,17 +2481,19 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
         partial_bytes[card_idx] = local_partial_bytes;
     }
 
-    const uint32_t active_cards = static_cast<uint32_t>(shards.size());
     execution.problem.cards = active_cards;
     if (active_cards > 1) {
         const CardId root_card = scale_plan.assigned_cards.front();
         const uint32_t sync_group = 1;
-        uint64_t reduce_bytes = partial_bytes[0];
+        std::vector<uint64_t> recv_ids;
+        recv_ids.reserve(active_cards - 1);
+        uint64_t reduce_bytes = req.ks_profile.output_bytes;
         for (uint32_t card_idx = 1; card_idx < active_cards; ++card_idx) {
             const uint64_t bytes = partial_bytes[card_idx];
             const CardId peer_card = scale_plan.assigned_cards[card_idx];
 
             TileExecutionStep send_step;
+            send_step.step_id = next_step_id++;
             send_step.type = TileExecutionStepType::InterCardSendStep;
             send_step.stage_type = StageType::Merge;
             send_step.bytes = bytes;
@@ -2834,9 +2504,14 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
             send_step.sync_group = sync_group;
             send_step.key_hit = execution.key_resident_hit;
             send_step.key_persistent = execution.key_persistent_bram;
+            if (card_terminal_step[card_idx] != 0) {
+                send_step.depends_on = {card_terminal_step[card_idx]};
+            }
+            const uint64_t send_step_id = send_step.step_id;
             execution.steps.push_back(std::move(send_step));
 
             TileExecutionStep recv_step;
+            recv_step.step_id = next_step_id++;
             recv_step.type = TileExecutionStepType::InterCardRecvStep;
             recv_step.stage_type = StageType::Merge;
             recv_step.bytes = bytes;
@@ -2847,12 +2522,22 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
             recv_step.sync_group = sync_group;
             recv_step.key_hit = execution.key_resident_hit;
             recv_step.key_persistent = execution.key_persistent_bram;
+            recv_step.depends_on = {send_step_id};
+            if (card_terminal_step[0] != 0) {
+                AddDependencyId(&recv_step.depends_on, card_terminal_step[0]);
+            }
+            recv_ids.push_back(recv_step.step_id);
             execution.steps.push_back(std::move(recv_step));
 
-            reduce_bytes += bytes;
+            const __uint128_t sum =
+                static_cast<__uint128_t>(reduce_bytes) + static_cast<__uint128_t>(bytes);
+            reduce_bytes = (sum > static_cast<__uint128_t>(std::numeric_limits<uint64_t>::max()))
+                ? std::numeric_limits<uint64_t>::max()
+                : static_cast<uint64_t>(sum);
         }
 
         TileExecutionStep reduce_step;
+        reduce_step.step_id = next_step_id++;
         reduce_step.type = TileExecutionStepType::InterCardReduceStep;
         reduce_step.stage_type = StageType::Merge;
         reduce_step.bytes = reduce_bytes;
@@ -2862,9 +2547,15 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
         reduce_step.sync_group = sync_group;
         reduce_step.key_hit = execution.key_resident_hit;
         reduce_step.key_persistent = execution.key_persistent_bram;
+        reduce_step.depends_on = recv_ids;
+        if (card_terminal_step[0] != 0) {
+            AddDependencyId(&reduce_step.depends_on, card_terminal_step[0]);
+        }
+        const uint64_t reduce_step_id = reduce_step.step_id;
         execution.steps.push_back(std::move(reduce_step));
 
         TileExecutionStep barrier_step;
+        barrier_step.step_id = next_step_id++;
         barrier_step.type = TileExecutionStepType::BarrierStep;
         barrier_step.stage_type = StageType::Merge;
         barrier_step.work_items = active_cards;
@@ -2873,19 +2564,41 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
         barrier_step.barrier_group = sync_group;
         barrier_step.key_hit = execution.key_resident_hit;
         barrier_step.key_persistent = execution.key_persistent_bram;
+        barrier_step.depends_on = {reduce_step_id};
+        const uint64_t barrier_step_id = barrier_step.step_id;
         execution.steps.push_back(std::move(barrier_step));
-    }
 
-    TileExecutionStep output_step;
-    output_step.type = TileExecutionStepType::OutputBRAMToHBM;
-    output_step.stage_type = StageType::Dispatch;
-    output_step.bytes = req.ks_profile.output_bytes;
-    output_step.work_items = 1;
-    output_step.key_hit = execution.key_resident_hit;
-    output_step.key_persistent = execution.key_persistent_bram;
-    execution.steps.push_back(std::move(output_step));
+        TileExecutionStep output_step;
+        output_step.step_id = next_step_id++;
+        output_step.type = TileExecutionStepType::OutputBRAMToHBM;
+        output_step.stage_type = StageType::Dispatch;
+        output_step.bytes = req.ks_profile.output_bytes;
+        output_step.work_items = 1;
+        output_step.key_hit = execution.key_resident_hit;
+        output_step.key_persistent = execution.key_persistent_bram;
+        output_step.depends_on = {barrier_step_id};
+        execution.steps.push_back(std::move(output_step));
+    } else {
+        TileExecutionStep output_step;
+        output_step.step_id = next_step_id++;
+        output_step.type = TileExecutionStepType::OutputBRAMToHBM;
+        output_step.stage_type = StageType::Dispatch;
+        output_step.bytes = req.ks_profile.output_bytes;
+        output_step.work_items = 1;
+        output_step.key_hit = execution.key_resident_hit;
+        output_step.key_persistent = execution.key_persistent_bram;
+        if (card_terminal_step[0] != 0) {
+            output_step.depends_on = {card_terminal_step[0]};
+        }
+        execution.steps.push_back(std::move(output_step));
+    }
     execution.out_bram_to_hbm_bytes = req.ks_profile.output_bytes;
     execution.problem.key_resident_hit = execution.key_resident_hit;
+    execution.predicted_hbm_bytes =
+        execution.key_host_to_hbm_bytes
+        + execution.key_hbm_to_bram_bytes
+        + execution.ct_hbm_to_bram_bytes
+        + execution.out_bram_to_hbm_bytes;
 
     return execution;
 }

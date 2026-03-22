@@ -1,0 +1,376 @@
+=== Experiment Config ===
+Scheduler: fifo
+Backend: cycle_stub
+Workload: synthetic
+KeySwitchMethod: max_parallel
+Seed: 123
+NumCards: 1
+NumUsers: 1
+EnableMultiCard: false
+KeySwitchMultiBoardMode: auto
+SyntheticRequestsPerUser: 1
+SyntheticInterArrival: 300
+SyntheticStartTime: 0
+BurstBursts: 4
+BurstRequestsPerUserPerBurst: 2
+BurstIntraGap: 20
+BurstInterGap: 1200
+BurstStartTime: 0
+BurstLevel: 1
+NumPools: 1
+PoolConfigSource: built-in default
+TreeConfigSource: built-in default
+HEParamsSource: built-in default
+CSVOutput: results/metrics_max_parallel.csv
+DumpLogicalGraph: true
+DumpRuntimePlan: true
+=========================
+Building Max Parallel program with ct 1, p 2, digit_num 3, digit_limbs 8, l 23, lk 31
+Step 1: load ct to BRAM, total bytes: 6029312
+Emitted group 0: load_input_digit_0, kind=0, bytes=2097152, work_items=8, micro_ops=16, est_cycles/op=100, total_est_cycles=1329, bram_live=2097152
+Emitted group 1: load_input_digit_1, kind=0, bytes=2097152, work_items=8, micro_ops=16, est_cycles/op=100, total_est_cycles=1329, bram_live=4194304
+Emitted group 2: load_input_digit_2, kind=0, bytes=2097152, work_items=8, micro_ops=16, est_cycles/op=100, total_est_cycles=1329, bram_live=6291456
+Step 2: INTT for all limbs
+Emitted group 3: intt_all_limbs_digit_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 4: intt_all_limbs_digit_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 5: intt_all_limbs_digit_2, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Step 3: BConv for each limb
+Emitted group 6: bconv_2k_limbs_digit_0, kind=8, bytes=2097152, work_items=31, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=6291456
+Emitted group 7: bconv_2k_limbs_digit_1, kind=8, bytes=2097152, work_items=31, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=12320768
+Emitted group 8: bconv_2k_limbs_digit_2, kind=8, bytes=2097152, work_items=31, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=18350080
+Emitted group 9: ntt_2k_limbs_digit_0, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=24379392
+Emitted group 10: ntt_2k_limbs_digit_1, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=24379392
+Emitted group 11: ntt_2k_limbs_digit_2, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=24379392
+Step 4: spill digit_num - 1 digits to HBM, keep one digit in BRAM for reuse in inner product
+Emitted group 12: spill_digit_0, kind=1, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=24379392
+Emitted group 13: spill_digit_1, kind=1, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
+Emitted group 14: load_eval_key_digit_0_part_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
+Emitted group 15: load_eval_key_digit_0_part_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
+Emitted group 16: bconv_inner_product_digit_0_part_0, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 17: bconv_inner_product_digit_0_part_1, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 18: store_result_digit_0, kind=1, bytes=16252928, work_items=62, micro_ops=62, est_cycles/op=182, total_est_cycles=10177, bram_live=16252928
+Emitted group 19: load_spilled_digit_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=0
+Emitted group 20: load_eval_key_digit_1_part_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
+Emitted group 21: load_eval_key_digit_1_part_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
+Emitted group 22: bconv_inner_product_digit_1_part_0, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 23: bconv_inner_product_digit_1_part_1, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 24: store_result_digit_1, kind=1, bytes=16252928, work_items=62, micro_ops=62, est_cycles/op=182, total_est_cycles=10177, bram_live=16252928
+Emitted group 25: load_spilled_digit_2, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=0
+Emitted group 26: load_eval_key_digit_2_part_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
+Emitted group 27: load_eval_key_digit_2_part_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
+Emitted group 28: bconv_inner_product_digit_2_part_0, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 29: bconv_inner_product_digit_2_part_1, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 30: store_result_digit_2, kind=1, bytes=16252928, work_items=62, micro_ops=62, est_cycles/op=182, total_est_cycles=10177, bram_live=16252928
+Step 5: accumulate the partial results for each digit in HBM, and store back to BRAM for final INTT
+Emitted group 31: load_partial_result_digit_0_part_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=0
+Emitted group 32: load_partial_result_digit_1_part_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
+Emitted group 33: accumulate_partial_result_digit_1_part_0, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=16252928
+Emitted group 34: load_partial_result_digit_2_part_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
+Emitted group 35: accumulate_partial_result_digit_2_part_0, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=16252928
+Emitted group 36: load_partial_result_digit_0_part_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
+Emitted group 37: load_partial_result_digit_1_part_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
+Emitted group 38: accumulate_partial_result_digit_1_part_1, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 39: load_partial_result_digit_2_part_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
+Emitted group 40: accumulate_partial_result_digit_2_part_1, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Step 6: store the 2*l limbs of the final result back to HBM
+Emitted group 41: store_final_result_part_0, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=16252928
+Emitted group 42: store_final_result_part_1, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=10223616
+Step 7: INTT for 2*(lk-l) limbs
+Emitted group 43: intt_final_result_part_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
+Emitted group 44: intt_final_result_part_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
+Step 8: BConv for 2*(lk-l) limbs
+Emitted group 45: bconv_final_result_part_0, kind=8, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=4194304
+Emitted group 46: bconv_final_result_part_1, kind=8, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=8126464
+Step 9: NTT for 2*l limbs
+Emitted group 47: ntt_final_result_part_0, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=12058624
+Emitted group 48: ntt_final_result_part_1, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=12058624
+Step 10: Load 2*l limbs to BRAM, sub, and store back to HBM
+Emitted group 49: load_final_result_part_0, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=12058624
+Emitted group 50: sub_final_result_part_0, kind=8, bytes=6029312, work_items=23, micro_ops=529, est_cycles/op=276, total_est_cycles=135444, bram_live=18087936
+Emitted group 51: store_final_result_part_0, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=12058624
+Emitted group 52: load_final_result_part_1, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=6029312
+Emitted group 53: sub_final_result_part_1, kind=8, bytes=6029312, work_items=23, micro_ops=529, est_cycles/op=276, total_est_cycles=135444, bram_live=12058624
+Emitted group 54: store_final_result_part_1, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=6029312
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           1006256
+Total latency (ns):     3354187
+Peak BRAM live (bytes): 24379392
+HBM read (bytes):       132120576
+HBM write (bytes):      89128960
+Dependency stalls:      50622 cycles
+Resource stalls:        955634 cycles
+Instruction groups:     55
+Total instructions:     12611
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=23809 (2.3661%)  count=528  bytes=132120576
+  StoreHBM: cycles=16031 (1.59313%)  count=340  bytes=89128960
+  NTT: cycles=123250 (12.2484%)  count=115  bytes=30146560
+  INTT: cycles=41095 (4.08395%)  count=40  bytes=10485760
+  BConv: cycles=802071 (79.7084%)  count=11588  bytes=103805426
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input_digit_0: kind=LoadHBM  one_limb_cycles=100  groups=1  instrs=16
+  load_input_digit_1: kind=LoadHBM  one_limb_cycles=100  groups=1  instrs=16
+  load_input_digit_2: kind=LoadHBM  one_limb_cycles=100  groups=1  instrs=16
+  intt_all_limbs_digit_0: kind=INTT  one_limb_cycles=4108  groups=1  instrs=8
+  intt_all_limbs_digit_1: kind=INTT  one_limb_cycles=4108  groups=1  instrs=8
+  intt_all_limbs_digit_2: kind=INTT  one_limb_cycles=4108  groups=1  instrs=8
+  bconv_2k_limbs_digit_0: kind=BConv  one_limb_cycles=276  groups=1  instrs=184
+  bconv_2k_limbs_digit_1: kind=BConv  one_limb_cycles=276  groups=1  instrs=184
+  bconv_2k_limbs_digit_2: kind=BConv  one_limb_cycles=276  groups=1  instrs=184
+  ntt_2k_limbs_digit_0: kind=NTT  one_limb_cycles=4108  groups=1  instrs=23
+  ntt_2k_limbs_digit_1: kind=NTT  one_limb_cycles=4108  groups=1  instrs=23
+  ntt_2k_limbs_digit_2: kind=NTT  one_limb_cycles=4108  groups=1  instrs=23
+  spill_digit_0: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=31
+  spill_digit_1: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=31
+  load_eval_key_digit_0_part_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  load_eval_key_digit_0_part_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  bconv_inner_product_digit_0_part_0: kind=BConv  one_limb_cycles=276  groups=1  instrs=961
+  bconv_inner_product_digit_0_part_1: kind=BConv  one_limb_cycles=276  groups=1  instrs=961
+  store_result_digit_0: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=62
+  load_spilled_digit_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  load_eval_key_digit_1_part_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  load_eval_key_digit_1_part_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  bconv_inner_product_digit_1_part_0: kind=BConv  one_limb_cycles=276  groups=1  instrs=961
+  bconv_inner_product_digit_1_part_1: kind=BConv  one_limb_cycles=276  groups=1  instrs=961
+  store_result_digit_1: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=62
+  load_spilled_digit_2: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  load_eval_key_digit_2_part_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  load_eval_key_digit_2_part_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  bconv_inner_product_digit_2_part_0: kind=BConv  one_limb_cycles=276  groups=1  instrs=961
+  bconv_inner_product_digit_2_part_1: kind=BConv  one_limb_cycles=276  groups=1  instrs=961
+  store_result_digit_2: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=62
+  load_partial_result_digit_0_part_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  load_partial_result_digit_1_part_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  accumulate_partial_result_digit_1_part_0: kind=BConv  one_limb_cycles=276  groups=1  instrs=961
+  load_partial_result_digit_2_part_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  accumulate_partial_result_digit_2_part_0: kind=BConv  one_limb_cycles=276  groups=1  instrs=961
+  load_partial_result_digit_0_part_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  load_partial_result_digit_1_part_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  accumulate_partial_result_digit_1_part_1: kind=BConv  one_limb_cycles=276  groups=1  instrs=961
+  load_partial_result_digit_2_part_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  accumulate_partial_result_digit_2_part_1: kind=BConv  one_limb_cycles=276  groups=1  instrs=961
+  store_final_result_part_0: kind=StoreHBM  one_limb_cycles=182  groups=2  instrs=46
+  store_final_result_part_1: kind=StoreHBM  one_limb_cycles=182  groups=2  instrs=46
+  intt_final_result_part_0: kind=INTT  one_limb_cycles=4108  groups=1  instrs=8
+  intt_final_result_part_1: kind=INTT  one_limb_cycles=4108  groups=1  instrs=8
+  bconv_final_result_part_0: kind=BConv  one_limb_cycles=276  groups=1  instrs=184
+  bconv_final_result_part_1: kind=BConv  one_limb_cycles=276  groups=1  instrs=184
+  ntt_final_result_part_0: kind=NTT  one_limb_cycles=4108  groups=1  instrs=23
+  ntt_final_result_part_1: kind=NTT  one_limb_cycles=4108  groups=1  instrs=23
+  load_final_result_part_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=23
+  sub_final_result_part_0: kind=BConv  one_limb_cycles=276  groups=1  instrs=529
+  load_final_result_part_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=23
+  sub_final_result_part_1: kind=BConv  one_limb_cycles=276  groups=1  instrs=529
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input_digit_0             0       403        403            0      2097152  2097152
+   1  load_input_digit_1           403       806        403      2097152      4194304  2097152
+   2  load_input_digit_2           806      1209        403      4194304      6291456  2097152
+   3  intt_all_limbs_digit_0      1209      9428       8219      6291456      6291456  2097152
+   4  intt_all_limbs_digit_1      9428     17647       8219      6291456      6291456  2097152
+   5  intt_all_limbs_digit_2     17647     25866       8219      6291456      6291456  2097152
+   6  bconv_2k_limbs_digit_0     25866     38565      12699      6291456      6291456  2097152
+   7  bconv_2k_limbs_digit_1     38565     51264      12699      6291456     12320768  2097152
+   8  bconv_2k_limbs_digit_2     51264     63963      12699     12320768     18350080  2097152
+   9  ntt_2k_limbs_digit_0       63963     88613      24650     18350080     24379392  6029312
+  10  ntt_2k_limbs_digit_1       88613    113263      24650     24379392     24379392  6029312
+  11  ntt_2k_limbs_digit_2      113263    137913      24650     24379392     24379392  6029312
+  12  spill_digit_0             137913    139371       1458     24379392     24379392  8126464
+  13  spill_digit_1             139371    140829       1458     24379392     16252928  8126464
+  14  load_eval_key_digit_0_part_0  140829    142287       1458     16252928      8126464  8126464
+  15  load_eval_key_digit_0_part_1  142287    143745       1458      8126464     16252928  8126464
+  16  bconv_inner_product_digit_0_part_0  143745    210261      66516     16252928     24379392  8126464
+  17  bconv_inner_product_digit_0_part_1  210261    276777      66516     24379392     24379392  8126464
+  18  store_result_digit_0      276777    279690       2913     24379392     16252928  16252928
+  19  load_spilled_digit_1      279690    281148       1458     16252928            0  8126464
+  20  load_eval_key_digit_1_part_0  281148    282606       1458            0      8126464  8126464
+  21  load_eval_key_digit_1_part_1  282606    284064       1458      8126464     16252928  8126464
+  22  bconv_inner_product_digit_1_part_0  284064    350580      66516     16252928     24379392  8126464
+  23  bconv_inner_product_digit_1_part_1  350580    417096      66516     24379392     24379392  8126464
+  24  store_result_digit_1      417096    420009       2913     24379392     16252928  16252928
+  25  load_spilled_digit_2      420009    421467       1458     16252928            0  8126464
+  26  load_eval_key_digit_2_part_0  421467    422925       1458            0      8126464  8126464
+  27  load_eval_key_digit_2_part_1  422925    424383       1458      8126464     16252928  8126464
+  28  bconv_inner_product_digit_2_part_0  424383    490899      66516     16252928     24379392  8126464
+  29  bconv_inner_product_digit_2_part_1  490899    557415      66516     24379392     24379392  8126464
+  30  store_result_digit_2      557415    560328       2913     24379392     16252928  16252928
+  31  load_partial_result_digit_0_part_0  560328    561786       1458     16252928            0  8126464
+  32  load_partial_result_digit_1_part_0  561786    563244       1458            0      8126464  8126464
+  33  accumulate_partial_result_digit_1_part_0  563244    629760      66516      8126464     16252928  8126464
+  34  load_partial_result_digit_2_part_0  629760    631218       1458     16252928      8126464  8126464
+  35  accumulate_partial_result_digit_2_part_0  631218    697734      66516      8126464     16252928  8126464
+  36  load_partial_result_digit_0_part_1  697734    699192       1458     16252928      8126464  8126464
+  37  load_partial_result_digit_1_part_1  699192    700650       1458      8126464     16252928  8126464
+  38  accumulate_partial_result_digit_1_part_1  700650    767166      66516     16252928     24379392  8126464
+  39  load_partial_result_digit_2_part_1  767166    768624       1458     24379392     16252928  8126464
+  40  accumulate_partial_result_digit_2_part_1  768624    835140      66516     16252928     24379392  8126464
+  41  store_final_result_part_0  835140    836234       1094     24379392     16252928  6029312
+  42  store_final_result_part_1  836234    837328       1094     16252928     10223616  6029312
+  43  intt_final_result_part_0  837328    845547       8219     10223616      4194304  2097152
+  44  intt_final_result_part_1  845547    853766       8219      4194304      4194304  2097152
+  45  bconv_final_result_part_0  853766    866465      12699      4194304      4194304  2097152
+  46  bconv_final_result_part_1  866465    879164      12699      4194304      8126464  2097152
+  47  ntt_final_result_part_0   879164    903814      24650      8126464     12058624  6029312
+  48  ntt_final_result_part_1   903814    928464      24650     12058624     12058624  6029312
+  49  load_final_result_part_0  928464    929558       1094     12058624     12058624  6029312
+  50  sub_final_result_part_0   929558    966266      36708     12058624     18087936  6029312
+  51  store_final_result_part_0  966266    967360       1094     18087936     12058624  6029312
+  52  load_final_result_part_1  967360    968454       1094     12058624      6029312  6029312
+  53  sub_final_result_part_1   968454   1005162      36708      6029312     12058624  6029312
+  54  store_final_result_part_1 1005162   1006256       1094     12058624      6029312  6029312
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+403,2097152
+403,2097152
+806,4194304
+806,4194304
+1209,6291456
+1209,6291456
+9428,6291456
+9428,6291456
+17647,6291456
+17647,6291456
+25866,6291456
+25866,6291456
+38565,6291456
+38565,6291456
+51264,12320768
+51264,12320768
+63963,18350080
+63963,18350080
+88613,24379392
+88613,24379392
+113263,24379392
+113263,24379392
+137913,24379392
+137913,24379392
+139371,24379392
+139371,24379392
+140829,16252928
+140829,16252928
+142287,8126464
+142287,8126464
+143745,16252928
+143745,16252928
+210261,24379392
+210261,24379392
+276777,24379392
+276777,24379392
+279690,16252928
+279690,16252928
+281148,0
+281148,0
+282606,8126464
+282606,8126464
+284064,16252928
+284064,16252928
+350580,24379392
+350580,24379392
+417096,24379392
+417096,24379392
+420009,16252928
+420009,16252928
+421467,0
+421467,0
+422925,8126464
+422925,8126464
+424383,16252928
+424383,16252928
+490899,24379392
+490899,24379392
+557415,24379392
+557415,24379392
+560328,16252928
+560328,16252928
+561786,0
+561786,0
+563244,8126464
+563244,8126464
+629760,16252928
+629760,16252928
+631218,8126464
+631218,8126464
+697734,16252928
+697734,16252928
+699192,8126464
+699192,8126464
+700650,16252928
+700650,16252928
+767166,24379392
+767166,24379392
+768624,16252928
+768624,16252928
+835140,24379392
+835140,24379392
+836234,16252928
+836234,16252928
+837328,10223616
+837328,10223616
+845547,4194304
+845547,4194304
+853766,4194304
+853766,4194304
+866465,4194304
+866465,4194304
+879164,8126464
+879164,8126464
+903814,12058624
+903814,12058624
+928464,12058624
+928464,12058624
+929558,12058624
+929558,12058624
+966266,18087936
+966266,18087936
+967360,12058624
+967360,12058624
+968454,6029312
+968454,6029312
+1005162,12058624
+1005162,12058624
+1006256,6029312
+
+--- Transfer vs Compute ---
+Transfer: 39840 cycles (3.95923%)
+Compute:  966416 cycles (96.0408%)
+====================================================
+
+Scheduler=fifo
+Backend=cycle_stub
+RuntimeBackend=cycle_stub
+Workload=synthetic
+Seed=123
+NumCards=1
+=== Request Metrics ===
+Completed requests: 1
+Mean latency(ns): 3354187.0000
+P95 latency(ns): 3354187
+P99 latency(ns): 3354187
+Max latency(ns): 3354187
+Mean queue time(ns): 0.0000
+Mean service time(ns): 3354187.0000
+=== User Metrics ===
+User 0: completed=1, mean_latency(ns)=3354187.0000, throughput(req/ns)=0.0000, reload_count=1
+=== Card Metrics ===
+Card 0: utilization=1.0000, reload_count=1, served_requests=1
+=== System Metrics ===
+Total throughput(req/ns): 0.0000
+Total reload count: 1
+Jain fairness index: 1.0000
+Simulation window(ns): [23, 3354210], duration=3354187
+PoolConfigSource=built-in default
+TreeConfigSource=built-in default
+HEParamsSource=built-in default
+=== CycleBackend Method Dispatch Stats ===
+EstimateCalls=1
+CycleFallbackCount=0
+CSVOutput=results/metrics_max_parallel.csv

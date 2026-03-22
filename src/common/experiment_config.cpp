@@ -107,9 +107,30 @@ bool ParseKeySwitchMethod(
         {"ola", KeySwitchMethod::OLA},
         {"hera", KeySwitchMethod::HERA},
         {"cinnamon", KeySwitchMethod::Cinnamon},
+        {"cinnamon_ib", KeySwitchMethod::CinnamonIB},
+        {"cinnamon_oa", KeySwitchMethod::CinnamonOA},
+        {"cinnamon_input_broadcast", KeySwitchMethod::CinnamonIB},
+        {"cinnamon_output_aggregation", KeySwitchMethod::CinnamonOA},
         {"digit_centric", KeySwitchMethod::DigitCentric},
         {"output_centric", KeySwitchMethod::OutputCentric},
         {"max_parallel", KeySwitchMethod::MaxParallel}};
+
+    const auto it = mapping.find(text);
+    if (it == mapping.end()) {
+        return false;
+    }
+    *value = it->second;
+    return true;
+}
+
+bool ParseMultiBoardMode(
+    const std::string& text,
+    MultiBoardMode* value) {
+    static const std::unordered_map<std::string, MultiBoardMode> mapping = {
+        {"auto", MultiBoardMode::Auto},
+        {"sequential", MultiBoardMode::Sequential},
+        {"input_broadcast", MultiBoardMode::InputBroadcast},
+        {"output_aggregation", MultiBoardMode::OutputAggregation}};
 
     const auto it = mapping.find(text);
     if (it == mapping.end()) {
@@ -135,6 +156,10 @@ const char* ToString(KeySwitchMethod method) {
         return "hera";
     case KeySwitchMethod::Cinnamon:
         return "cinnamon";
+    case KeySwitchMethod::CinnamonIB:
+        return "cinnamon_ib";
+    case KeySwitchMethod::CinnamonOA:
+        return "cinnamon_oa";
     case KeySwitchMethod::DigitCentric:
         return "digit_centric";
     case KeySwitchMethod::OutputCentric:
@@ -153,6 +178,20 @@ const char* ToString(KeySwitchMethod method) {
         return "scaleout_ciphertext";
     }
     return "poseidon";
+}
+
+const char* ToString(MultiBoardMode mode) {
+    switch (mode) {
+    case MultiBoardMode::Auto:
+        return "auto";
+    case MultiBoardMode::Sequential:
+        return "sequential";
+    case MultiBoardMode::InputBroadcast:
+        return "input_broadcast";
+    case MultiBoardMode::OutputAggregation:
+        return "output_aggregation";
+    }
+    return "auto";
 }
 
 } // namespace
@@ -234,8 +273,10 @@ std::string BuildUsageText(const std::string& program_name) {
         << "  --pool-config <path>                  External pool config file.\n"
         << "  --tree-config <path>                  External resource-tree config file.\n"
         << "  --he-params <path>                    HE parameter file for workload derivation.\n"
-        << "  --ks-method <poseidon|fab|fast|ola|hera|cinnamon|max_parallel|digit_centric|output_centric>\n"
+        << "  --ks-method <poseidon|fab|fast|ola|hera|cinnamon|cinnamon_ib|cinnamon_oa|max_parallel|digit_centric|output_centric>\n"
         << "                                        Keyswitch execution method for generated requests.\n"
+        << "  --ks-multi-board-mode <auto|sequential|input_broadcast|output_aggregation>\n"
+        << "                                        Multi-board mode used by cinnamon requests.\n"
         << "  --csv-output <path>                   Append run metrics to CSV file.\n"
         << "  --dump-logical-graph                  Print the shared single-board logical graph for the first request.\n"
         << "  --dump-runtime-plan                   Print the runtime-planned physical step graph for the first request.\n"
@@ -557,10 +598,30 @@ ParseExperimentConfigResult ParseExperimentConfig(int argc, char** argv) {
                 if (!ParseKeySwitchMethod(value_text, &method)) {
                     result.error_message =
                         "Invalid --ks-method: " + value_text
-                        + " (expected poseidon|fab|fast|ola|hera|cinnamon|max_parallel|digit_centric|output_centric)";
+                        + " (expected poseidon|fab|fast|ola|hera|cinnamon|cinnamon_ib|cinnamon_oa|max_parallel|digit_centric|output_centric)";
                     return result;
                 }
                 config.keyswitch_method = method;
+                const MultiBoardMode forced_mode = ForcedMultiBoardModeForMethod(method);
+                if (forced_mode != MultiBoardMode::Auto) {
+                    config.keyswitch_multi_board_mode = forced_mode;
+                }
+                continue;
+            }
+
+            if (arg == "--ks-multi-board-mode") {
+                std::string value_text;
+                if (!require_value("--ks-multi-board-mode", &value_text)) {
+                    return result;
+                }
+                MultiBoardMode mode = MultiBoardMode::Auto;
+                if (!ParseMultiBoardMode(value_text, &mode)) {
+                    result.error_message =
+                        "Invalid --ks-multi-board-mode: " + value_text
+                        + " (expected auto|sequential|input_broadcast|output_aggregation)";
+                    return result;
+                }
+                config.keyswitch_multi_board_mode = mode;
                 continue;
             }
 
@@ -711,6 +772,7 @@ void PrintExperimentConfig(std::ostream& os, const ExperimentConfig& config) {
     os << "NumCards: " << config.num_cards << "\n";
     os << "NumUsers: " << config.num_users << "\n";
     os << "EnableMultiCard: " << (config.enable_multi_card ? "true" : "false") << "\n";
+    os << "KeySwitchMultiBoardMode: " << ToString(config.keyswitch_multi_board_mode) << "\n";
     os << "SyntheticRequestsPerUser: " << config.synthetic_requests_per_user << "\n";
     os << "SyntheticInterArrival: " << config.synthetic_inter_arrival << "\n";
     os << "SyntheticStartTime: " << config.synthetic_start_time << "\n";

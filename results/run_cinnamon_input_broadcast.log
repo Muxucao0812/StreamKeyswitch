@@ -1,0 +1,712 @@
+=== Experiment Config ===
+Scheduler: fifo
+Backend: cycle_stub
+Workload: synthetic
+KeySwitchMethod: cinnamon
+Seed: 123
+NumCards: 3
+NumUsers: 1
+EnableMultiCard: true
+KeySwitchMultiBoardMode: input_broadcast
+SyntheticRequestsPerUser: 1
+SyntheticInterArrival: 300
+SyntheticStartTime: 0
+BurstBursts: 4
+BurstRequestsPerUserPerBurst: 2
+BurstIntraGap: 20
+BurstInterGap: 1200
+BurstStartTime: 0
+BurstLevel: 1
+NumPools: 1
+PoolConfigSource: built-in default
+TreeConfigSource: built-in default
+HEParamsSource: built-in default
+CSVOutput: results/metrics_cinnamon_input_broadcast.csv
+DumpLogicalGraph: true
+DumpRuntimePlan: true
+=========================
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           3925
+Total latency (ns):     13084
+Peak BRAM live (bytes): 42205184
+HBM read (bytes):       110100549
+HBM write (bytes):      66322432
+Dependency stalls:      3833 cycles
+Resource stalls:        92 cycles
+Instruction groups:     188
+Total instructions:     188
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=1152 (29.3503%)  count=18  bytes=110100549
+  StoreHBM: cycles=640 (16.3057%)  count=10  bytes=66322432
+  EweMul: cycles=192 (4.89172%)  count=3  bytes=0
+  EweAdd: cycles=384 (9.78344%)  count=6  bytes=0
+  EweSub: cycles=192 (4.89172%)  count=3  bytes=0
+  NTTLoad: cycles=384 (9.78344%)  count=6  bytes=0
+  NTTButterflyLocal: cycles=384 (9.78344%)  count=6  bytes=0
+  NTTTranspose1: cycles=96 (2.44586%)  count=6  bytes=0
+  NTTButterflyGlobal: cycles=384 (9.78344%)  count=6  bytes=0
+  NTTTranspose2: cycles=384 (9.78344%)  count=6  bytes=0
+  NTTStore: cycles=384 (9.78344%)  count=6  bytes=0
+  INTTLoad: cycles=384 (9.78344%)  count=6  bytes=0
+  INTTButterflyLocal: cycles=384 (9.78344%)  count=6  bytes=0
+  INTTTranspose1: cycles=96 (2.44586%)  count=6  bytes=0
+  INTTButterflyGlobal: cycles=384 (9.78344%)  count=6  bytes=0
+  INTTTranspose2: cycles=384 (9.78344%)  count=6  bytes=0
+  INTTStore: cycles=384 (9.78344%)  count=6  bytes=0
+  BConvLoad: cycles=384 (9.78344%)  count=6  bytes=0
+  BConvMAC: cycles=3072 (78.2675%)  count=48  bytes=0
+  BConvReduce: cycles=384 (9.78344%)  count=6  bytes=0
+  BConvStore: cycles=384 (9.78344%)  count=6  bytes=0
+  InterCardSend: cycles=257 (6.54777%)  count=5  bytes=36175872
+  InterCardRecv: cycles=256 (6.52229%)  count=4  bytes=36175872
+  InterCardReduce: cycles=64 (1.63057%)  count=1  bytes=24117248
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  inter_card_send: kind=InterCardSend  one_limb_cycles=64  groups=4  instrs=4
+  inter_card_recv: kind=InterCardRecv  one_limb_cycles=64  groups=4  instrs=4
+  key_host_to_hbm: kind=LoadHBM  one_limb_cycles=64  groups=3  instrs=3
+  input_hbm_to_spm: kind=LoadHBM  one_limb_cycles=64  groups=12  instrs=12
+  intt_load: kind=INTTLoad  one_limb_cycles=64  groups=6  instrs=6
+  intt_bfly_local: kind=INTTButterflyLocal  one_limb_cycles=64  groups=6  instrs=6
+  intt_transpose1: kind=INTTTranspose1  one_limb_cycles=16  groups=6  instrs=6
+  intt_bfly_global: kind=INTTButterflyGlobal  one_limb_cycles=64  groups=6  instrs=6
+  intt_transpose2: kind=INTTTranspose2  one_limb_cycles=64  groups=6  instrs=6
+  intt_store: kind=INTTStore  one_limb_cycles=64  groups=6  instrs=6
+  bconv_load: kind=BConvLoad  one_limb_cycles=64  groups=6  instrs=6
+  bconv_mac_p0: kind=BConvMAC  one_limb_cycles=64  groups=6  instrs=6
+  bconv_mac_p1: kind=BConvMAC  one_limb_cycles=64  groups=6  instrs=6
+  bconv_mac_p2: kind=BConvMAC  one_limb_cycles=64  groups=6  instrs=6
+  bconv_mac_p3: kind=BConvMAC  one_limb_cycles=64  groups=6  instrs=6
+  bconv_mac_p4: kind=BConvMAC  one_limb_cycles=64  groups=6  instrs=6
+  bconv_mac_p5: kind=BConvMAC  one_limb_cycles=64  groups=6  instrs=6
+  bconv_mac_p6: kind=BConvMAC  one_limb_cycles=64  groups=6  instrs=6
+  bconv_mac_p7: kind=BConvMAC  one_limb_cycles=64  groups=6  instrs=6
+  bconv_reduce: kind=BConvReduce  one_limb_cycles=64  groups=6  instrs=6
+  bconv_store: kind=BConvStore  one_limb_cycles=64  groups=6  instrs=6
+  ntt_load: kind=NTTLoad  one_limb_cycles=64  groups=6  instrs=6
+  ntt_bfly_local: kind=NTTButterflyLocal  one_limb_cycles=64  groups=6  instrs=6
+  ntt_transpose1: kind=NTTTranspose1  one_limb_cycles=16  groups=6  instrs=6
+  ntt_bfly_global: kind=NTTButterflyGlobal  one_limb_cycles=64  groups=6  instrs=6
+  ntt_transpose2: kind=NTTTranspose2  one_limb_cycles=64  groups=6  instrs=6
+  ntt_store: kind=NTTStore  one_limb_cycles=64  groups=6  instrs=6
+  output_spm_to_hbm: kind=StoreHBM  one_limb_cycles=64  groups=10  instrs=10
+  key_hbm_to_spm: kind=LoadHBM  one_limb_cycles=64  groups=3  instrs=3
+  ks_inner_mul: kind=EweMul  one_limb_cycles=64  groups=3  instrs=3
+  ks_inner_add: kind=EweAdd  one_limb_cycles=64  groups=3  instrs=3
+  cross_digit_reduce: kind=EweAdd  one_limb_cycles=64  groups=3  instrs=3
+  final_subtract: kind=EweSub  one_limb_cycles=64  groups=3  instrs=3
+  inter_card_reduce: kind=InterCardReduce  one_limb_cycles=64  groups=1  instrs=1
+  inter_card_barrier: kind=InterCardSend  one_limb_cycles=1  groups=1  instrs=1
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  inter_card_send                0        64         64            0      6029312  12058624
+   1  inter_card_recv               64       128         64      6029312     12058624  12058624
+   2  inter_card_send                1        65         64      6029312      6029312  12058624
+   3  inter_card_recv               65       129         64      6029312     18087936  12058624
+   4  key_host_to_hbm                0        64         64            0      6029312  8388608
+   5  input_hbm_to_spm               1        65         64            0      6029312  6029312
+   6  intt_load                     65       129         64      6029312     18087936  0
+   7  intt_bfly_local              129       193         64     18087936     30146560  0
+   8  intt_transpose1              193       209         16     30146560     36175872  0
+   9  intt_bfly_global             209       273         64     36175872     36175872  0
+  10  intt_transpose2              273       337         64     36175872     36175872  0
+  11  intt_store                   337       401         64     36175872     30146560  0
+  12  bconv_load                   401       465         64     30146560     36175872  0
+  13  bconv_mac_p0                 465       529         64     36175872     36175872  0
+  14  bconv_mac_p1                 529       593         64     36175872     36175872  0
+  15  bconv_mac_p2                 593       657         64     36175872     36175872  0
+  16  bconv_mac_p3                 657       721         64     36175872     36175872  0
+  17  bconv_mac_p4                 721       785         64     36175872     36175872  0
+  18  bconv_mac_p5                 785       849         64     36175872     36175872  0
+  19  bconv_mac_p6                 849       913         64     36175872     36175872  0
+  20  bconv_mac_p7                 913       977         64     36175872     36175872  0
+  21  bconv_reduce                 977      1041         64     36175872     36175872  0
+  22  bconv_store                 1041      1105         64     36175872     30146560  0
+  23  ntt_load                    1105      1169         64     30146560     30146560  0
+  24  ntt_bfly_local              1169      1233         64     30146560     30146560  0
+  25  ntt_transpose1              1233      1249         16     30146560     30146560  0
+  26  ntt_bfly_global             1249      1313         64     24117248     24117248  0
+  27  ntt_transpose2              1313      1377         64     24117248     18087936  0
+  28  ntt_store                   1377      1441         64     18087936     12058624  0
+  29  output_spm_to_hbm           1441      1505         64     12058624      6029312  6029312
+  30  input_hbm_to_spm            1505      1569         64      6029312     12058624  6029312
+  31  key_hbm_to_spm                64       128         64      6029312     12058624  4194327
+  32  ks_inner_mul                1569      1633         64     12058624      6029312  0
+  33  ks_inner_add                1633      1697         64      6029312            0  0
+  34  output_spm_to_hbm           1697      1761         64            0            0  6029312
+  35  input_hbm_to_spm            1761      1825         64            0      6029312  6029312
+  36  cross_digit_reduce          1825      1889         64      6029312      6029312  0
+  37  output_spm_to_hbm           1889      1953         64      6029312            0  6029312
+  38  input_hbm_to_spm            1953      2017         64            0      6029312  6029312
+  39  intt_load                   2017      2081         64      6029312     12058624  0
+  40  intt_bfly_local             2081      2145         64     12058624     12058624  0
+  41  intt_transpose1             2145      2161         16     12058624     12058624  0
+  42  intt_bfly_global            2161      2225         64     12058624     18087936  0
+  43  intt_transpose2             2225      2289         64     18087936     24117248  0
+  44  intt_store                  2289      2353         64     24117248     24117248  0
+  45  bconv_load                  2353      2417         64     24117248     30146560  0
+  46  bconv_mac_p0                2417      2481         64     30146560     30146560  0
+  47  bconv_mac_p1                2481      2545         64     30146560     36175872  0
+  48  bconv_mac_p2                2545      2609         64     36175872     42205184  0
+  49  bconv_mac_p3                2609      2673         64     42205184     42205184  0
+  50  bconv_mac_p4                2673      2737         64     42205184     42205184  0
+  51  bconv_mac_p5                2737      2801         64     42205184     42205184  0
+  52  bconv_mac_p6                2801      2865         64     42205184     42205184  0
+  53  bconv_mac_p7                2865      2929         64     42205184     42205184  0
+  54  bconv_reduce                2929      2993         64     42205184     42205184  0
+  55  bconv_store                 2993      3057         64     42205184     36175872  0
+  56  ntt_load                    3057      3121         64     36175872     42205184  0
+  57  ntt_bfly_local              3121      3185         64     42205184     42205184  0
+  58  ntt_transpose1              3185      3201         16     42205184     42205184  0
+  59  ntt_bfly_global             3201      3265         64     42205184     42205184  0
+  60  ntt_transpose2              3265      3329         64     42205184     42205184  0
+  61  ntt_store                   3329      3393         64     42205184     36175872  0
+  62  final_subtract              3393      3457         64     36175872     36175872  0
+  63  key_host_to_hbm              129       193         64     18087936     30146560  8388608
+  64  input_hbm_to_spm             128       192         64     12058624     24117248  6029312
+  65  intt_load                    192       256         64     24117248     36175872  0
+  66  intt_bfly_local              256       320         64     36175872     36175872  0
+  67  intt_transpose1              353       369         16     36175872     36175872  0
+  68  intt_bfly_global             369       433         64     36175872     36175872  0
+  69  intt_transpose2              481       545         64     36175872     36175872  0
+  70  intt_store                   546       610         64     36175872     30146560  0
+  71  bconv_load                   610       674         64     30146560     36175872  0
+  72  bconv_mac_p0                 674       738         64     36175872     36175872  0
+  73  bconv_mac_p1                 738       802         64     36175872     36175872  0
+  74  bconv_mac_p2                 802       866         64     36175872     36175872  0
+  75  bconv_mac_p3                 866       930         64     36175872     36175872  0
+  76  bconv_mac_p4                 930       994         64     36175872     36175872  0
+  77  bconv_mac_p5                 994      1058         64     36175872     36175872  0
+  78  bconv_mac_p6                1058      1122         64     36175872     30146560  0
+  79  bconv_mac_p7                1122      1186         64     30146560     30146560  0
+  80  bconv_reduce                1186      1250         64     30146560     24117248  0
+  81  bconv_store                 1250      1314         64     24117248     18087936  0
+  82  ntt_load                    1314      1378         64     18087936     18087936  0
+  83  ntt_bfly_local              1378      1442         64     18087936     12058624  0
+  84  ntt_transpose1              1442      1458         16     12058624     12058624  0
+  85  ntt_bfly_global             1458      1522         64     12058624     12058624  0
+  86  ntt_transpose2              1522      1586         64     12058624     12058624  0
+  87  ntt_store                   1587      1651         64      6029312            0  0
+  88  output_spm_to_hbm           1651      1715         64            0            0  6029312
+  89  input_hbm_to_spm            1715      1779         64            0      6029312  6029312
+  90  key_hbm_to_spm               193       257         64     30146560     36175872  4194327
+  91  ks_inner_mul                1779      1843         64      6029312      6029312  0
+  92  ks_inner_add                1843      1907         64      6029312      6029312  0
+  93  output_spm_to_hbm           1907      1971         64      6029312            0  6029312
+  94  input_hbm_to_spm            1971      2035         64            0     12058624  6029312
+  95  cross_digit_reduce          2035      2099         64     12058624     12058624  0
+  96  output_spm_to_hbm           2099      2163         64     12058624     12058624  6029312
+  97  input_hbm_to_spm            2163      2227         64     12058624     18087936  6029312
+  98  intt_load                   2227      2291         64     18087936     24117248  0
+  99  intt_bfly_local             2291      2355         64     24117248     30146560  0
+  100  intt_transpose1             2355      2371         16     30146560     30146560  0
+  101  intt_bfly_global            2371      2435         64     30146560     30146560  0
+  102  intt_transpose2             2435      2499         64     30146560     30146560  0
+  103  intt_store                  2499      2563         64     30146560     36175872  0
+  104  bconv_load                  2563      2627         64     36175872     42205184  0
+  105  bconv_mac_p0                2627      2691         64     42205184     42205184  0
+  106  bconv_mac_p1                2691      2755         64     42205184     42205184  0
+  107  bconv_mac_p2                2755      2819         64     42205184     42205184  0
+  108  bconv_mac_p3                2819      2883         64     42205184     42205184  0
+  109  bconv_mac_p4                2883      2947         64     42205184     42205184  0
+  110  bconv_mac_p5                2947      3011         64     42205184     42205184  0
+  111  bconv_mac_p6                3011      3075         64     42205184     42205184  0
+  112  bconv_mac_p7                3075      3139         64     42205184     42205184  0
+  113  bconv_reduce                3139      3203         64     42205184     42205184  0
+  114  bconv_store                 3203      3267         64     42205184     36175872  0
+  115  ntt_load                    3267      3331         64     36175872     42205184  0
+  116  ntt_bfly_local              3331      3395         64     42205184     42205184  0
+  117  ntt_transpose1              3395      3411         16     42205184     42205184  0
+  118  ntt_bfly_global             3411      3475         64     42205184     36175872  0
+  119  ntt_transpose2              3476      3540         64     36175872     36175872  0
+  120  ntt_store                   3540      3604         64     30146560     24117248  0
+  121  final_subtract              3604      3668         64     24117248     24117248  0
+  122  key_host_to_hbm              130       194         64     18087936     30146560  8388608
+  123  input_hbm_to_spm             131       195         64     18087936     30146560  6029312
+  124  intt_load                    195       259         64     30146560     36175872  0
+  125  intt_bfly_local              259       323         64     36175872     36175872  0
+  126  intt_transpose1              337       353         16     36175872     36175872  0
+  127  intt_bfly_global             353       417         64     36175872     36175872  0
+  128  intt_transpose2              417       481         64     36175872     36175872  0
+  129  intt_store                   481       545         64     36175872     30146560  0
+  130  bconv_load                   545       609         64     30146560     36175872  0
+  131  bconv_mac_p0                 609       673         64     36175872     36175872  0
+  132  bconv_mac_p1                 673       737         64     36175872     36175872  0
+  133  bconv_mac_p2                 737       801         64     36175872     36175872  0
+  134  bconv_mac_p3                 801       865         64     36175872     36175872  0
+  135  bconv_mac_p4                 865       929         64     36175872     36175872  0
+  136  bconv_mac_p5                 929       993         64     36175872     36175872  0
+  137  bconv_mac_p6                 993      1057         64     36175872     36175872  0
+  138  bconv_mac_p7                1057      1121         64     36175872     30146560  0
+  139  bconv_reduce                1121      1185         64     30146560     30146560  0
+  140  bconv_store                 1185      1249         64     30146560     24117248  0
+  141  ntt_load                    1249      1313         64     24117248     24117248  0
+  142  ntt_bfly_local              1313      1377         64     24117248     18087936  0
+  143  ntt_transpose1              1377      1393         16     18087936     18087936  0
+  144  ntt_bfly_global             1393      1457         64     18087936     12058624  0
+  145  ntt_transpose2              1458      1522         64     12058624     12058624  0
+  146  ntt_store                   1522      1586         64     12058624      6029312  0
+  147  output_spm_to_hbm           1586      1650         64      6029312            0  6029312
+  148  input_hbm_to_spm            1650      1714         64            0            0  6029312
+  149  key_hbm_to_spm               194       258         64     30146560     36175872  4194327
+  150  ks_inner_mul                1714      1778         64            0      6029312  0
+  151  ks_inner_add                1778      1842         64      6029312      6029312  0
+  152  output_spm_to_hbm           1842      1906         64      6029312            0  6029312
+  153  input_hbm_to_spm            1906      1970         64            0      6029312  6029312
+  154  cross_digit_reduce          1970      2034         64      6029312     12058624  0
+  155  output_spm_to_hbm           2034      2098         64     12058624      6029312  6029312
+  156  input_hbm_to_spm            2098      2162         64      6029312     12058624  6029312
+  157  intt_load                   2162      2226         64     12058624     18087936  0
+  158  intt_bfly_local             2226      2290         64     18087936     24117248  0
+  159  intt_transpose1             2290      2306         16     24117248     24117248  0
+  160  intt_bfly_global            2306      2370         64     24117248     30146560  0
+  161  intt_transpose2             2371      2435         64     30146560     30146560  0
+  162  intt_store                  2435      2499         64     30146560     30146560  0
+  163  bconv_load                  2500      2564         64     30146560     42205184  0
+  164  bconv_mac_p0                2564      2628         64     42205184     42205184  0
+  165  bconv_mac_p1                2628      2692         64     42205184     42205184  0
+  166  bconv_mac_p2                2692      2756         64     42205184     42205184  0
+  167  bconv_mac_p3                2756      2820         64     42205184     42205184  0
+  168  bconv_mac_p4                2820      2884         64     42205184     42205184  0
+  169  bconv_mac_p5                2884      2948         64     42205184     42205184  0
+  170  bconv_mac_p6                2948      3012         64     42205184     42205184  0
+  171  bconv_mac_p7                3012      3076         64     42205184     42205184  0
+  172  bconv_reduce                3076      3140         64     42205184     42205184  0
+  173  bconv_store                 3140      3204         64     42205184     36175872  0
+  174  ntt_load                    3204      3268         64     36175872     42205184  0
+  175  ntt_bfly_local              3268      3332         64     42205184     42205184  0
+  176  ntt_transpose1              3332      3348         16     42205184     42205184  0
+  177  ntt_bfly_global             3348      3412         64     42205184     42205184  0
+  178  ntt_transpose2              3412      3476         64     42205184     36175872  0
+  179  ntt_store                   3476      3540         64     36175872     30146560  0
+  180  final_subtract              3540      3604         64     30146560     30146560  0
+  181  inter_card_send             3668      3732         64     24117248     24117248  6029312
+  182  inter_card_recv             3732      3796         64     24117248     24117248  6029312
+  183  inter_card_send             3604      3668         64     24117248     24117248  6029312
+  184  inter_card_recv             3669      3733         64     24117248     24117248  6029312
+  185  inter_card_reduce           3796      3860         64     24117248     24117248  24117248
+  186  inter_card_barrier          3860      3861          1     24117248     24117248  0
+  187  output_spm_to_hbm           3861      3925         64     24117248     24117248  12058624
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+64,6029312
+64,6029312
+128,12058624
+1,6029312
+65,6029312
+65,6029312
+129,18087936
+0,0
+64,6029312
+1,0
+65,6029312
+65,6029312
+129,18087936
+129,18087936
+193,30146560
+193,30146560
+209,36175872
+209,36175872
+273,36175872
+273,36175872
+337,36175872
+337,36175872
+401,30146560
+401,30146560
+465,36175872
+465,36175872
+529,36175872
+529,36175872
+593,36175872
+593,36175872
+657,36175872
+657,36175872
+721,36175872
+721,36175872
+785,36175872
+785,36175872
+849,36175872
+849,36175872
+913,36175872
+913,36175872
+977,36175872
+977,36175872
+1041,36175872
+1041,36175872
+1105,30146560
+1105,30146560
+1169,30146560
+1169,30146560
+1233,30146560
+1233,30146560
+1249,30146560
+1249,24117248
+1313,24117248
+1313,24117248
+1377,18087936
+1377,18087936
+1441,12058624
+1441,12058624
+1505,6029312
+1505,6029312
+1569,12058624
+64,6029312
+128,12058624
+1569,12058624
+1633,6029312
+1633,6029312
+1697,0
+1697,0
+1761,0
+1761,0
+1825,6029312
+1825,6029312
+1889,6029312
+1889,6029312
+1953,0
+1953,0
+2017,6029312
+2017,6029312
+2081,12058624
+2081,12058624
+2145,12058624
+2145,12058624
+2161,12058624
+2161,12058624
+2225,18087936
+2225,18087936
+2289,24117248
+2289,24117248
+2353,24117248
+2353,24117248
+2417,30146560
+2417,30146560
+2481,30146560
+2481,30146560
+2545,36175872
+2545,36175872
+2609,42205184
+2609,42205184
+2673,42205184
+2673,42205184
+2737,42205184
+2737,42205184
+2801,42205184
+2801,42205184
+2865,42205184
+2865,42205184
+2929,42205184
+2929,42205184
+2993,42205184
+2993,42205184
+3057,36175872
+3057,36175872
+3121,42205184
+3121,42205184
+3185,42205184
+3185,42205184
+3201,42205184
+3201,42205184
+3265,42205184
+3265,42205184
+3329,42205184
+3329,42205184
+3393,36175872
+3393,36175872
+3457,36175872
+129,18087936
+193,30146560
+128,12058624
+192,24117248
+192,24117248
+256,36175872
+256,36175872
+320,36175872
+353,36175872
+369,36175872
+369,36175872
+433,36175872
+481,36175872
+545,36175872
+546,36175872
+610,30146560
+610,30146560
+674,36175872
+674,36175872
+738,36175872
+738,36175872
+802,36175872
+802,36175872
+866,36175872
+866,36175872
+930,36175872
+930,36175872
+994,36175872
+994,36175872
+1058,36175872
+1058,36175872
+1122,30146560
+1122,30146560
+1186,30146560
+1186,30146560
+1250,24117248
+1250,24117248
+1314,18087936
+1314,18087936
+1378,18087936
+1378,18087936
+1442,12058624
+1442,12058624
+1458,12058624
+1458,12058624
+1522,12058624
+1522,12058624
+1586,12058624
+1587,6029312
+1651,0
+1651,0
+1715,0
+1715,0
+1779,6029312
+193,30146560
+257,36175872
+1779,6029312
+1843,6029312
+1843,6029312
+1907,6029312
+1907,6029312
+1971,0
+1971,0
+2035,12058624
+2035,12058624
+2099,12058624
+2099,12058624
+2163,12058624
+2163,12058624
+2227,18087936
+2227,18087936
+2291,24117248
+2291,24117248
+2355,30146560
+2355,30146560
+2371,30146560
+2371,30146560
+2435,30146560
+2435,30146560
+2499,30146560
+2499,30146560
+2563,36175872
+2563,36175872
+2627,42205184
+2627,42205184
+2691,42205184
+2691,42205184
+2755,42205184
+2755,42205184
+2819,42205184
+2819,42205184
+2883,42205184
+2883,42205184
+2947,42205184
+2947,42205184
+3011,42205184
+3011,42205184
+3075,42205184
+3075,42205184
+3139,42205184
+3139,42205184
+3203,42205184
+3203,42205184
+3267,36175872
+3267,36175872
+3331,42205184
+3331,42205184
+3395,42205184
+3395,42205184
+3411,42205184
+3411,42205184
+3475,36175872
+3476,36175872
+3540,36175872
+3540,30146560
+3604,24117248
+3604,24117248
+3668,24117248
+130,18087936
+194,30146560
+131,18087936
+195,30146560
+195,30146560
+259,36175872
+259,36175872
+323,36175872
+337,36175872
+353,36175872
+353,36175872
+417,36175872
+417,36175872
+481,36175872
+481,36175872
+545,30146560
+545,30146560
+609,36175872
+609,36175872
+673,36175872
+673,36175872
+737,36175872
+737,36175872
+801,36175872
+801,36175872
+865,36175872
+865,36175872
+929,36175872
+929,36175872
+993,36175872
+993,36175872
+1057,36175872
+1057,36175872
+1121,30146560
+1121,30146560
+1185,30146560
+1185,30146560
+1249,24117248
+1249,24117248
+1313,24117248
+1313,24117248
+1377,18087936
+1377,18087936
+1393,18087936
+1393,18087936
+1457,12058624
+1458,12058624
+1522,12058624
+1522,12058624
+1586,6029312
+1586,6029312
+1650,0
+1650,0
+1714,0
+194,30146560
+258,36175872
+1714,0
+1778,6029312
+1778,6029312
+1842,6029312
+1842,6029312
+1906,0
+1906,0
+1970,6029312
+1970,6029312
+2034,12058624
+2034,12058624
+2098,6029312
+2098,6029312
+2162,12058624
+2162,12058624
+2226,18087936
+2226,18087936
+2290,24117248
+2290,24117248
+2306,24117248
+2306,24117248
+2370,30146560
+2371,30146560
+2435,30146560
+2435,30146560
+2499,30146560
+2500,30146560
+2564,42205184
+2564,42205184
+2628,42205184
+2628,42205184
+2692,42205184
+2692,42205184
+2756,42205184
+2756,42205184
+2820,42205184
+2820,42205184
+2884,42205184
+2884,42205184
+2948,42205184
+2948,42205184
+3012,42205184
+3012,42205184
+3076,42205184
+3076,42205184
+3140,42205184
+3140,42205184
+3204,36175872
+3204,36175872
+3268,42205184
+3268,42205184
+3332,42205184
+3332,42205184
+3348,42205184
+3348,42205184
+3412,42205184
+3412,42205184
+3476,36175872
+3476,36175872
+3540,30146560
+3540,30146560
+3604,30146560
+3668,24117248
+3732,24117248
+3732,24117248
+3796,24117248
+3604,24117248
+3668,24117248
+3669,24117248
+3733,24117248
+3796,24117248
+3860,24117248
+3860,24117248
+3861,24117248
+3861,24117248
+3925,24117248
+
+--- Transfer vs Compute ---
+Transfer: 1792 cycles (45.6561%)
+Compute:  9601 cycles (244.611%)
+====================================================
+
+Scheduler=fifo
+Backend=cycle_stub
+RuntimeBackend=cycle_stub
+Workload=synthetic
+Seed=123
+NumCards=3
+=== Request Metrics ===
+Completed requests: 1
+Mean latency(ns): 13084.0000
+P95 latency(ns): 13084
+P99 latency(ns): 13084
+Max latency(ns): 13084
+Mean queue time(ns): 0.0000
+Mean service time(ns): 13084.0000
+=== User Metrics ===
+User 0: completed=1, mean_latency(ns)=13084.0000, throughput(req/ns)=0.0001, reload_count=3
+=== Card Metrics ===
+Card 0: utilization=1.0000, reload_count=1, served_requests=1
+Card 1: utilization=1.0000, reload_count=1, served_requests=1
+Card 2: utilization=1.0000, reload_count=1, served_requests=1
+=== System Metrics ===
+Total throughput(req/ns): 0.0001
+Total reload count: 3
+Jain fairness index: 1.0000
+Simulation window(ns): [23, 13107], duration=13084
+PoolConfigSource=built-in default
+TreeConfigSource=built-in default
+HEParamsSource=built-in default
+=== CycleBackend Method Dispatch Stats ===
+EstimateCalls=1
+CycleFallbackCount=0
+CSVOutput=results/metrics_cinnamon_input_broadcast.csv

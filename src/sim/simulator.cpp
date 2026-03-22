@@ -37,6 +37,10 @@ const char* ToString(KeySwitchMethod method) {
         return "MaxParallel";
     case KeySwitchMethod::Cinnamon:
         return "Cinnamon";
+    case KeySwitchMethod::CinnamonIB:
+        return "CinnamonIB";
+    case KeySwitchMethod::CinnamonOA:
+        return "CinnamonOA";
     }
     return "Unknown";
 }

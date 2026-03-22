@@ -13,6 +13,10 @@ METHOD_ORDER = [
     "fast",
     "ola",
     "hera",
+    "cinnamon_oa",
+    "cinnamon_ib",
+    "cinnamon_output_aggregation",
+    "cinnamon_input_broadcast",
     "cinnamon",
 ]
 

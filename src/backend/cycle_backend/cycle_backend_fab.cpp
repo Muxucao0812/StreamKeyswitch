@@ -22,7 +22,6 @@ CycleProgram BuildFABProgram(
     const uint32_t digit_num = problem.digits;
     const uint32_t l = problem.digit_limbs;
     const uint32_t lk = problem.key_limbs;
-    const uint32_t p_lk = problem.polys * problem.key_limbs;
 
     auto emit_op = [&builder](
                        const std::string& name,

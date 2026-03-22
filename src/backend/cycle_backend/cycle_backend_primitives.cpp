@@ -52,6 +52,18 @@ uint32_t CyclePrimitiveEmitter::EmitEweSub(const CyclePrimitiveDesc& desc) {
     return Emit(CycleInstructionKind::EweSub, desc);
 }
 
+uint32_t CyclePrimitiveEmitter::EmitInterCardSend(const CyclePrimitiveDesc& desc) {
+    return Emit(CycleInstructionKind::InterCardSend, desc);
+}
+
+uint32_t CyclePrimitiveEmitter::EmitInterCardRecv(const CyclePrimitiveDesc& desc) {
+    return Emit(CycleInstructionKind::InterCardRecv, desc);
+}
+
+uint32_t CyclePrimitiveEmitter::EmitInterCardReduce(const CyclePrimitiveDesc& desc) {
+    return Emit(CycleInstructionKind::InterCardReduce, desc);
+}
+
 bool CyclePrimitiveEmitter::ValidateMemoryAccounting(const char* label) const {
     uint64_t replay_live = 0;
     uint64_t replay_peak = 0;
@@ -194,6 +206,10 @@ uint64_t CyclePrimitiveEmitter::EstimateCycles(
         return hardware_.EstimateEweAddCycles(problem_, input_limbs);
     case CycleInstructionKind::EweSub:
         return hardware_.EstimateEweSubCycles(problem_, input_limbs);
+    case CycleInstructionKind::InterCardSend:
+    case CycleInstructionKind::InterCardRecv:
+    case CycleInstructionKind::InterCardReduce:
+        return hardware_.EstimateInterconnectTransferCycles(bytes);
     default:
         return 1;
     }
@@ -294,6 +310,15 @@ uint32_t CycleProgramBuilder::EmitPrimitive(
         break;
     case CycleInstructionKind::EweSub:
         group_id = primitive.EmitEweSub(desc);
+        break;
+    case CycleInstructionKind::InterCardSend:
+        group_id = primitive.EmitInterCardSend(desc);
+        break;
+    case CycleInstructionKind::InterCardRecv:
+        group_id = primitive.EmitInterCardRecv(desc);
+        break;
+    case CycleInstructionKind::InterCardReduce:
+        group_id = primitive.EmitInterCardReduce(desc);
         break;
     default:
         build_ok = false;

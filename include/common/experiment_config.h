@@ -83,6 +83,7 @@ struct ExperimentConfig {
 
     // Keyswitch execution method selection.
     KeySwitchMethod keyswitch_method = KeySwitchMethod::Poseidon;
+    MultiBoardMode keyswitch_multi_board_mode = MultiBoardMode::Auto;
 };
 
 struct ParseExperimentConfigResult {

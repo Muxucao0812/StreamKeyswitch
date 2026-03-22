@@ -166,6 +166,174 @@ src/backend/cycle_backend/cycle_backend.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend.cpp.s
 .PHONY : src/backend/cycle_backend/cycle_backend.cpp.s
 
+src/backend/cycle_backend/cycle_backend_cinnamon_ib.o: src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_cinnamon_ib.o
+
+# target to build an object file
+src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o
+
+src/backend/cycle_backend/cycle_backend_cinnamon_ib.i: src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_cinnamon_ib.i
+
+# target to preprocess a source file
+src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.i
+
+src/backend/cycle_backend/cycle_backend_cinnamon_ib.s: src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_cinnamon_ib.s
+
+# target to generate assembly for a file
+src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.s
+
+src/backend/cycle_backend/cycle_backend_cinnamon_oa.o: src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_cinnamon_oa.o
+
+# target to build an object file
+src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o
+
+src/backend/cycle_backend/cycle_backend_cinnamon_oa.i: src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_cinnamon_oa.i
+
+# target to preprocess a source file
+src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.i
+
+src/backend/cycle_backend/cycle_backend_cinnamon_oa.s: src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_cinnamon_oa.s
+
+# target to generate assembly for a file
+src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.s
+
+src/backend/cycle_backend/cycle_backend_digit_centric.o: src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_digit_centric.o
+
+# target to build an object file
+src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o
+
+src/backend/cycle_backend/cycle_backend_digit_centric.i: src/backend/cycle_backend/cycle_backend_digit_centric.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_digit_centric.i
+
+# target to preprocess a source file
+src/backend/cycle_backend/cycle_backend_digit_centric.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_digit_centric.cpp.i
+
+src/backend/cycle_backend/cycle_backend_digit_centric.s: src/backend/cycle_backend/cycle_backend_digit_centric.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_digit_centric.s
+
+# target to generate assembly for a file
+src/backend/cycle_backend/cycle_backend_digit_centric.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_digit_centric.cpp.s
+
+src/backend/cycle_backend/cycle_backend_fab.o: src/backend/cycle_backend/cycle_backend_fab.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_fab.o
+
+# target to build an object file
+src/backend/cycle_backend/cycle_backend_fab.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_fab.cpp.o
+
+src/backend/cycle_backend/cycle_backend_fab.i: src/backend/cycle_backend/cycle_backend_fab.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_fab.i
+
+# target to preprocess a source file
+src/backend/cycle_backend/cycle_backend_fab.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_fab.cpp.i
+
+src/backend/cycle_backend/cycle_backend_fab.s: src/backend/cycle_backend/cycle_backend_fab.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_fab.s
+
+# target to generate assembly for a file
+src/backend/cycle_backend/cycle_backend_fab.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_fab.cpp.s
+
+src/backend/cycle_backend/cycle_backend_fast.o: src/backend/cycle_backend/cycle_backend_fast.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_fast.o
+
+# target to build an object file
+src/backend/cycle_backend/cycle_backend_fast.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_fast.cpp.o
+
+src/backend/cycle_backend/cycle_backend_fast.i: src/backend/cycle_backend/cycle_backend_fast.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_fast.i
+
+# target to preprocess a source file
+src/backend/cycle_backend/cycle_backend_fast.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_fast.cpp.i
+
+src/backend/cycle_backend/cycle_backend_fast.s: src/backend/cycle_backend/cycle_backend_fast.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_fast.s
+
+# target to generate assembly for a file
+src/backend/cycle_backend/cycle_backend_fast.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_fast.cpp.s
+
+src/backend/cycle_backend/cycle_backend_hera.o: src/backend/cycle_backend/cycle_backend_hera.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_hera.o
+
+# target to build an object file
+src/backend/cycle_backend/cycle_backend_hera.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_hera.cpp.o
+
+src/backend/cycle_backend/cycle_backend_hera.i: src/backend/cycle_backend/cycle_backend_hera.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_hera.i
+
+# target to preprocess a source file
+src/backend/cycle_backend/cycle_backend_hera.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_hera.cpp.i
+
+src/backend/cycle_backend/cycle_backend_hera.s: src/backend/cycle_backend/cycle_backend_hera.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_hera.s
+
+# target to generate assembly for a file
+src/backend/cycle_backend/cycle_backend_hera.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_hera.cpp.s
+
+src/backend/cycle_backend/cycle_backend_max_parallel.o: src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_max_parallel.o
+
+# target to build an object file
+src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o
+
+src/backend/cycle_backend/cycle_backend_max_parallel.i: src/backend/cycle_backend/cycle_backend_max_parallel.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_max_parallel.i
+
+# target to preprocess a source file
+src/backend/cycle_backend/cycle_backend_max_parallel.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_max_parallel.cpp.i
+
+src/backend/cycle_backend/cycle_backend_max_parallel.s: src/backend/cycle_backend/cycle_backend_max_parallel.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_max_parallel.s
+
+# target to generate assembly for a file
+src/backend/cycle_backend/cycle_backend_max_parallel.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_max_parallel.cpp.s
+
 src/backend/cycle_backend/cycle_backend_ola.o: src/backend/cycle_backend/cycle_backend_ola.cpp.o
 .PHONY : src/backend/cycle_backend/cycle_backend_ola.o
 
@@ -189,6 +357,30 @@ src/backend/cycle_backend/cycle_backend_ola.s: src/backend/cycle_backend/cycle_b
 src/backend/cycle_backend/cycle_backend_ola.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.s
 .PHONY : src/backend/cycle_backend/cycle_backend_ola.cpp.s
+
+src/backend/cycle_backend/cycle_backend_output_centric.o: src/backend/cycle_backend/cycle_backend_output_centric.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_output_centric.o
+
+# target to build an object file
+src/backend/cycle_backend/cycle_backend_output_centric.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.o
+.PHONY : src/backend/cycle_backend/cycle_backend_output_centric.cpp.o
+
+src/backend/cycle_backend/cycle_backend_output_centric.i: src/backend/cycle_backend/cycle_backend_output_centric.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_output_centric.i
+
+# target to preprocess a source file
+src/backend/cycle_backend/cycle_backend_output_centric.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.i
+.PHONY : src/backend/cycle_backend/cycle_backend_output_centric.cpp.i
+
+src/backend/cycle_backend/cycle_backend_output_centric.s: src/backend/cycle_backend/cycle_backend_output_centric.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_output_centric.s
+
+# target to generate assembly for a file
+src/backend/cycle_backend/cycle_backend_output_centric.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.s
+.PHONY : src/backend/cycle_backend/cycle_backend_output_centric.cpp.s
 
 src/backend/cycle_backend/cycle_backend_poseidon.o: src/backend/cycle_backend/cycle_backend_poseidon.cpp.o
 .PHONY : src/backend/cycle_backend/cycle_backend_poseidon.o
@@ -755,9 +947,33 @@ help:
 	@echo "... src/backend/cycle_backend/cycle_backend.o"
 	@echo "... src/backend/cycle_backend/cycle_backend.i"
 	@echo "... src/backend/cycle_backend/cycle_backend.s"
+	@echo "... src/backend/cycle_backend/cycle_backend_cinnamon_ib.o"
+	@echo "... src/backend/cycle_backend/cycle_backend_cinnamon_ib.i"
+	@echo "... src/backend/cycle_backend/cycle_backend_cinnamon_ib.s"
+	@echo "... src/backend/cycle_backend/cycle_backend_cinnamon_oa.o"
+	@echo "... src/backend/cycle_backend/cycle_backend_cinnamon_oa.i"
+	@echo "... src/backend/cycle_backend/cycle_backend_cinnamon_oa.s"
+	@echo "... src/backend/cycle_backend/cycle_backend_digit_centric.o"
+	@echo "... src/backend/cycle_backend/cycle_backend_digit_centric.i"
+	@echo "... src/backend/cycle_backend/cycle_backend_digit_centric.s"
+	@echo "... src/backend/cycle_backend/cycle_backend_fab.o"
+	@echo "... src/backend/cycle_backend/cycle_backend_fab.i"
+	@echo "... src/backend/cycle_backend/cycle_backend_fab.s"
+	@echo "... src/backend/cycle_backend/cycle_backend_fast.o"
+	@echo "... src/backend/cycle_backend/cycle_backend_fast.i"
+	@echo "... src/backend/cycle_backend/cycle_backend_fast.s"
+	@echo "... src/backend/cycle_backend/cycle_backend_hera.o"
+	@echo "... src/backend/cycle_backend/cycle_backend_hera.i"
+	@echo "... src/backend/cycle_backend/cycle_backend_hera.s"
+	@echo "... src/backend/cycle_backend/cycle_backend_max_parallel.o"
+	@echo "... src/backend/cycle_backend/cycle_backend_max_parallel.i"
+	@echo "... src/backend/cycle_backend/cycle_backend_max_parallel.s"
 	@echo "... src/backend/cycle_backend/cycle_backend_ola.o"
 	@echo "... src/backend/cycle_backend/cycle_backend_ola.i"
 	@echo "... src/backend/cycle_backend/cycle_backend_ola.s"
+	@echo "... src/backend/cycle_backend/cycle_backend_output_centric.o"
+	@echo "... src/backend/cycle_backend/cycle_backend_output_centric.i"
+	@echo "... src/backend/cycle_backend/cycle_backend_output_centric.s"
 	@echo "... src/backend/cycle_backend/cycle_backend_poseidon.o"
 	@echo "... src/backend/cycle_backend/cycle_backend_poseidon.i"
 	@echo "... src/backend/cycle_backend/cycle_backend_poseidon.s"

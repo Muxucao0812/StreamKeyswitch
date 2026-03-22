@@ -28,6 +28,8 @@ enum class KeySwitchMethod : uint8_t {
     MaxParallel,
     // Multi Board
     Cinnamon,
+    CinnamonIB,
+    CinnamonOA,
 };
 
 enum class PartitionStrategy : uint8_t {
@@ -59,6 +61,28 @@ enum class MultiBoardMode : uint8_t {
     InputBroadcast,
     OutputAggregation
 };
+
+inline bool IsCinnamonMethod(KeySwitchMethod method) {
+    switch (method) {
+    case KeySwitchMethod::Cinnamon:
+    case KeySwitchMethod::CinnamonIB:
+    case KeySwitchMethod::CinnamonOA:
+        return true;
+    default:
+        return false;
+    }
+}
+
+inline MultiBoardMode ForcedMultiBoardModeForMethod(KeySwitchMethod method) {
+    switch (method) {
+    case KeySwitchMethod::CinnamonIB:
+        return MultiBoardMode::InputBroadcast;
+    case KeySwitchMethod::CinnamonOA:
+        return MultiBoardMode::OutputAggregation;
+    default:
+        return MultiBoardMode::Auto;
+    }
+}
 
 struct KeySwitchProfile {
     uint32_t num_ciphertexts = 1;

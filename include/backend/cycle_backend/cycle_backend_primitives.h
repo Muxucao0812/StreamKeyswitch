@@ -37,6 +37,9 @@ public:
     uint32_t EmitEweMul(const CyclePrimitiveDesc& desc);
     uint32_t EmitEweAdd(const CyclePrimitiveDesc& desc);
     uint32_t EmitEweSub(const CyclePrimitiveDesc& desc);
+    uint32_t EmitInterCardSend(const CyclePrimitiveDesc& desc);
+    uint32_t EmitInterCardRecv(const CyclePrimitiveDesc& desc);
+    uint32_t EmitInterCardReduce(const CyclePrimitiveDesc& desc);
 
     bool ValidateMemoryAccounting(const char* label) const;
 

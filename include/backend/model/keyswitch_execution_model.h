@@ -22,6 +22,12 @@ struct KeySwitchProblem {
     bool key_resident_hit = false;
     // 当前问题采用的 keyswitch 方法。
     KeySwitchMethod method = KeySwitchMethod::Poseidon;
+    // Multi-board metadata used by direct program builders.
+    MultiBoardMode multi_board_mode = MultiBoardMode::Sequential;
+    PartitionStrategy partition_strategy = PartitionStrategy::None;
+    KeyPlacement key_placement = KeyPlacement::StreamFromHBM;
+    CollectiveStrategy collective_strategy = CollectiveStrategy::None;
+    uint32_t active_cards = 1;
 
     // 并行资源与数据维度。
     uint32_t cards = 1;
@@ -617,13 +623,6 @@ private:
         const SystemState& state
     ) const;
 
-    // 通用构建路径：根据 policy/tile_plan 生成主执行 DAG。
-    KeySwitchExecution BuildWithMode(
-        const Request& req,
-        const ExecutionPlan& plan,
-        const SystemState& state,
-        bool allow_inter_card_steps) const;
-
     // 返回“不支持方法”的 execution 结果。
     KeySwitchExecution BuildUnsupportedMethod(
         KeySwitchMethod requested_method,
@@ -650,31 +649,8 @@ private:
     KeySwitchExecution BuildCinnamon(
         const Request& req,
         const ExecutionPlan& plan,
-        const SystemState& state) const;
-
-    KeySwitchExecution BuildSequential(
-        const Request& req,
-        const ExecutionPlan& plan,
         const SystemState& state,
-        KeySwitchMethod per_card_method) const;
-
-    KeySwitchExecution BuildInputBroadcast(
-        const Request& req,
-        const ExecutionPlan& plan,
-        const SystemState& state,
-        KeySwitchMethod per_card_method) const;
-
-    KeySwitchExecution BuildOutputAggregation(
-        const Request& req,
-        const ExecutionPlan& plan,
-        const SystemState& state,
-        KeySwitchMethod per_card_method) const;
-
-    KeySwitchExecution BuildMultiBoard(
-        const Request& req,
-        const ExecutionPlan& plan,
-        const SystemState& state,
-        KeySwitchMethod per_card_method) const;
+        KeySwitchMethod method) const;
 
 private:
     KeySwitchExecutionModelParams params_;

@@ -7,6 +7,7 @@ Seed: 123
 NumCards: 1
 NumUsers: 1
 EnableMultiCard: false
+KeySwitchMultiBoardMode: auto
 SyntheticRequestsPerUser: 1
 SyntheticInterArrival: 300
 SyntheticStartTime: 0
@@ -627,7 +628,7 @@ Card 0: utilization=1.0000, reload_count=1, served_requests=1
 Total throughput(req/ns): 0.0000
 Total reload count: 1
 Jain fairness index: 1.0000
-Simulation window(ns): [64, 899991], duration=899927
+Simulation window(ns): [23, 899950], duration=899927
 PoolConfigSource=built-in default
 TreeConfigSource=built-in default
 HEParamsSource=built-in default

@@ -7,14 +7,16 @@ BUILD_DIR := build
 RESULTS_DIR := results
 
 MODE ?= release
-# METHODS ?= poseidon ola fab fast hera cinnamon max_parallel digit_centric output_centric
-METHODS ?= output_centric
-# PROFILE_METHODS ?= poseidon ola fab fast hera cinnamon max_parallel digit_centric output_centric
-PROFILE_METHODS ?= output_centric
+ALL_METHODS := poseidon fab fast ola hera max_parallel digit_centric output_centric cinnamon_oa cinnamon_ib
+# METHODS ?= $(ALL_METHODS)
+METHODS ?= $(ALL_METHODS)
+# PROFILE_METHODS ?= $(ALL_METHODS)
+PROFILE_METHODS ?= $(ALL_METHODS)
 RUN_SEED ?= 123
-RUN_NUM_CARDS ?= 1
 RUN_NUM_USERS ?= 1
 RUN_REQUESTS_PER_USER ?= 1
+RUN_SINGLE_NUM_CARDS ?= 1
+RUN_MULTI_NUM_CARDS ?= 3
 ALWAYS_DUMP_LOGICAL_GRAPH ?= 1
 ALWAYS_DUMP_RUNTIME_PLAN ?= 1
 
@@ -56,18 +58,32 @@ run: $(TARGET)
 	@rm -f "$(RESULTS_DIR)/metrics_auto.csv" "$(RESULTS_DIR)/run_auto.log"
 	@set -eu; \
 	for m in $(METHODS); do \
-		echo "=== running $$m ==="; \
-		rm -f "$(RESULTS_DIR)/metrics_$$m.csv" "$(RESULTS_DIR)/run_$$m.log"; \
-		./$(TARGET) \
-			--workload synthetic \
-			--num-cards $(RUN_NUM_CARDS) \
-			--disable-multi-card \
-			--num-users $(RUN_NUM_USERS) \
-			--requests-per-user $(RUN_REQUESTS_PER_USER) \
-			--ks-method "$$m" \
-			--seed $(RUN_SEED) \
-			--csv-output "$(RESULTS_DIR)/metrics_$$m.csv" \
-			2>&1 | tee "$(RESULTS_DIR)/run_$$m.log"; \
+		method_tag="$$m"; \
+		ks_method="$$m"; \
+		ks_multi_board_mode="auto"; \
+		num_cards="$(RUN_SINGLE_NUM_CARDS)"; \
+		multi_card_flag="--disable-multi-card"; \
+			case "$$m" in \
+				cinnamon_output_aggregation|cinnamon_oa) \
+					num_cards="$(RUN_MULTI_NUM_CARDS)"; \
+					multi_card_flag="--enable-multi-card" ;; \
+				cinnamon_input_broadcast|cinnamon_ib) \
+					num_cards="$(RUN_MULTI_NUM_CARDS)"; \
+					multi_card_flag="--enable-multi-card" ;; \
+		esac; \
+		echo "=== running $$method_tag ==="; \
+		rm -f "$(RESULTS_DIR)/metrics_$$method_tag.csv" "$(RESULTS_DIR)/run_$$method_tag.log"; \
+			./$(TARGET) \
+				--workload synthetic \
+				--num-cards "$$num_cards" \
+				"$$multi_card_flag" \
+				--num-users $(RUN_NUM_USERS) \
+				--requests-per-user $(RUN_REQUESTS_PER_USER) \
+				--ks-method "$$ks_method" \
+				--ks-multi-board-mode "$$ks_multi_board_mode" \
+				--seed $(RUN_SEED) \
+				--csv-output "$(RESULTS_DIR)/metrics_$$method_tag.csv" \
+			2>&1 | tee "$(RESULTS_DIR)/run_$$method_tag.log"; \
 	done
 	@echo "Run completed. CSV/LOG files are under $(RESULTS_DIR)/"
 
@@ -83,16 +99,27 @@ draw:
 		--output "$(RESULTS_DIR)/latency_p99.svg"
 	@set -eu; \
 	for m in $(PROFILE_METHODS); do \
+		method_tag="$$m"; \
+		ks_method="$$m"; \
+		num_cards="$(RUN_SINGLE_NUM_CARDS)"; \
+		multi_card_flag="--disable-multi-card"; \
+			case "$$m" in \
+				cinnamon_output_aggregation|cinnamon_input_broadcast|cinnamon_oa|cinnamon_ib) \
+					ks_method="cinnamon"; \
+					num_cards="$(RUN_MULTI_NUM_CARDS)"; \
+					multi_card_flag="--enable-multi-card" ;; \
+		esac; \
 		echo "=== drawing $$m execution profile ==="; \
-		$(PYTHON) scripts/plot_execution.py \
-			--ks-method "$$m" \
-			--input-log "$(RESULTS_DIR)/run_$$m.log" \
-			--seed $(RUN_SEED) \
-			--num-cards $(RUN_NUM_CARDS) \
-			--num-users $(RUN_NUM_USERS) \
-			--requests-per-user $(RUN_REQUESTS_PER_USER) \
-			--output "$(RESULTS_DIR)/$${m}_execution_profile.png"; \
-	done
+			$(PYTHON) scripts/plot_execution.py \
+				--ks-method "$$ks_method" \
+				--input-log "$(RESULTS_DIR)/run_$$method_tag.log" \
+				--seed $(RUN_SEED) \
+				--num-cards "$$num_cards" \
+				"$$multi_card_flag" \
+				--num-users $(RUN_NUM_USERS) \
+				--requests-per-user $(RUN_REQUESTS_PER_USER) \
+				--output "$(RESULTS_DIR)/$${method_tag}_execution_profile.png"; \
+		done
 	@echo "Charts generated:"
 	@echo "  $(RESULTS_DIR)/latency_mean.svg"
 	@echo "  $(RESULTS_DIR)/latency_p99.svg"
@@ -104,16 +131,27 @@ draw-profile: $(TARGET)
 	@mkdir -p $(RESULTS_DIR)
 	@set -eu; \
 	for m in $(PROFILE_METHODS); do \
+		method_tag="$$m"; \
+		ks_method="$$m"; \
+		num_cards="$(RUN_SINGLE_NUM_CARDS)"; \
+		multi_card_flag="--disable-multi-card"; \
+			case "$$m" in \
+				cinnamon_output_aggregation|cinnamon_input_broadcast|cinnamon_oa|cinnamon_ib) \
+					ks_method="cinnamon"; \
+					num_cards="$(RUN_MULTI_NUM_CARDS)"; \
+					multi_card_flag="--enable-multi-card" ;; \
+		esac; \
 		echo "=== drawing $$m execution profile ==="; \
-		$(PYTHON) scripts/plot_execution.py \
-			--ks-method "$$m" \
-			--input-log "$(RESULTS_DIR)/run_$$m.log" \
-			--seed $(RUN_SEED) \
-			--num-cards $(RUN_NUM_CARDS) \
-			--num-users $(RUN_NUM_USERS) \
-			--requests-per-user $(RUN_REQUESTS_PER_USER) \
-			--output "$(RESULTS_DIR)/$${m}_execution_profile.png"; \
-	done
+			$(PYTHON) scripts/plot_execution.py \
+				--ks-method "$$ks_method" \
+				--input-log "$(RESULTS_DIR)/run_$$method_tag.log" \
+				--seed $(RUN_SEED) \
+				--num-cards "$$num_cards" \
+				"$$multi_card_flag" \
+				--num-users $(RUN_NUM_USERS) \
+				--requests-per-user $(RUN_REQUESTS_PER_USER) \
+				--output "$(RESULTS_DIR)/$${method_tag}_execution_profile.png"; \
+		done
 	@echo "Execution profiles generated:"
 	@for m in $(PROFILE_METHODS); do \
 		echo "  $(RESULTS_DIR)/$${m}_execution_profile.png"; \

@@ -265,10 +265,122 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_primitives.
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_primitives.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_primitives.cpp -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_primitives.cpp.s
 
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.o: ../src/backend/cycle_backend/cycle_backend_fab.cpp
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.o -MF CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_fab.cpp
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_fab.cpp > CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.i
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_fab.cpp -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.s
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.o: ../src/backend/cycle_backend/cycle_backend_fast.cpp
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.o -MF CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_fast.cpp
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_fast.cpp > CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.i
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_fast.cpp -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.s
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.o: ../src/backend/cycle_backend/cycle_backend_hera.cpp
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.o -MF CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_hera.cpp
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_hera.cpp > CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.i
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_hera.cpp -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.s
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o: ../src/backend/cycle_backend/cycle_backend_digit_centric.cpp
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o -MF CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_digit_centric.cpp
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_digit_centric.cpp > CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.i
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_digit_centric.cpp -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.s
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.o: ../src/backend/cycle_backend/cycle_backend_output_centric.cpp
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.o -MF CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_output_centric.cpp
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_output_centric.cpp > CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.i
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_output_centric.cpp -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.s
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o: ../src/backend/cycle_backend/cycle_backend_max_parallel.cpp
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o -MF CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_max_parallel.cpp
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_max_parallel.cpp > CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.i
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_max_parallel.cpp -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.s
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o: ../src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o -MF CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp > CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.i
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.s
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o: ../src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o -MF CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp > CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.i
+
+CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.s
+
 CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
 CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o: ../src/backend/cycle_backend/cycle_backend_ola.cpp
 CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o -MF CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_ola.cpp
 
 CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.i: cmake_force
@@ -282,7 +394,7 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.s: 
 CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
 CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o: ../src/backend/cycle_backend/cycle_backend_poseidon.cpp
 CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o -MF CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/backend/cycle_backend/cycle_backend_poseidon.cpp
 
 CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.i: cmake_force
@@ -296,7 +408,7 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cp
 CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
 CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.o: ../src/scheduler/fifo_scheduler.cpp
 CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.o -MF CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/scheduler/fifo_scheduler.cpp
 
 CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.i: cmake_force
@@ -310,7 +422,7 @@ CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.s: cmake_force
 CMakeFiles/keyaware_core.dir/src/scheduler/affinity_scheduler.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
 CMakeFiles/keyaware_core.dir/src/scheduler/affinity_scheduler.cpp.o: ../src/scheduler/affinity_scheduler.cpp
 CMakeFiles/keyaware_core.dir/src/scheduler/affinity_scheduler.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/keyaware_core.dir/src/scheduler/affinity_scheduler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/keyaware_core.dir/src/scheduler/affinity_scheduler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/scheduler/affinity_scheduler.cpp.o -MF CMakeFiles/keyaware_core.dir/src/scheduler/affinity_scheduler.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/scheduler/affinity_scheduler.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/scheduler/affinity_scheduler.cpp
 
 CMakeFiles/keyaware_core.dir/src/scheduler/affinity_scheduler.cpp.i: cmake_force
@@ -324,7 +436,7 @@ CMakeFiles/keyaware_core.dir/src/scheduler/affinity_scheduler.cpp.s: cmake_force
 CMakeFiles/keyaware_core.dir/src/scheduler/static_partition_scheduler.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
 CMakeFiles/keyaware_core.dir/src/scheduler/static_partition_scheduler.cpp.o: ../src/scheduler/static_partition_scheduler.cpp
 CMakeFiles/keyaware_core.dir/src/scheduler/static_partition_scheduler.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/keyaware_core.dir/src/scheduler/static_partition_scheduler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object CMakeFiles/keyaware_core.dir/src/scheduler/static_partition_scheduler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/scheduler/static_partition_scheduler.cpp.o -MF CMakeFiles/keyaware_core.dir/src/scheduler/static_partition_scheduler.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/scheduler/static_partition_scheduler.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/scheduler/static_partition_scheduler.cpp
 
 CMakeFiles/keyaware_core.dir/src/scheduler/static_partition_scheduler.cpp.i: cmake_force
@@ -338,7 +450,7 @@ CMakeFiles/keyaware_core.dir/src/scheduler/static_partition_scheduler.cpp.s: cma
 CMakeFiles/keyaware_core.dir/src/scheduler/score_scheduler.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
 CMakeFiles/keyaware_core.dir/src/scheduler/score_scheduler.cpp.o: ../src/scheduler/score_scheduler.cpp
 CMakeFiles/keyaware_core.dir/src/scheduler/score_scheduler.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/keyaware_core.dir/src/scheduler/score_scheduler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object CMakeFiles/keyaware_core.dir/src/scheduler/score_scheduler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/scheduler/score_scheduler.cpp.o -MF CMakeFiles/keyaware_core.dir/src/scheduler/score_scheduler.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/scheduler/score_scheduler.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/scheduler/score_scheduler.cpp
 
 CMakeFiles/keyaware_core.dir/src/scheduler/score_scheduler.cpp.i: cmake_force
@@ -352,7 +464,7 @@ CMakeFiles/keyaware_core.dir/src/scheduler/score_scheduler.cpp.s: cmake_force
 CMakeFiles/keyaware_core.dir/src/scheduler/pool_scheduler.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
 CMakeFiles/keyaware_core.dir/src/scheduler/pool_scheduler.cpp.o: ../src/scheduler/pool_scheduler.cpp
 CMakeFiles/keyaware_core.dir/src/scheduler/pool_scheduler.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/keyaware_core.dir/src/scheduler/pool_scheduler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building CXX object CMakeFiles/keyaware_core.dir/src/scheduler/pool_scheduler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/scheduler/pool_scheduler.cpp.o -MF CMakeFiles/keyaware_core.dir/src/scheduler/pool_scheduler.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/scheduler/pool_scheduler.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/scheduler/pool_scheduler.cpp
 
 CMakeFiles/keyaware_core.dir/src/scheduler/pool_scheduler.cpp.i: cmake_force
@@ -366,7 +478,7 @@ CMakeFiles/keyaware_core.dir/src/scheduler/pool_scheduler.cpp.s: cmake_force
 CMakeFiles/keyaware_core.dir/src/scheduler/hierarchical_scheduler.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
 CMakeFiles/keyaware_core.dir/src/scheduler/hierarchical_scheduler.cpp.o: ../src/scheduler/hierarchical_scheduler.cpp
 CMakeFiles/keyaware_core.dir/src/scheduler/hierarchical_scheduler.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/keyaware_core.dir/src/scheduler/hierarchical_scheduler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object CMakeFiles/keyaware_core.dir/src/scheduler/hierarchical_scheduler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/scheduler/hierarchical_scheduler.cpp.o -MF CMakeFiles/keyaware_core.dir/src/scheduler/hierarchical_scheduler.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/scheduler/hierarchical_scheduler.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/scheduler/hierarchical_scheduler.cpp
 
 CMakeFiles/keyaware_core.dir/src/scheduler/hierarchical_scheduler.cpp.i: cmake_force
@@ -380,7 +492,7 @@ CMakeFiles/keyaware_core.dir/src/scheduler/hierarchical_scheduler.cpp.s: cmake_f
 CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
 CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.o: ../src/sim/metrics.cpp
 CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.o -MF CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/sim/metrics.cpp
 
 CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.i: cmake_force
@@ -394,7 +506,7 @@ CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.s: cmake_force
 CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o: CMakeFiles/keyaware_core.dir/flags.make
 CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o: ../src/sim/simulator.cpp
 CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o: CMakeFiles/keyaware_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building CXX object CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o -MF CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o.d -o CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o -c /home/mxc/work/KeyAwareSwitch/src/sim/simulator.cpp
 
 CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.i: cmake_force
@@ -421,6 +533,14 @@ keyaware_core_OBJECTS = \
 "CMakeFiles/keyaware_core.dir/src/backend/primitive_simulator.cpp.o" \
 "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend.cpp.o" \
 "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_primitives.cpp.o" \
+"CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.o" \
+"CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.o" \
+"CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.o" \
+"CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o" \
+"CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.o" \
+"CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o" \
+"CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o" \
+"CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o" \
 "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o" \
 "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o" \
 "CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.o" \
@@ -449,6 +569,14 @@ libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/model/keyswitch_exe
 libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/primitive_simulator.cpp.o
 libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend.cpp.o
 libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_primitives.cpp.o
+libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.o
+libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.o
+libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.o
+libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o
+libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.o
+libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o
+libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o
+libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o
 libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o
 libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o
 libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.o
@@ -461,7 +589,7 @@ libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.o
 libkeyaware_core.a: CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o
 libkeyaware_core.a: CMakeFiles/keyaware_core.dir/build.make
 libkeyaware_core.a: CMakeFiles/keyaware_core.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Linking CXX static library libkeyaware_core.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Linking CXX static library libkeyaware_core.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/keyaware_core.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/keyaware_core.dir/link.txt --verbose=$(VERBOSE)
 

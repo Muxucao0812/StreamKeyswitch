@@ -83,12 +83,12 @@ clean: CMakeFiles/keyaware_sim.dir/clean
 CMakeFiles/keyaware_core.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_core.dir/build.make CMakeFiles/keyaware_core.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25 "Built target keyaware_core"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33 "Built target keyaware_core"
 .PHONY : CMakeFiles/keyaware_core.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/keyaware_core.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles 25
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles 33
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/keyaware_core.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles 0
 .PHONY : CMakeFiles/keyaware_core.dir/rule
@@ -109,12 +109,12 @@ CMakeFiles/keyaware_core.dir/clean:
 CMakeFiles/keyaware_sim.dir/all: CMakeFiles/keyaware_core.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_sim.dir/build.make CMakeFiles/keyaware_sim.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyaware_sim.dir/build.make CMakeFiles/keyaware_sim.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=26,27 "Built target keyaware_sim"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles --progress-num=34,35 "Built target keyaware_sim"
 .PHONY : CMakeFiles/keyaware_sim.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/keyaware_sim.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles 27
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles 35
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/keyaware_sim.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/mxc/work/KeyAwareSwitch/build-cmake/CMakeFiles 0
 .PHONY : CMakeFiles/keyaware_sim.dir/rule

@@ -27,6 +27,26 @@
       "problemMatcher": [
         "$gcc"
       ]
+    },
+    {
+      "label": "run all methods (single+multi)",
+      "type": "shell",
+      "command": "make run -j",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "run+draw all methods (single+multi)",
+      "type": "shell",
+      "command": "make run -j && make draw",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": []
     }
   ]
 }

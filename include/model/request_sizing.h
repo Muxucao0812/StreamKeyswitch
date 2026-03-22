@@ -35,7 +35,18 @@ inline uint32_t DecideCardCountForRequest(
     if (req.ks_profile.method == KeySwitchMethod::SingleBoardClassic) {
         return 1;
     }
+
     const uint32_t recommended_cards = RecommendCardCountForRequest(req, per_card_memory_bytes);
-    const uint32_t max_cards = (req.ks_profile.max_cards == 0) ? recommended_cards : req.ks_profile.max_cards;
-    return std::max<uint32_t>(1, std::min(recommended_cards, max_cards));
+    const uint32_t preferred_cards = std::max<uint32_t>(1, req.ks_profile.preferred_cards);
+    uint32_t desired_cards = std::max<uint32_t>(recommended_cards, preferred_cards);
+    if (IsCinnamonMethod(req.ks_profile.method)) {
+        desired_cards = std::max<uint32_t>(
+            desired_cards,
+            std::max<uint32_t>(1, req.ks_profile.num_digits));
+    }
+
+    const uint32_t max_cards = (req.ks_profile.max_cards == 0)
+        ? desired_cards
+        : req.ks_profile.max_cards;
+    return std::max<uint32_t>(1, std::min(desired_cards, max_cards));
 }

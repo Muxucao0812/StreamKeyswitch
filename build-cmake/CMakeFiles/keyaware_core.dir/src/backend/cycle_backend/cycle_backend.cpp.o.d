@@ -164,6 +164,14 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend.cpp.o: \
  /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_ola.h \
  /home/mxc/work/KeyAwareSwitch/include/backend/cycle_sim/instruction.h \
  /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_poseidon.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_fab.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_fast.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_hera.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_digit_centric.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_output_centric.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_max_parallel.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_cinnamon_ib.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_cinnamon_oa.h \
  /home/mxc/work/KeyAwareSwitch/include/backend/cycle_sim/driver.h \
  /home/mxc/work/KeyAwareSwitch/include/backend/cycle_sim/arch.h \
  /home/mxc/work/KeyAwareSwitch/include/backend/cycle_sim/stats.h \

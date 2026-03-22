@@ -213,6 +213,30 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
   /usr/include/c++/11/bits/unordered_map.h \
   /usr/include/c++/11/pstl/execution_defs.h \
   /usr/include/c++/11/limits \
+  /usr/include/c++/11/iostream \
+  /usr/include/c++/11/ostream \
+  /usr/include/c++/11/ios \
+  /usr/include/c++/11/bits/ios_base.h \
+  /usr/include/c++/11/bits/locale_classes.h \
+  /usr/include/c++/11/bits/locale_classes.tcc \
+  /usr/include/c++/11/system_error \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/error_constants.h \
+  /usr/include/c++/11/stdexcept \
+  /usr/include/c++/11/streambuf \
+  /usr/include/c++/11/bits/streambuf.tcc \
+  /usr/include/c++/11/bits/basic_ios.h \
+  /usr/include/c++/11/bits/locale_facets.h \
+  /usr/include/c++/11/cwctype \
+  /usr/include/wctype.h \
+  /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/ctype_base.h \
+  /usr/include/c++/11/bits/streambuf_iterator.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/ctype_inline.h \
+  /usr/include/c++/11/bits/locale_facets.tcc \
+  /usr/include/c++/11/bits/basic_ios.tcc \
+  /usr/include/c++/11/bits/ostream.tcc \
+  /usr/include/c++/11/istream \
+  /usr/include/c++/11/bits/istream.tcc \
   ../include/backend/cycle_sim/arch.h \
   ../include/backend/cycle_sim/stats.h \
   /usr/include/c++/11/memory \
@@ -260,67 +284,43 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
   /usr/include/c++/11/tr1/poly_hermite.tcc \
   /usr/include/c++/11/tr1/poly_laguerre.tcc \
   /usr/include/c++/11/tr1/riemann_zeta.tcc \
-  /usr/include/c++/11/iostream \
-  /usr/include/c++/11/ostream \
-  /usr/include/c++/11/ios \
-  /usr/include/c++/11/bits/ios_base.h \
-  /usr/include/c++/11/bits/locale_classes.h \
-  /usr/include/c++/11/bits/locale_classes.tcc \
-  /usr/include/c++/11/system_error \
-  /usr/include/x86_64-linux-gnu/c++/11/bits/error_constants.h \
-  /usr/include/c++/11/stdexcept \
-  /usr/include/c++/11/streambuf \
-  /usr/include/c++/11/bits/streambuf.tcc \
-  /usr/include/c++/11/bits/basic_ios.h \
-  /usr/include/c++/11/bits/locale_facets.h \
-  /usr/include/c++/11/cwctype \
-  /usr/include/wctype.h \
-  /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
-  /usr/include/x86_64-linux-gnu/c++/11/bits/ctype_base.h \
-  /usr/include/c++/11/bits/streambuf_iterator.h \
-  /usr/include/x86_64-linux-gnu/c++/11/bits/ctype_inline.h \
-  /usr/include/c++/11/bits/locale_facets.tcc \
-  /usr/include/c++/11/bits/basic_ios.tcc \
-  /usr/include/c++/11/bits/ostream.tcc \
-  /usr/include/c++/11/istream \
-  /usr/include/c++/11/bits/istream.tcc \
   /usr/include/c++/11/sstream \
   /usr/include/c++/11/bits/sstream.tcc
 
 
 /usr/include/c++/11/sstream:
 
-/usr/include/c++/11/bits/istream.tcc:
-
-/usr/include/c++/11/istream:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/ctype_inline.h:
-
-/usr/include/c++/11/bits/streambuf_iterator.h:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/ctype_base.h:
-
-/usr/include/x86_64-linux-gnu/bits/wctype-wchar.h:
-
-/usr/include/c++/11/cwctype:
-
-/usr/include/c++/11/bits/streambuf.tcc:
-
-/usr/include/c++/11/streambuf:
-
-/usr/include/c++/11/system_error:
-
-/usr/include/c++/11/bits/locale_classes.tcc:
-
-/usr/include/c++/11/bits/locale_classes.h:
-
-/usr/include/c++/11/bits/ios_base.h:
-
-/usr/include/c++/11/ostream:
-
 /usr/include/c++/11/tr1/riemann_zeta.tcc:
 
 /usr/include/c++/11/tr1/poly_laguerre.tcc:
+
+/usr/include/c++/11/tr1/poly_hermite.tcc:
+
+/usr/include/c++/11/tr1/modified_bessel_func.tcc:
+
+/usr/include/c++/11/tr1/hypergeometric.tcc:
+
+/usr/include/c++/11/tr1/exp_integral.tcc:
+
+/usr/include/c++/11/tr1/bessel_function.tcc:
+
+/usr/include/c++/11/tr1/special_function_util.h:
+
+/usr/include/c++/11/bits/specfun.h:
+
+/usr/include/x86_64-linux-gnu/bits/iscanonical.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
+
+/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
+
+/usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
+
+../tests/test_framework.h:
+
+../include/model/request_sizing.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
 
@@ -347,10 +347,6 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 /usr/include/x86_64-linux-gnu/bits/cpu-set.h:
 
 ../include/backend/runtime_planner.h:
-
-/usr/include/wctype.h:
-
-/usr/include/sched.h:
 
 /usr/include/pthread.h:
 
@@ -384,27 +380,29 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 /usr/include/c++/11/bits/localefwd.h:
 
-/usr/include/c++/11/tr1/hypergeometric.tcc:
-
 /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/locale_t.h:
 
-/usr/include/c++/11/bits/locale_facets.tcc:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
+/usr/include/x86_64-linux-gnu/bits/wctype-wchar.h:
 
 /usr/include/c++/11/bits/stringfwd.h:
+
+/usr/include/x86_64-linux-gnu/bits/fp-fast.h:
+
+/usr/include/c++/11/iostream:
+
+/usr/include/c++/11/bits/node_handle.h:
+
+/usr/include/x86_64-linux-gnu/bits/math-vector.h:
+
+../include/backend/cycle_backend/bram_tracker.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
 
 /usr/include/wchar.h:
 
 /usr/include/c++/11/bits/cxxabi_init_exception.h:
-
-/usr/include/c++/11/bits/basic_ios.h:
-
-/usr/include/c++/11/bits/uniform_int_dist.h:
 
 /usr/include/c++/11/cwchar:
 
@@ -420,7 +418,9 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 /usr/include/c++/11/bits/invoke.h:
 
-/usr/include/c++/11/tr1/special_function_util.h:
+/usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
+
+/usr/include/c++/11/bits/postypes.h:
 
 /usr/include/c++/11/bits/char_traits.h:
 
@@ -430,17 +430,13 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 ../include/model/execution_result.h:
 
-/usr/include/c++/11/stdexcept:
-
-/usr/include/c++/11/pstl/glue_algorithm_defs.h:
-
 /usr/include/c++/11/bits/string_view.tcc:
 
 /usr/include/c++/11/bits/functional_hash.h:
 
 /usr/include/x86_64-linux-gnu/bits/endianness.h:
 
-/usr/include/c++/11/tr1/modified_bessel_func.tcc:
+/usr/include/c++/11/system_error:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/cpu_defines.h:
 
@@ -464,6 +460,10 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 /usr/include/c++/11/bits/stl_bvector.h:
 
+/usr/include/c++/11/tr1/gamma.tcc:
+
+/usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
+
 /usr/include/c++/11/cctype:
 
 /usr/include/c++/11/unordered_map:
@@ -471,6 +471,10 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 /usr/include/x86_64-linux-gnu/bits/types.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/clock_t.h:
+
+/usr/include/math.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
 
 /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h:
 
@@ -484,9 +488,13 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 ../tests/cycle_sim_tests.cpp:
 
-/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
+/usr/include/c++/11/bits/ios_base.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+/usr/include/c++/11/cmath:
+
+/usr/include/c++/11/bits/allocator.h:
 
 /usr/include/c++/11/pstl/pstl_config.h:
 
@@ -516,8 +524,6 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 ../include/backend/model/keyswitch_execution_model.h:
 
-../tests/test_framework.h:
-
 /usr/include/c++/11/bits/memoryfwd.h:
 
 /usr/include/c++/11/bits/stl_function.h:
@@ -528,7 +534,9 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 ../include/backend/primitive_simulator.h:
 
-../include/model/request_sizing.h:
+/usr/include/c++/11/tr1/ell_integral.tcc:
+
+../include/backend/cycle_backend/cycle_backend.h:
 
 /usr/include/c++/11/bits/hashtable.h:
 
@@ -568,8 +576,6 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 /usr/include/c++/11/bits/alloc_traits.h:
 
-/usr/include/c++/11/tr1/exp_integral.tcc:
-
 ../include/backend/cycle_sim/stats.h:
 
 /usr/include/c++/11/bits/unordered_map.h:
@@ -583,6 +589,12 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h:
 
 /usr/include/c++/11/debug/assertions.h:
+
+/usr/include/c++/11/tr1/legendre_function.tcc:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h:
+
+/usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
 
 /usr/include/c++/11/functional:
 
@@ -610,6 +622,8 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 /usr/include/c++/11/bits/functexcept.h:
 
+/usr/include/c++/11/streambuf:
+
 /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h:
 
 /usr/include/c++/11/bits/exception_defines.h:
@@ -634,10 +648,6 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/c++allocator.h:
 
-/usr/include/c++/11/bits/allocator.h:
-
-/usr/include/c++/11/cmath:
-
 /usr/include/x86_64-linux-gnu/bits/floatn.h:
 
 /usr/include/c++/11/bits/range_access.h:
@@ -654,10 +664,6 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 ../include/backend/hw/hardware_model.h:
 
-/usr/include/c++/11/bits/locale_facets.h:
-
-/usr/include/c++/11/bits/exception.h:
-
 /usr/include/ctype.h:
 
 /usr/include/c++/11/bits/cpp_type_traits.h:
@@ -669,6 +675,14 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 /usr/include/c++/11/backward/auto_ptr.h:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/atomic_word.h:
+
+/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
+
+/usr/include/c++/11/string_view:
 
 /usr/include/c++/11/ext/string_conversions.h:
 
@@ -708,25 +722,19 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 /usr/include/errno.h:
 
-/usr/include/x86_64-linux-gnu/c++/11/bits/error_constants.h:
-
-/usr/include/c++/11/ios:
-
-/usr/include/c++/11/utility:
-
 /usr/include/x86_64-linux-gnu/bits/errno.h:
+
+/usr/include/sched.h:
+
+/usr/include/wctype.h:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/ctype_base.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
 
 /usr/include/asm-generic/errno.h:
 
-../include/backend/cycle_backend/cycle_backend.h:
-
-/usr/include/c++/11/tr1/ell_integral.tcc:
-
 /usr/include/x86_64-linux-gnu/bits/types/error_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
 
 /usr/include/c++/11/bits/charconv.h:
 
@@ -748,15 +756,17 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 /usr/include/c++/11/bits/nested_exception.h:
 
-/usr/include/c++/11/bits/basic_ios.tcc:
-
-/usr/include/c++/11/bits/enable_special_members.h:
-
 /usr/include/c++/11/string:
 
 ../include/backend/model/keyswitch_method_policy.h:
 
+/usr/include/c++/11/bits/streambuf_iterator.h:
+
 /usr/include/c++/11/bits/hashtable_policy.h:
+
+/usr/include/c++/11/tr1/beta_function.tcc:
+
+/usr/include/c++/11/array:
 
 /usr/include/c++/11/bits/uses_allocator.h:
 
@@ -778,19 +788,15 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 ../include/backend/cycle_backend/cycle_backend_primitives.h:
 
-/usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
-
-/usr/include/c++/11/tr1/gamma.tcc:
+/usr/include/c++/11/bits/locale_classes.h:
 
 /usr/include/c++/11/bits/ostream.tcc:
 
 ../include/backend/cycle_backend/bram_accounting.h:
 
+/usr/include/x86_64-linux-gnu/c++/11/bits/ctype_inline.h:
+
 /usr/include/c++/11/bits/stl_algo.h:
-
-../include/backend/cycle_backend/bram_tracker.h:
-
-/usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
 /usr/include/c++/11/pstl/execution_defs.h:
 
@@ -804,56 +810,50 @@ CMakeFiles/keyaware_cycle_tests.dir/tests/cycle_sim_tests.cpp.o: ../tests/cycle_
 
 /usr/include/c++/11/limits:
 
+/usr/include/c++/11/ostream:
+
+/usr/include/c++/11/bits/unique_ptr.h:
+
+/usr/include/c++/11/bits/locale_classes.tcc:
+
+/usr/include/c++/11/ios:
+
+/usr/include/c++/11/utility:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/error_constants.h:
+
+/usr/include/c++/11/pstl/glue_algorithm_defs.h:
+
+/usr/include/c++/11/stdexcept:
+
+/usr/include/c++/11/bits/streambuf.tcc:
+
+/usr/include/c++/11/bits/atomic_lockfree_defines.h:
+
+/usr/include/c++/11/bits/uniform_int_dist.h:
+
+/usr/include/c++/11/bits/basic_ios.h:
+
+/usr/include/c++/11/bits/exception.h:
+
+/usr/include/c++/11/bits/locale_facets.h:
+
+/usr/include/c++/11/cwctype:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
+
+/usr/include/c++/11/bits/locale_facets.tcc:
+
+/usr/include/c++/11/bits/enable_special_members.h:
+
+/usr/include/c++/11/bits/basic_ios.tcc:
+
+/usr/include/c++/11/istream:
+
+/usr/include/c++/11/bits/istream.tcc:
+
 /usr/include/c++/11/memory:
 
 /usr/include/c++/11/bits/stl_raw_storage_iter.h:
 
-/usr/include/c++/11/bits/unique_ptr.h:
-
 /usr/include/c++/11/bits/shared_ptr_atomic.h:
-
-/usr/include/c++/11/bits/atomic_lockfree_defines.h:
-
-/usr/include/c++/11/tr1/bessel_function.tcc:
-
-/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
-
-/usr/include/math.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
-
-/usr/include/c++/11/string_view:
-
-/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
-
-/usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
-
-/usr/include/c++/11/iostream:
-
-/usr/include/c++/11/bits/node_handle.h:
-
-/usr/include/x86_64-linux-gnu/bits/fp-fast.h:
-
-/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
-
-/usr/include/c++/11/bits/postypes.h:
-
-/usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
-
-/usr/include/x86_64-linux-gnu/bits/iscanonical.h:
-
-/usr/include/c++/11/bits/specfun.h:
-
-/usr/include/c++/11/array:
-
-/usr/include/c++/11/tr1/beta_function.tcc:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h:
-
-/usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
-
-/usr/include/c++/11/tr1/legendre_function.tcc:
-
-/usr/include/c++/11/tr1/poly_hermite.tcc:

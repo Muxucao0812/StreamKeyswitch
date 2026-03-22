@@ -10,10 +10,6 @@
 
 namespace {
 
-uint64_t CeilDivU64(uint64_t a, uint64_t b) {
-    return (b == 0) ? 0 : ((a + b - 1) / b);
-}
-
 bool IsInterCardStepType(TileExecutionStepType step_type) {
     switch (step_type) {
     case TileExecutionStepType::InterCardSendStep:
@@ -138,8 +134,18 @@ const char* MethodTag(KeySwitchMethod method) {
         return "ola";
     case KeySwitchMethod::HERA:
         return "hera";
+    case KeySwitchMethod::DigitCentric:
+        return "digit_centric";
+    case KeySwitchMethod::OutputCentric:
+        return "output_centric";
+    case KeySwitchMethod::MaxParallel:
+        return "max_parallel";
     case KeySwitchMethod::Cinnamon:
         return "cinnamon";
+    case KeySwitchMethod::CinnamonIB:
+        return "cinnamon_ib";
+    case KeySwitchMethod::CinnamonOA:
+        return "cinnamon_oa";
     case KeySwitchMethod::Auto:
         return "auto";
     }
@@ -426,26 +432,6 @@ uint32_t AppendGroup(
     return group_id;
 }
 
-std::size_t FlatIndex(
-    uint32_t ct_tile_index,
-    uint32_t limb_tile_index,
-    uint32_t digit_tile_index,
-    uint32_t limb_tiles,
-    uint32_t digit_tiles) {
-
-    return (static_cast<std::size_t>(ct_tile_index) * limb_tiles + limb_tile_index)
-        * digit_tiles
-        + digit_tile_index;
-}
-
-std::size_t FlatIndex2D(
-    uint32_t ct_tile_index,
-    uint32_t limb_tile_index,
-    uint32_t limb_tiles) {
-
-    return static_cast<std::size_t>(ct_tile_index) * limb_tiles + limb_tile_index;
-}
-
 } // namespace
 
 SingleBoardCycleLowerer::SingleBoardCycleLowerer(
@@ -458,7 +444,9 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
 
     CycleLoweringResult result;
     result.program.method = method_;
-    result.program.name = std::string(MethodTag(method_)) + "_single_board";
+    result.program.name = IsCinnamonMethod(method_)
+        ? "outputaggragation_keyswitch"
+        : (std::string(MethodTag(method_)) + "_single_board");
 
     if (!execution.valid) {
         result.valid = false;
@@ -466,7 +454,8 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
         return result;
     }
 
-    if (!IsSharedSingleBoardMethod(method_)) {
+    const bool allow_multi_board_method = IsCinnamonMethod(method_);
+    if (!IsSharedSingleBoardMethod(method_) && !allow_multi_board_method) {
         result.valid = false;
         result.fallback_reason = KeySwitchFallbackReason::UnsupportedMethod;
         result.fallback_reason_message =
@@ -474,7 +463,7 @@ CycleLoweringResult SingleBoardCycleLowerer::Lower(
         return result;
     }
 
-    if (execution.problem.cards > 1) {
+    if (execution.problem.cards > 1 && !allow_multi_board_method) {
         result.valid = false;
         result.fallback_reason = KeySwitchFallbackReason::UnsupportedConfig;
         result.fallback_reason_message =
@@ -969,17 +958,13 @@ CycleLoweringResult CycleLowererSelector::Lower(
     case KeySwitchMethod::FAST:
     case KeySwitchMethod::OLA:
     case KeySwitchMethod::HERA:
+    case KeySwitchMethod::DigitCentric:
+    case KeySwitchMethod::OutputCentric:
+    case KeySwitchMethod::MaxParallel:
+    case KeySwitchMethod::Cinnamon:
+    case KeySwitchMethod::CinnamonIB:
+    case KeySwitchMethod::CinnamonOA:
         return SingleBoardCycleLowerer(hardware_, method).Lower(execution);
-
-    case KeySwitchMethod::Cinnamon: {
-        CycleLoweringResult result;
-        result.valid = false;
-        result.fallback_reason = KeySwitchFallbackReason::UnsupportedMethod;
-        result.fallback_reason_message = "cinnamon_cycle_sim_not_implemented";
-        result.program.method = KeySwitchMethod::Cinnamon;
-        result.program.name = "cinnamon";
-        return result;
-    }
 
     default: {
         CycleLoweringResult result;

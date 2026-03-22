@@ -203,6 +203,14 @@ void ApplyMultiCardConfig(
     }
 }
 
+void ApplyKeySwitchModeConfig(
+    std::vector<Request>* requests,
+    MultiBoardMode multi_board_mode) {
+    for (auto& req : *requests) {
+        req.ks_profile.multi_board_mode = multi_board_mode;
+    }
+}
+
 std::string CsvEscape(const std::string& value) {
     bool need_quote = false;
     for (const char ch : value) {
@@ -320,6 +328,7 @@ int main(int argc, char** argv) {
 
     WorkloadBuilder workload_builder(config.seed, he_params);
     auto requests = BuildWorkload(workload_builder, config);
+    ApplyKeySwitchModeConfig(&requests, config.keyswitch_multi_board_mode);
     ApplyMultiCardConfig(&requests, config.enable_multi_card);
 
     SystemState initial_state;

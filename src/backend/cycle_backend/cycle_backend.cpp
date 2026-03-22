@@ -7,6 +7,8 @@
 #include "backend/cycle_backend/cycle_backend_digit_centric.h"
 #include "backend/cycle_backend/cycle_backend_output_centric.h"
 #include "backend/cycle_backend/cycle_backend_max_parallel.h"
+#include "backend/cycle_backend/cycle_backend_cinnamon_ib.h"
+#include "backend/cycle_backend/cycle_backend_cinnamon_oa.h"
 #include "backend/cycle_sim/driver.h"
 
 #include <algorithm>
@@ -251,6 +253,33 @@ void AddCycleComputeTime(
         return;
     case CycleOpType::Sub:
         SaturatingAdd(&breakdown->subtract_time, value);
+        return;
+    default:
+        return;
+    }
+}
+
+void AddCommunicationStats(
+    CommunicationBreakdown* breakdown,
+    const CycleGroupTiming& timing,
+    Time value) {
+
+    switch (timing.kind) {
+    case CycleInstructionKind::InterCardSend:
+        if (timing.bytes == 0) {
+            SaturatingAdd(&breakdown->inter_card_barrier_time, value);
+        } else {
+            SaturatingAdd(&breakdown->inter_card_send_time, value);
+            SaturatingAdd(&breakdown->inter_card_send_bytes, timing.bytes);
+        }
+        return;
+    case CycleInstructionKind::InterCardRecv:
+        SaturatingAdd(&breakdown->inter_card_recv_time, value);
+        SaturatingAdd(&breakdown->inter_card_recv_bytes, timing.bytes);
+        return;
+    case CycleInstructionKind::InterCardReduce:
+        SaturatingAdd(&breakdown->inter_card_reduce_time, value);
+        SaturatingAdd(&breakdown->inter_card_reduce_bytes, timing.bytes);
         return;
     default:
         return;
@@ -582,7 +611,7 @@ KeySwitchMethod CycleBackend::ResolveKeySwitchMethod(
     }
 
     return (plan.assigned_cards.size() > 1)
-        ? KeySwitchMethod::Cinnamon
+        ? KeySwitchMethod::CinnamonOA
         : KeySwitchMethod::Poseidon;
 }
 
@@ -594,49 +623,7 @@ ExecutionResult CycleBackend::Estimate(
     ++stats_.estimate_calls;
 
     const KeySwitchMethod method = ResolveKeySwitchMethod(req, plan, state);
-
-    ExecutionResult result{};
-    switch (method) {
-    case KeySwitchMethod::Poseidon:
-        result = EstimateMethod(req, plan, state, KeySwitchMethod::Poseidon);
-        break;
-
-    case KeySwitchMethod::FAB:
-        result = EstimateMethod(req, plan, state, KeySwitchMethod::FAB);
-        break;
-
-    case KeySwitchMethod::FAST:
-        result = EstimateMethod(req, plan, state, KeySwitchMethod::FAST);
-        break;
-
-    case KeySwitchMethod::OLA:
-        result = EstimateMethod(req, plan, state, KeySwitchMethod::OLA);
-        break;
-
-    case KeySwitchMethod::HERA:
-        result = EstimateMethod(req, plan, state, KeySwitchMethod::HERA);
-        break;
-
-    case KeySwitchMethod::DigitCentric:
-        result = EstimateMethod(req, plan, state, KeySwitchMethod::DigitCentric);
-        break;
-
-    case KeySwitchMethod::OutputCentric:
-        result = EstimateMethod(req, plan, state, KeySwitchMethod::OutputCentric);
-        break;
-
-    case KeySwitchMethod::MaxParallel:
-        result = EstimateMethod(req, plan, state, KeySwitchMethod::MaxParallel);
-        break;
-
-    case KeySwitchMethod::Cinnamon:
-        result = EstimateMethod(req, plan, state, KeySwitchMethod::Cinnamon);
-        break;
-
-    default:
-        result = MakeFallbackResult(req, method, KeySwitchFallbackReason::UnsupportedMethod);
-        break;
-    }
+    ExecutionResult result = EstimateMethod(req, plan, state, method);
 
     NormalizeStatusFlags(&result);
     if (result.fallback_used) {
@@ -649,17 +636,52 @@ CycleProgram CycleBackend::BuildProgram(
     const Request& req,
     const ExecutionPlan& plan,
     const SystemState& state,
-    KeySwitchMethod method) const {
+    KeySwitchMethod method,
+    KeySwitchExecution* execution,
+    KeySwitchFallbackReason* fallback_reason,
+    std::string* fallback_reason_message) const {
 
-    Request method_req = req;
-    method_req.ks_profile.method = method;
-    const KeySwitchProblem problem = execution_model_.BuildProblem(method_req, plan, state);
+    if (execution != nullptr) {
+        *execution = KeySwitchExecution{};
+    }
+    if (fallback_reason != nullptr) {
+        *fallback_reason = KeySwitchFallbackReason::None;
+    }
+    if (fallback_reason_message != nullptr) {
+        fallback_reason_message->clear();
+    }
+
+    KeySwitchMethod program_method = method;
+    KeySwitchProblem problem;
+    if (IsCinnamonMethod(method)) {
+        const KeySwitchExecution built = execution_model_.Build(req, plan, state);
+        if (execution != nullptr) {
+            *execution = built;
+        }
+        if (!built.valid) {
+            if (fallback_reason != nullptr) {
+                *fallback_reason =
+                    (built.fallback_reason == KeySwitchFallbackReason::None)
+                    ? KeySwitchFallbackReason::TilePlanInvalid
+                    : built.fallback_reason;
+            }
+            return CycleProgram{};
+        }
+        problem = built.problem;
+        program_method = (built.effective_method == KeySwitchMethod::Auto)
+            ? built.method
+            : built.effective_method;
+    } else {
+        Request method_req = req;
+        method_req.ks_profile.method = method;
+        problem = execution_model_.BuildProblem(method_req, plan, state);
+    }
 
     if (!problem.valid) {
         return CycleProgram{};
     }
 
-    switch (method) {
+    switch (program_method) {
     case KeySwitchMethod::Poseidon:
         return BuildPoseidonProgram(problem, hw_model_);
     case KeySwitchMethod::OLA:
@@ -676,6 +698,15 @@ CycleProgram CycleBackend::BuildProgram(
         return BuildOutputCentricProgram(problem, hw_model_);
     case KeySwitchMethod::MaxParallel:
         return BuildMaxParallelProgram(problem, hw_model_);
+    case KeySwitchMethod::Cinnamon:
+        if (problem.multi_board_mode == MultiBoardMode::InputBroadcast) {
+            return BuildCinnamonInputBroadcastProgram(problem, hw_model_);
+        }
+        return BuildCinnamonOutputAggregationProgram(problem, hw_model_);
+    case KeySwitchMethod::CinnamonIB:
+        return BuildCinnamonInputBroadcastProgram(problem, hw_model_);
+    case KeySwitchMethod::CinnamonOA:
+        return BuildCinnamonOutputAggregationProgram(problem, hw_model_);
     default:
         return CycleProgram{};
     }
@@ -693,13 +724,21 @@ ExecutionResult CycleBackend::CollectResult(
     KeySwitchMethod effective_method,
     const CycleSimStats& sim_stats) const {
 
-    (void)req;
-    (void)effective_method;
     ExecutionResult result{};
+    result.requested_method = req.ks_profile.method;
+    result.effective_method = effective_method;
+    result.method_degraded = false;
+    result.degraded_reason = KeySwitchFallbackReason::None;
+    result.fallback_used = false;
+    result.fallback_reason = KeySwitchFallbackReason::None;
+    result.tiled_execution = true;
+    result.primitive_breakdown_primary = true;
+    result.stage_breakdown_compat_only = true;
 
     std::array<uint64_t, kStageTypeCount> stage_cycles{};
     TransferBreakdown transfer_cycles;
     PrimitiveComputeBreakdown compute_cycles;
+    CommunicationBreakdown communication_cycles;
 
     for (const CycleGroupTiming& timing : sim_stats.group_timings) {
         const uint64_t duration_cycles = timing.DurationCycles();
@@ -715,6 +754,15 @@ ExecutionResult CycleBackend::CollectResult(
             &compute_cycles,
             timing,
             duration_cycles);
+        AddCommunicationStats(
+            &communication_cycles,
+            timing,
+            duration_cycles);
+        if (timing.transfer_path != CycleTransferPath::None) {
+            SaturatingAdd(&result.transfer_cycles, duration_cycles);
+        } else {
+            SaturatingAdd(&result.compute_cycles, duration_cycles);
+        }
         if (timing.transfer_path != CycleTransferPath::None) {
             result.energy_nj += hw_model_.EstimateTransferEnergyByBytes(timing.bytes);
         }
@@ -724,6 +772,20 @@ ExecutionResult CycleBackend::CollectResult(
     result.breakdown = StageBreakdownFromCycles(hw_model_, stage_cycles, total_latency_ns);
     result.transfer_breakdown = TransferBreakdownFromCycles(hw_model_, transfer_cycles);
     result.compute_breakdown = ComputeBreakdownFromCycles(hw_model_, compute_cycles);
+    result.communication_breakdown.inter_card_send_time =
+        hw_model_.CyclesToNs(communication_cycles.inter_card_send_time);
+    result.communication_breakdown.inter_card_recv_time =
+        hw_model_.CyclesToNs(communication_cycles.inter_card_recv_time);
+    result.communication_breakdown.inter_card_reduce_time =
+        hw_model_.CyclesToNs(communication_cycles.inter_card_reduce_time);
+    result.communication_breakdown.inter_card_barrier_time =
+        hw_model_.CyclesToNs(communication_cycles.inter_card_barrier_time);
+    result.communication_breakdown.inter_card_send_bytes =
+        communication_cycles.inter_card_send_bytes;
+    result.communication_breakdown.inter_card_recv_bytes =
+        communication_cycles.inter_card_recv_bytes;
+    result.communication_breakdown.inter_card_reduce_bytes =
+        communication_cycles.inter_card_reduce_bytes;
 
     result.total_latency = total_latency_ns;
     result.hbm_read_bytes = sim_stats.hbm_read_bytes;
@@ -744,6 +806,7 @@ ExecutionResult CycleBackend::CollectResult(
     result.primitive_peak_memory_bytes = result.peak_total_bytes;
     result.peak_memory_bytes = result.peak_total_bytes;
     result.total_latency = TotalLatency(result.breakdown);
+    result.normal_execution = true;
 
     NormalizeStatusFlags(&result);
     return result;
@@ -756,9 +819,46 @@ ExecutionResult CycleBackend::EstimateMethod(
     KeySwitchMethod method) const {
 
     // 1. 构建 CycleProgram：memory-aware 调度 + 直接生成硬件指令。
-    const CycleProgram program = BuildProgram(req, plan, state, method);
+    KeySwitchExecution execution{};
+    KeySwitchFallbackReason build_fallback_reason = KeySwitchFallbackReason::None;
+    std::string build_fallback_reason_message;
+    const CycleProgram program = BuildProgram(
+        req,
+        plan,
+        state,
+        method,
+        &execution,
+        &build_fallback_reason,
+        &build_fallback_reason_message);
+
     if (program.empty()) {
-        return MakeFallbackResult(req, method, KeySwitchFallbackReason::TilePlanInvalid);
+        const KeySwitchMethod effective =
+            (execution.effective_method == KeySwitchMethod::Auto)
+            ? method
+            : execution.effective_method;
+        const KeySwitchFallbackReason reason =
+            (build_fallback_reason == KeySwitchFallbackReason::None)
+            ? KeySwitchFallbackReason::TilePlanInvalid
+            : build_fallback_reason;
+
+        ExecutionResult fallback = MakeFallbackResult(req, effective, reason);
+        fallback.fallback_reason_message = build_fallback_reason_message;
+        if (IsCinnamonMethod(method)) {
+            fallback.requested_method =
+                (execution.requested_method == KeySwitchMethod::Auto)
+                ? req.ks_profile.method
+                : execution.requested_method;
+            fallback.effective_method = effective;
+            fallback.method_degraded = execution.method_degraded;
+            fallback.degraded_reason = execution.degraded_reason;
+            fallback.tiled_execution = execution.tiled_execution;
+            fallback.key_resident_hit = execution.key_resident_hit;
+            fallback.key_persistent_bram = execution.key_persistent_bram;
+            fallback.tile_count = execution.tile_count;
+            fallback.working_set_bytes = execution.working_set_bytes;
+        }
+        NormalizeStatusFlags(&fallback);
+        return fallback;
     }
 
     // 2. 运行 cycle 级仿真。
@@ -768,7 +868,47 @@ ExecutionResult CycleBackend::EstimateMethod(
     DumpDetailedStats(program, sim_stats, hw_model_);
 
     // 4. 汇聚结果。
-    return CollectResult(req, method, sim_stats);
+    const KeySwitchMethod effective_method = (IsCinnamonMethod(method)
+        && execution.effective_method != KeySwitchMethod::Auto)
+        ? execution.effective_method
+        : method;
+    ExecutionResult result = CollectResult(req, effective_method, sim_stats);
+    if (IsCinnamonMethod(method)) {
+        result.requested_method =
+            (execution.requested_method == KeySwitchMethod::Auto)
+            ? req.ks_profile.method
+            : execution.requested_method;
+        result.effective_method = effective_method;
+        result.method_degraded = execution.method_degraded;
+        result.degraded_reason = execution.degraded_reason;
+        result.tiled_execution = execution.tiled_execution;
+        result.key_resident_hit = execution.key_resident_hit;
+        result.key_persistent_bram = execution.key_persistent_bram;
+        result.tile_count = execution.tile_count;
+        result.working_set_bytes = execution.working_set_bytes;
+        result.key_host_to_hbm_bytes = execution.key_host_to_hbm_bytes;
+        result.key_hbm_to_bram_bytes = execution.key_hbm_to_bram_bytes;
+        result.ct_hbm_to_bram_bytes = execution.ct_hbm_to_bram_bytes;
+        result.out_bram_to_hbm_bytes = execution.out_bram_to_hbm_bytes;
+        result.peak_bram_bytes = std::max<uint64_t>(result.peak_bram_bytes, execution.peak_bram_bytes);
+        result.peak_buffers.persistent_peak_bytes = execution.peak_buffers.persistent_peak_bytes;
+        result.peak_buffers.static_peak_bytes = execution.peak_buffers.static_peak_bytes;
+        result.peak_buffers.dynamic_peak_bytes = execution.peak_buffers.dynamic_peak_bytes;
+        result.peak_buffers.key_peak_bytes = execution.peak_buffers.key_peak_bytes;
+        result.peak_buffers.ct_peak_bytes = execution.peak_buffers.ct_peak_bytes;
+        result.peak_buffers.out_peak_bytes = execution.peak_buffers.out_peak_bytes;
+        result.peak_buffers.temp_peak_bytes = execution.peak_buffers.temp_peak_bytes;
+    } else {
+        result.requested_method = req.ks_profile.method;
+        result.effective_method = method;
+        result.method_degraded = false;
+        result.degraded_reason = KeySwitchFallbackReason::None;
+    }
+    result.fallback_used = false;
+    result.fallback_reason = KeySwitchFallbackReason::None;
+    result.fallback_reason_message.clear();
+    NormalizeStatusFlags(&result);
+    return result;
 }
 
 CycleBackendStats CycleBackend::GetStats() const {

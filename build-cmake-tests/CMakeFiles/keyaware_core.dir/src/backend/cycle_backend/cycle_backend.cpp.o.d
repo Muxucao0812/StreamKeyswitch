@@ -165,6 +165,11 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend.cpp.o: \
  /home/mxc/work/KeyAwareSwitch/include/backend/cycle_sim/instruction.h \
  /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_poseidon.h \
  /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_fab.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_fast.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_hera.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_digit_centric.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_output_centric.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_backend/cycle_backend_max_parallel.h \
  /home/mxc/work/KeyAwareSwitch/include/backend/cycle_sim/driver.h \
  /home/mxc/work/KeyAwareSwitch/include/backend/cycle_sim/arch.h \
  /home/mxc/work/KeyAwareSwitch/include/backend/cycle_sim/stats.h \
@@ -181,8 +186,9 @@ CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend.cpp.o: \
  /usr/include/c++/11/bits/atomic_lockfree_defines.h \
  /usr/include/c++/11/backward/auto_ptr.h \
  /usr/include/c++/11/pstl/glue_memory_defs.h \
- /usr/include/c++/11/pstl/execution_defs.h /usr/include/c++/11/algorithm \
- /usr/include/c++/11/bits/stl_algo.h \
+ /usr/include/c++/11/pstl/execution_defs.h \
+ /home/mxc/work/KeyAwareSwitch/include/backend/cycle_sim/lowering.h \
+ /usr/include/c++/11/algorithm /usr/include/c++/11/bits/stl_algo.h \
  /usr/include/c++/11/bits/algorithmfwd.h \
  /usr/include/c++/11/bits/stl_heap.h \
  /usr/include/c++/11/bits/uniform_int_dist.h \

@@ -1,0 +1,1821 @@
+=== Experiment Config ===
+Scheduler: fifo
+Backend: cycle_stub
+Workload: synthetic
+KeySwitchMethod: fab
+Seed: 123
+NumCards: 1
+NumUsers: 1
+EnableMultiCard: false
+KeySwitchMultiBoardMode: auto
+SyntheticRequestsPerUser: 1
+SyntheticInterArrival: 300
+SyntheticStartTime: 0
+BurstBursts: 4
+BurstRequestsPerUserPerBurst: 2
+BurstIntraGap: 20
+BurstInterGap: 1200
+BurstStartTime: 0
+BurstLevel: 1
+NumPools: 1
+PoolConfigSource: built-in default
+TreeConfigSource: built-in default
+HEParamsSource: built-in default
+CSVOutput: results/metrics_fab.csv
+DumpLogicalGraph: true
+DumpRuntimePlan: true
+=========================
+Step 1: load ct to BRAM, total bytes: 0
+Emitted group 0: load_input, kind=0, bytes=12582912, work_items=0, micro_ops=48, est_cycles/op=182, total_est_cycles=7883, bram_live=12582912
+Step 2: load evalkey to BRAM and do computation
+Emitted group 1: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 2: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 3: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 4: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 5: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 6: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 7: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 8: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 9: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 10: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 11: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 12: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 13: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 14: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 15: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 16: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 17: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 18: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 19: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 20: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 21: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 22: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 23: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 24: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 25: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 26: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 27: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 28: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 29: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 30: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 31: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 32: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 33: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 34: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 35: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 36: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 37: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 38: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 39: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 40: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 41: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 42: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 43: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 44: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 45: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 46: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 47: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 48: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 49: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 50: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 51: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 52: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 53: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 54: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 55: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 56: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 57: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 58: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 59: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 60: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 61: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 62: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 63: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 64: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 65: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 66: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 67: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 68: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 69: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 70: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 71: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 72: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 73: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 74: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 75: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 76: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 77: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 78: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 79: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 80: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 81: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 82: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 83: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 84: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 85: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 86: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 87: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 88: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 89: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 90: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 91: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 92: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 93: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 94: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 95: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 96: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 97: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 98: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 99: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 100: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 101: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 102: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 103: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 104: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 105: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 106: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 107: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 108: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 109: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 110: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 111: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 112: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 113: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 114: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 115: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 116: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 117: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 118: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 119: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 120: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 121: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 122: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 123: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 124: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 125: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 126: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 127: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 128: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 129: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 130: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 131: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 132: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 133: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 134: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 135: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Emitted group 136: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12845056
+Emitted group 137: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=12845056
+Emitted group 138: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13107200
+Emitted group 139: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13107200
+Emitted group 140: load_evalkey, kind=0, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=13369344
+Emitted group 141: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=13369344
+Emitted group 142: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=13107200
+Emitted group 143: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=258, total_est_cycles=258, bram_live=12845056
+Emitted group 144: Spill_InnerProduct_Result, kind=1, bytes=262144, work_items=0, micro_ops=1, est_cycles/op=182, total_est_cycles=182, bram_live=12582912
+Step 3: INTT and ModDown for digit 0
+Emitted group 145: intt, kind=4, bytes=0, work_items=0, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=12582912
+Emitted group 146: modup_bconv, kind=8, bytes=6029312, work_items=0, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=18612224
+Emitted group 147: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18747525
+Emitted group 148: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18747525
+Emitted group 149: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18882826
+Emitted group 150: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18882826
+Emitted group 151: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19018127
+Emitted group 152: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19018127
+Emitted group 153: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19153428
+Emitted group 154: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19153428
+Emitted group 155: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19288729
+Emitted group 156: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19288729
+Emitted group 157: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19424030
+Emitted group 158: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19424030
+Emitted group 159: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19559331
+Emitted group 160: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19559331
+Emitted group 161: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19694632
+Emitted group 162: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19694632
+Emitted group 163: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19829933
+Emitted group 164: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19829933
+Emitted group 165: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19965234
+Emitted group 166: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19965234
+Emitted group 167: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20100535
+Emitted group 168: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20100535
+Emitted group 169: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20235836
+Emitted group 170: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20235836
+Emitted group 171: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20371137
+Emitted group 172: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20371137
+Emitted group 173: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20506438
+Emitted group 174: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20506438
+Emitted group 175: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20641739
+Emitted group 176: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20641739
+Emitted group 177: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20777040
+Emitted group 178: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20777040
+Emitted group 179: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20912341
+Emitted group 180: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20912341
+Emitted group 181: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=21047642
+Emitted group 182: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=21047642
+Emitted group 183: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=21182943
+Emitted group 184: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=21182943
+Emitted group 185: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=21318244
+Emitted group 186: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=21318244
+Emitted group 187: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=21453545
+Emitted group 188: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=21453545
+Emitted group 189: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=21588846
+Emitted group 190: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=21588846
+Emitted group 191: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=21724147
+Emitted group 192: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=21724147
+Emitted group 193: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=15830136
+Emitted group 194: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=15830136
+Emitted group 195: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=15965437
+Emitted group 196: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=15965437
+Emitted group 197: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16100738
+Emitted group 198: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16100738
+Emitted group 199: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16236039
+Emitted group 200: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16236039
+Emitted group 201: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16371340
+Emitted group 202: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16371340
+Emitted group 203: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16506641
+Emitted group 204: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16506641
+Emitted group 205: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16641942
+Emitted group 206: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16641942
+Emitted group 207: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16777243
+Emitted group 208: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16777243
+Emitted group 209: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16912544
+Emitted group 210: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16912544
+Emitted group 211: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17047845
+Emitted group 212: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17047845
+Emitted group 213: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17183146
+Emitted group 214: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17183146
+Emitted group 215: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17318447
+Emitted group 216: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17318447
+Emitted group 217: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17453748
+Emitted group 218: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17453748
+Emitted group 219: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17589049
+Emitted group 220: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17589049
+Emitted group 221: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17724350
+Emitted group 222: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17724350
+Emitted group 223: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17859651
+Emitted group 224: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17859651
+Emitted group 225: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17994952
+Emitted group 226: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17994952
+Emitted group 227: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18130253
+Emitted group 228: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18130253
+Emitted group 229: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18265554
+Emitted group 230: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18265554
+Emitted group 231: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18400855
+Emitted group 232: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18400855
+Emitted group 233: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18536156
+Emitted group 234: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18536156
+Emitted group 235: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18671457
+Emitted group 236: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18671457
+Emitted group 237: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18806758
+Emitted group 238: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18806758
+Step 3: INTT and ModDown for digit 1
+Emitted group 239: intt, kind=4, bytes=0, work_items=0, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=12777446
+Emitted group 240: modup_bconv, kind=8, bytes=6029312, work_items=0, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=18806758
+Emitted group 241: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18942059
+Emitted group 242: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18942059
+Emitted group 243: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19077360
+Emitted group 244: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19077360
+Emitted group 245: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19212661
+Emitted group 246: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19212661
+Emitted group 247: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19347962
+Emitted group 248: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19347962
+Emitted group 249: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19483263
+Emitted group 250: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19483263
+Emitted group 251: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19618564
+Emitted group 252: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19618564
+Emitted group 253: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19753865
+Emitted group 254: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19753865
+Emitted group 255: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19889166
+Emitted group 256: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19889166
+Emitted group 257: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20024467
+Emitted group 258: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20024467
+Emitted group 259: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20159768
+Emitted group 260: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20159768
+Emitted group 261: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20295069
+Emitted group 262: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20295069
+Emitted group 263: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20430370
+Emitted group 264: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20430370
+Emitted group 265: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20565671
+Emitted group 266: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20565671
+Emitted group 267: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20700972
+Emitted group 268: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20700972
+Emitted group 269: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20836273
+Emitted group 270: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20836273
+Emitted group 271: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=20971574
+Emitted group 272: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=20971574
+Emitted group 273: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=21106875
+Emitted group 274: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=21106875
+Emitted group 275: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=21242176
+Emitted group 276: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=21242176
+Emitted group 277: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=21377477
+Emitted group 278: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=21377477
+Emitted group 279: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=21512778
+Emitted group 280: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=21512778
+Emitted group 281: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=21648079
+Emitted group 282: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=21648079
+Emitted group 283: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=21783380
+Emitted group 284: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=21783380
+Emitted group 285: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=21918681
+Emitted group 286: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=21918681
+Emitted group 287: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16024670
+Emitted group 288: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16024670
+Emitted group 289: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16159971
+Emitted group 290: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16159971
+Emitted group 291: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16295272
+Emitted group 292: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16295272
+Emitted group 293: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16430573
+Emitted group 294: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16430573
+Emitted group 295: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16565874
+Emitted group 296: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16565874
+Emitted group 297: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16701175
+Emitted group 298: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16701175
+Emitted group 299: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16836476
+Emitted group 300: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16836476
+Emitted group 301: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=16971777
+Emitted group 302: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=16971777
+Emitted group 303: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17107078
+Emitted group 304: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17107078
+Emitted group 305: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17242379
+Emitted group 306: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17242379
+Emitted group 307: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17377680
+Emitted group 308: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17377680
+Emitted group 309: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17512981
+Emitted group 310: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17512981
+Emitted group 311: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17648282
+Emitted group 312: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17648282
+Emitted group 313: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17783583
+Emitted group 314: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17783583
+Emitted group 315: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=17918884
+Emitted group 316: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=17918884
+Emitted group 317: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18054185
+Emitted group 318: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18054185
+Emitted group 319: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18189486
+Emitted group 320: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18189486
+Emitted group 321: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18324787
+Emitted group 322: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18324787
+Emitted group 323: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18460088
+Emitted group 324: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18460088
+Emitted group 325: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18595389
+Emitted group 326: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18595389
+Emitted group 327: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18730690
+Emitted group 328: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18730690
+Emitted group 329: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=18865991
+Emitted group 330: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=18865991
+Emitted group 331: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=19001292
+Emitted group 332: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=19001292
+Emitted group 333: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=46, est_cycles/op=258, total_est_cycles=11778, bram_live=913356
+Step 3: INTT and ModDown for digit 2
+Emitted group 334: intt, kind=4, bytes=0, work_items=0, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=913356
+Emitted group 335: modup_bconv, kind=8, bytes=6029312, work_items=0, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=6942668
+Emitted group 336: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=7077969
+Emitted group 337: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=7077969
+Emitted group 338: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=7213270
+Emitted group 339: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=7213270
+Emitted group 340: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=7348571
+Emitted group 341: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=7348571
+Emitted group 342: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=7483872
+Emitted group 343: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=7483872
+Emitted group 344: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=7619173
+Emitted group 345: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=7619173
+Emitted group 346: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=7754474
+Emitted group 347: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=7754474
+Emitted group 348: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=7889775
+Emitted group 349: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=7889775
+Emitted group 350: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=8025076
+Emitted group 351: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=8025076
+Emitted group 352: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=8160377
+Emitted group 353: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=8160377
+Emitted group 354: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=8295678
+Emitted group 355: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=8295678
+Emitted group 356: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=8430979
+Emitted group 357: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=8430979
+Emitted group 358: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=8566280
+Emitted group 359: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=8566280
+Emitted group 360: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=8701581
+Emitted group 361: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=8701581
+Emitted group 362: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=8836882
+Emitted group 363: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=8836882
+Emitted group 364: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=8972183
+Emitted group 365: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=8972183
+Emitted group 366: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=9107484
+Emitted group 367: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=9107484
+Emitted group 368: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=9242785
+Emitted group 369: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=9242785
+Emitted group 370: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=9378086
+Emitted group 371: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=9378086
+Emitted group 372: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=9513387
+Emitted group 373: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=9513387
+Emitted group 374: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=9648688
+Emitted group 375: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=9648688
+Emitted group 376: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=9783989
+Emitted group 377: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=9783989
+Emitted group 378: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=9919290
+Emitted group 379: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=9919290
+Emitted group 380: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=10054591
+Emitted group 381: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=10054591
+Emitted group 382: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=4160580
+Emitted group 383: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=4160580
+Emitted group 384: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=4295881
+Emitted group 385: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=4295881
+Emitted group 386: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=4431182
+Emitted group 387: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=4431182
+Emitted group 388: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=4566483
+Emitted group 389: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=4566483
+Emitted group 390: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=4701784
+Emitted group 391: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=4701784
+Emitted group 392: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=4837085
+Emitted group 393: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=4837085
+Emitted group 394: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=4972386
+Emitted group 395: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=4972386
+Emitted group 396: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=5107687
+Emitted group 397: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=5107687
+Emitted group 398: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=5242988
+Emitted group 399: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=5242988
+Emitted group 400: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=5378289
+Emitted group 401: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=5378289
+Emitted group 402: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=5513590
+Emitted group 403: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=5513590
+Emitted group 404: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=5648891
+Emitted group 405: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=5648891
+Emitted group 406: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=5784192
+Emitted group 407: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=5784192
+Emitted group 408: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=5919493
+Emitted group 409: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=5919493
+Emitted group 410: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=6054794
+Emitted group 411: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=6054794
+Emitted group 412: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=6190095
+Emitted group 413: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=6190095
+Emitted group 414: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=6325396
+Emitted group 415: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=6325396
+Emitted group 416: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=6460697
+Emitted group 417: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=6460697
+Emitted group 418: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=6595998
+Emitted group 419: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=6595998
+Emitted group 420: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=6731299
+Emitted group 421: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=6731299
+Emitted group 422: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=6866600
+Emitted group 423: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=6866600
+Emitted group 424: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=7001901
+Emitted group 425: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=7001901
+Emitted group 426: load_evalkey, kind=0, bytes=135301, work_items=0, micro_ops=1, est_cycles/op=103, total_est_cycles=103, bram_live=7137202
+Emitted group 427: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=7137202
+Emitted group 428: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=46, est_cycles/op=258, total_est_cycles=11778, bram_live=0
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           141280
+Total latency (ns):     470934
+Peak BRAM live (bytes): 22053982
+HBM read (bytes):       43837362
+HBM write (bytes):      4194304
+Dependency stalls:      96328 cycles
+Resource stalls:        44952 cycles
+Instruction groups:     429
+Total instructions:     1115
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=25137 (17.7923%)  count=234  bytes=43837362
+  StoreHBM: cycles=2912 (2.06116%)  count=16  bytes=4194304
+  INTT: cycles=12324 (8.7231%)  count=3  bytes=0
+  EweMul: cycles=48360 (34.2299%)  count=186  bytes=0
+  EweAdd: cycles=14450 (10.2279%)  count=124  bytes=0
+  BConv: cycles=38097 (26.9656%)  count=552  bytes=18087936
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=48
+  load_evalkey: kind=LoadHBM  one_limb_cycles(avg/min/max)=123/103/182  groups=186  instrs=186
+  inner_product: kind=EweMul  one_limb_cycles=260  groups=186  instrs=186
+  reduce_and_spill: kind=EweAdd  one_limb_cycles=258  groups=34  instrs=124
+  Spill_InnerProduct_Result: kind=StoreHBM  one_limb_cycles=182  groups=16  instrs=16
+  intt: kind=INTT  one_limb_cycles=4108  groups=3  instrs=3
+  modup_bconv: kind=BConv  one_limb_cycles=276  groups=3  instrs=552
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input                     0      2187       2187            0     12582912  12582912
+   1  load_evalkey                2187      2369        182     12582912     12845056  262144
+   2  inner_product               2369      2629        260     12845056     12845056  0
+   3  load_evalkey                2629      2811        182     12845056     13107200  262144
+   4  inner_product               2811      3071        260     13107200     13107200  0
+   5  load_evalkey                3071      3253        182     13107200     13369344  262144
+   6  inner_product               3253      3513        260     13369344     13369344  0
+   7  reduce_and_spill            3513      3771        258     13369344     13107200  0
+   8  reduce_and_spill            3771      4029        258     13107200     12845056  0
+   9  Spill_InnerProduct_Result    4029      4211        182     12845056     12582912  262144
+  10  load_evalkey                4211      4393        182     12582912     12845056  262144
+  11  inner_product               4393      4653        260     12845056     12845056  0
+  12  load_evalkey                4653      4835        182     12845056     13107200  262144
+  13  inner_product               4835      5095        260     13107200     13107200  0
+  14  load_evalkey                5095      5277        182     13107200     13369344  262144
+  15  inner_product               5277      5537        260     13369344     13369344  0
+  16  reduce_and_spill            5537      5795        258     13369344     13107200  0
+  17  reduce_and_spill            5795      6053        258     13107200     12845056  0
+  18  Spill_InnerProduct_Result    6053      6235        182     12845056     12582912  262144
+  19  load_evalkey                6235      6417        182     12582912     12845056  262144
+  20  inner_product               6417      6677        260     12845056     12845056  0
+  21  load_evalkey                6677      6859        182     12845056     13107200  262144
+  22  inner_product               6859      7119        260     13107200     13107200  0
+  23  load_evalkey                7119      7301        182     13107200     13369344  262144
+  24  inner_product               7301      7561        260     13369344     13369344  0
+  25  reduce_and_spill            7561      7819        258     13369344     13107200  0
+  26  reduce_and_spill            7819      8077        258     13107200     12845056  0
+  27  Spill_InnerProduct_Result    8077      8259        182     12845056     12582912  262144
+  28  load_evalkey                8259      8441        182     12582912     12845056  262144
+  29  inner_product               8441      8701        260     12845056     12845056  0
+  30  load_evalkey                8701      8883        182     12845056     13107200  262144
+  31  inner_product               8883      9143        260     13107200     13107200  0
+  32  load_evalkey                9143      9325        182     13107200     13369344  262144
+  33  inner_product               9325      9585        260     13369344     13369344  0
+  34  reduce_and_spill            9585      9843        258     13369344     13107200  0
+  35  reduce_and_spill            9843     10101        258     13107200     12845056  0
+  36  Spill_InnerProduct_Result   10101     10283        182     12845056     12582912  262144
+  37  load_evalkey               10283     10465        182     12582912     12845056  262144
+  38  inner_product              10465     10725        260     12845056     12845056  0
+  39  load_evalkey               10725     10907        182     12845056     13107200  262144
+  40  inner_product              10907     11167        260     13107200     13107200  0
+  41  load_evalkey               11167     11349        182     13107200     13369344  262144
+  42  inner_product              11349     11609        260     13369344     13369344  0
+  43  reduce_and_spill           11609     11867        258     13369344     13107200  0
+  44  reduce_and_spill           11867     12125        258     13107200     12845056  0
+  45  Spill_InnerProduct_Result   12125     12307        182     12845056     12582912  262144
+  46  load_evalkey               12307     12489        182     12582912     12845056  262144
+  47  inner_product              12489     12749        260     12845056     12845056  0
+  48  load_evalkey               12749     12931        182     12845056     13107200  262144
+  49  inner_product              12931     13191        260     13107200     13107200  0
+  50  load_evalkey               13191     13373        182     13107200     13369344  262144
+  51  inner_product              13373     13633        260     13369344     13369344  0
+  52  reduce_and_spill           13633     13891        258     13369344     13107200  0
+  53  reduce_and_spill           13891     14149        258     13107200     12845056  0
+  54  Spill_InnerProduct_Result   14149     14331        182     12845056     12582912  262144
+  55  load_evalkey               14331     14513        182     12582912     12845056  262144
+  56  inner_product              14513     14773        260     12845056     12845056  0
+  57  load_evalkey               14773     14955        182     12845056     13107200  262144
+  58  inner_product              14955     15215        260     13107200     13107200  0
+  59  load_evalkey               15215     15397        182     13107200     13369344  262144
+  60  inner_product              15397     15657        260     13369344     13369344  0
+  61  reduce_and_spill           15657     15915        258     13369344     13107200  0
+  62  reduce_and_spill           15915     16173        258     13107200     12845056  0
+  63  Spill_InnerProduct_Result   16173     16355        182     12845056     12582912  262144
+  64  load_evalkey               16355     16537        182     12582912     12845056  262144
+  65  inner_product              16537     16797        260     12845056     12845056  0
+  66  load_evalkey               16797     16979        182     12845056     13107200  262144
+  67  inner_product              16979     17239        260     13107200     13107200  0
+  68  load_evalkey               17239     17421        182     13107200     13369344  262144
+  69  inner_product              17421     17681        260     13369344     13369344  0
+  70  reduce_and_spill           17681     17939        258     13369344     13107200  0
+  71  reduce_and_spill           17939     18197        258     13107200     12845056  0
+  72  Spill_InnerProduct_Result   18197     18379        182     12845056     12582912  262144
+  73  load_evalkey               18379     18561        182     12582912     12845056  262144
+  74  inner_product              18561     18821        260     12845056     12845056  0
+  75  load_evalkey               18821     19003        182     12845056     13107200  262144
+  76  inner_product              19003     19263        260     13107200     13107200  0
+  77  load_evalkey               19263     19445        182     13107200     13369344  262144
+  78  inner_product              19445     19705        260     13369344     13369344  0
+  79  reduce_and_spill           19705     19963        258     13369344     13107200  0
+  80  reduce_and_spill           19963     20221        258     13107200     12845056  0
+  81  Spill_InnerProduct_Result   20221     20403        182     12845056     12582912  262144
+  82  load_evalkey               20403     20585        182     12582912     12845056  262144
+  83  inner_product              20585     20845        260     12845056     12845056  0
+  84  load_evalkey               20845     21027        182     12845056     13107200  262144
+  85  inner_product              21027     21287        260     13107200     13107200  0
+  86  load_evalkey               21287     21469        182     13107200     13369344  262144
+  87  inner_product              21469     21729        260     13369344     13369344  0
+  88  reduce_and_spill           21729     21987        258     13369344     13107200  0
+  89  reduce_and_spill           21987     22245        258     13107200     12845056  0
+  90  Spill_InnerProduct_Result   22245     22427        182     12845056     12582912  262144
+  91  load_evalkey               22427     22609        182     12582912     12845056  262144
+  92  inner_product              22609     22869        260     12845056     12845056  0
+  93  load_evalkey               22869     23051        182     12845056     13107200  262144
+  94  inner_product              23051     23311        260     13107200     13107200  0
+  95  load_evalkey               23311     23493        182     13107200     13369344  262144
+  96  inner_product              23493     23753        260     13369344     13369344  0
+  97  reduce_and_spill           23753     24011        258     13369344     13107200  0
+  98  reduce_and_spill           24011     24269        258     13107200     12845056  0
+  99  Spill_InnerProduct_Result   24269     24451        182     12845056     12582912  262144
+  100  load_evalkey               24451     24633        182     12582912     12845056  262144
+  101  inner_product              24633     24893        260     12845056     12845056  0
+  102  load_evalkey               24893     25075        182     12845056     13107200  262144
+  103  inner_product              25075     25335        260     13107200     13107200  0
+  104  load_evalkey               25335     25517        182     13107200     13369344  262144
+  105  inner_product              25517     25777        260     13369344     13369344  0
+  106  reduce_and_spill           25777     26035        258     13369344     13107200  0
+  107  reduce_and_spill           26035     26293        258     13107200     12845056  0
+  108  Spill_InnerProduct_Result   26293     26475        182     12845056     12582912  262144
+  109  load_evalkey               26475     26657        182     12582912     12845056  262144
+  110  inner_product              26657     26917        260     12845056     12845056  0
+  111  load_evalkey               26917     27099        182     12845056     13107200  262144
+  112  inner_product              27099     27359        260     13107200     13107200  0
+  113  load_evalkey               27359     27541        182     13107200     13369344  262144
+  114  inner_product              27541     27801        260     13369344     13369344  0
+  115  reduce_and_spill           27801     28059        258     13369344     13107200  0
+  116  reduce_and_spill           28059     28317        258     13107200     12845056  0
+  117  Spill_InnerProduct_Result   28317     28499        182     12845056     12582912  262144
+  118  load_evalkey               28499     28681        182     12582912     12845056  262144
+  119  inner_product              28681     28941        260     12845056     12845056  0
+  120  load_evalkey               28941     29123        182     12845056     13107200  262144
+  121  inner_product              29123     29383        260     13107200     13107200  0
+  122  load_evalkey               29383     29565        182     13107200     13369344  262144
+  123  inner_product              29565     29825        260     13369344     13369344  0
+  124  reduce_and_spill           29825     30083        258     13369344     13107200  0
+  125  reduce_and_spill           30083     30341        258     13107200     12845056  0
+  126  Spill_InnerProduct_Result   30341     30523        182     12845056     12582912  262144
+  127  load_evalkey               30523     30705        182     12582912     12845056  262144
+  128  inner_product              30705     30965        260     12845056     12845056  0
+  129  load_evalkey               30965     31147        182     12845056     13107200  262144
+  130  inner_product              31147     31407        260     13107200     13107200  0
+  131  load_evalkey               31407     31589        182     13107200     13369344  262144
+  132  inner_product              31589     31849        260     13369344     13369344  0
+  133  reduce_and_spill           31849     32107        258     13369344     13107200  0
+  134  reduce_and_spill           32107     32365        258     13107200     12845056  0
+  135  Spill_InnerProduct_Result   32365     32547        182     12845056     12582912  262144
+  136  load_evalkey               32547     32729        182     12582912     12845056  262144
+  137  inner_product              32729     32989        260     12845056     12845056  0
+  138  load_evalkey               32989     33171        182     12845056     13107200  262144
+  139  inner_product              33171     33431        260     13107200     13107200  0
+  140  load_evalkey               33431     33613        182     13107200     13369344  262144
+  141  inner_product              33613     33873        260     13369344     13369344  0
+  142  reduce_and_spill           33873     34131        258     13369344     13107200  0
+  143  reduce_and_spill           34131     34389        258     13107200     12845056  0
+  144  Spill_InnerProduct_Result   34389     34571        182     12845056     12582912  262144
+  145  intt                       34571     38679       4108     12582912     12582912  0
+  146  modup_bconv                38679     51378      12699     12582912     18612224  6029312
+  147  load_evalkey               51378     51481        103     18612224     18747525  135301
+  148  inner_product              51481     51741        260     18747525     18747525  0
+  149  load_evalkey               51741     51844        103     18747525     18882826  135301
+  150  inner_product              51844     52104        260     18882826     18882826  0
+  151  load_evalkey               52104     52207        103     18882826     19018127  135301
+  152  inner_product              52207     52467        260     19018127     19018127  0
+  153  load_evalkey               52467     52570        103     19018127     19153428  135301
+  154  inner_product              52570     52830        260     19153428     19153428  0
+  155  load_evalkey               52830     52933        103     19153428     19288729  135301
+  156  inner_product              52933     53193        260     19288729     19288729  0
+  157  load_evalkey               53193     53296        103     19288729     19424030  135301
+  158  inner_product              53296     53556        260     19424030     19424030  0
+  159  load_evalkey               53556     53659        103     19424030     19559331  135301
+  160  inner_product              53659     53919        260     19559331     19559331  0
+  161  load_evalkey               53919     54022        103     19559331     19694632  135301
+  162  inner_product              54022     54282        260     19694632     19694632  0
+  163  load_evalkey               54282     54385        103     19694632     19829933  135301
+  164  inner_product              54385     54645        260     19829933     19829933  0
+  165  load_evalkey               54645     54748        103     19829933     19965234  135301
+  166  inner_product              54748     55008        260     19965234     19965234  0
+  167  load_evalkey               55008     55111        103     19965234     20100535  135301
+  168  inner_product              55111     55371        260     20100535     20100535  0
+  169  load_evalkey               55371     55474        103     20100535     20235836  135301
+  170  inner_product              55474     55734        260     20235836     20235836  0
+  171  load_evalkey               55734     55837        103     20235836     20371137  135301
+  172  inner_product              55837     56097        260     20371137     20371137  0
+  173  load_evalkey               56097     56200        103     20371137     20506438  135301
+  174  inner_product              56200     56460        260     20506438     20506438  0
+  175  load_evalkey               56460     56563        103     20506438     20641739  135301
+  176  inner_product              56563     56823        260     20641739     20641739  0
+  177  load_evalkey               56823     56926        103     20641739     20777040  135301
+  178  inner_product              56926     57186        260     20777040     20777040  0
+  179  load_evalkey               57186     57289        103     20777040     20912341  135301
+  180  inner_product              57289     57549        260     20912341     20912341  0
+  181  load_evalkey               57549     57652        103     20912341     21047642  135301
+  182  inner_product              57652     57912        260     21047642     21047642  0
+  183  load_evalkey               57912     58015        103     21047642     21182943  135301
+  184  inner_product              58015     58275        260     21182943     21182943  0
+  185  load_evalkey               58275     58378        103     21182943     21318244  135301
+  186  inner_product              58378     58638        260     21318244     21318244  0
+  187  load_evalkey               58638     58741        103     21318244     21453545  135301
+  188  inner_product              58741     59001        260     21453545     21453545  0
+  189  load_evalkey               59001     59104        103     21453545     21588846  135301
+  190  inner_product              59104     59364        260     21588846     21588846  0
+  191  load_evalkey               59364     59467        103     21588846     21724147  135301
+  192  inner_product              59467     59727        260     21724147     21724147  0
+  193  load_evalkey               59727     59830        103     21724147     15830136  135301
+  194  inner_product              59830     60090        260     15830136     15830136  0
+  195  load_evalkey               60090     60193        103     15830136     15965437  135301
+  196  inner_product              60193     60453        260     15965437     15965437  0
+  197  load_evalkey               60453     60556        103     15965437     16100738  135301
+  198  inner_product              60556     60816        260     16100738     16100738  0
+  199  load_evalkey               60816     60919        103     16100738     16236039  135301
+  200  inner_product              60919     61179        260     16236039     16236039  0
+  201  load_evalkey               61179     61282        103     16236039     16371340  135301
+  202  inner_product              61282     61542        260     16371340     16371340  0
+  203  load_evalkey               61542     61645        103     16371340     16506641  135301
+  204  inner_product              61645     61905        260     16506641     16506641  0
+  205  load_evalkey               61905     62008        103     16506641     16641942  135301
+  206  inner_product              62008     62268        260     16641942     16641942  0
+  207  load_evalkey               62268     62371        103     16641942     16777243  135301
+  208  inner_product              62371     62631        260     16777243     16777243  0
+  209  load_evalkey               62631     62734        103     16777243     16912544  135301
+  210  inner_product              62734     62994        260     16912544     16912544  0
+  211  load_evalkey               62994     63097        103     16912544     17047845  135301
+  212  inner_product              63097     63357        260     17047845     17047845  0
+  213  load_evalkey               63357     63460        103     17047845     17183146  135301
+  214  inner_product              63460     63720        260     17183146     17183146  0
+  215  load_evalkey               63720     63823        103     17183146     17318447  135301
+  216  inner_product              63823     64083        260     17318447     17318447  0
+  217  load_evalkey               64083     64186        103     17318447     17453748  135301
+  218  inner_product              64186     64446        260     17453748     17453748  0
+  219  load_evalkey               64446     64549        103     17453748     17589049  135301
+  220  inner_product              64549     64809        260     17589049     17589049  0
+  221  load_evalkey               64809     64912        103     17589049     17724350  135301
+  222  inner_product              64912     65172        260     17724350     17724350  0
+  223  load_evalkey               65172     65275        103     17724350     17859651  135301
+  224  inner_product              65275     65535        260     17859651     17859651  0
+  225  load_evalkey               65535     65638        103     17859651     17994952  135301
+  226  inner_product              65638     65898        260     17994952     17994952  0
+  227  load_evalkey               65898     66001        103     17994952     18130253  135301
+  228  inner_product              66001     66261        260     18130253     18130253  0
+  229  load_evalkey               66261     66364        103     18130253     18265554  135301
+  230  inner_product              66364     66624        260     18265554     18265554  0
+  231  load_evalkey               66624     66727        103     18265554     18400855  135301
+  232  inner_product              66727     66987        260     18400855     18400855  0
+  233  load_evalkey               66987     67090        103     18400855     18536156  135301
+  234  inner_product              67090     67350        260     18536156     18536156  0
+  235  load_evalkey               67350     67453        103     18536156     18671457  135301
+  236  inner_product              67453     67713        260     18671457     18671457  0
+  237  load_evalkey               67713     67816        103     18671457     18806758  135301
+  238  inner_product              67816     68076        260     18806758     18806758  0
+  239  intt                       68076     72184       4108     18806758     12777446  0
+  240  modup_bconv                72184     84883      12699     12777446     18806758  6029312
+  241  load_evalkey               84883     84986        103     18806758     18942059  135301
+  242  inner_product              84986     85246        260     18942059     18942059  0
+  243  load_evalkey               85246     85349        103     18942059     19077360  135301
+  244  inner_product              85349     85609        260     19077360     19077360  0
+  245  load_evalkey               85609     85712        103     19077360     19212661  135301
+  246  inner_product              85712     85972        260     19212661     19212661  0
+  247  load_evalkey               85972     86075        103     19212661     19347962  135301
+  248  inner_product              86075     86335        260     19347962     19347962  0
+  249  load_evalkey               86335     86438        103     19347962     19483263  135301
+  250  inner_product              86438     86698        260     19483263     19483263  0
+  251  load_evalkey               86698     86801        103     19483263     19618564  135301
+  252  inner_product              86801     87061        260     19618564     19618564  0
+  253  load_evalkey               87061     87164        103     19618564     19753865  135301
+  254  inner_product              87164     87424        260     19753865     19753865  0
+  255  load_evalkey               87424     87527        103     19753865     19889166  135301
+  256  inner_product              87527     87787        260     19889166     19889166  0
+  257  load_evalkey               87787     87890        103     19889166     20024467  135301
+  258  inner_product              87890     88150        260     20024467     20024467  0
+  259  load_evalkey               88150     88253        103     20024467     20159768  135301
+  260  inner_product              88253     88513        260     20159768     20159768  0
+  261  load_evalkey               88513     88616        103     20159768     20295069  135301
+  262  inner_product              88616     88876        260     20295069     20295069  0
+  263  load_evalkey               88876     88979        103     20295069     20430370  135301
+  264  inner_product              88979     89239        260     20430370     20430370  0
+  265  load_evalkey               89239     89342        103     20430370     20565671  135301
+  266  inner_product              89342     89602        260     20565671     20565671  0
+  267  load_evalkey               89602     89705        103     20565671     20700972  135301
+  268  inner_product              89705     89965        260     20700972     20700972  0
+  269  load_evalkey               89965     90068        103     20700972     20836273  135301
+  270  inner_product              90068     90328        260     20836273     20836273  0
+  271  load_evalkey               90328     90431        103     20836273     20971574  135301
+  272  inner_product              90431     90691        260     20971574     20971574  0
+  273  load_evalkey               90691     90794        103     20971574     21106875  135301
+  274  inner_product              90794     91054        260     21106875     21106875  0
+  275  load_evalkey               91054     91157        103     21106875     21242176  135301
+  276  inner_product              91157     91417        260     21242176     21242176  0
+  277  load_evalkey               91417     91520        103     21242176     21377477  135301
+  278  inner_product              91520     91780        260     21377477     21377477  0
+  279  load_evalkey               91780     91883        103     21377477     21512778  135301
+  280  inner_product              91883     92143        260     21512778     21512778  0
+  281  load_evalkey               92143     92246        103     21512778     21648079  135301
+  282  inner_product              92246     92506        260     21648079     21648079  0
+  283  load_evalkey               92506     92609        103     21648079     21783380  135301
+  284  inner_product              92609     92869        260     21783380     21783380  0
+  285  load_evalkey               92869     92972        103     21783380     21918681  135301
+  286  inner_product              92972     93232        260     21918681     21918681  0
+  287  load_evalkey               93232     93335        103     21918681     16024670  135301
+  288  inner_product              93335     93595        260     16024670     16024670  0
+  289  load_evalkey               93595     93698        103     16024670     16159971  135301
+  290  inner_product              93698     93958        260     16159971     16159971  0
+  291  load_evalkey               93958     94061        103     16159971     16295272  135301
+  292  inner_product              94061     94321        260     16295272     16295272  0
+  293  load_evalkey               94321     94424        103     16295272     16430573  135301
+  294  inner_product              94424     94684        260     16430573     16430573  0
+  295  load_evalkey               94684     94787        103     16430573     16565874  135301
+  296  inner_product              94787     95047        260     16565874     16565874  0
+  297  load_evalkey               95047     95150        103     16565874     16701175  135301
+  298  inner_product              95150     95410        260     16701175     16701175  0
+  299  load_evalkey               95410     95513        103     16701175     16836476  135301
+  300  inner_product              95513     95773        260     16836476     16836476  0
+  301  load_evalkey               95773     95876        103     16836476     16971777  135301
+  302  inner_product              95876     96136        260     16971777     16971777  0
+  303  load_evalkey               96136     96239        103     16971777     17107078  135301
+  304  inner_product              96239     96499        260     17107078     17107078  0
+  305  load_evalkey               96499     96602        103     17107078     17242379  135301
+  306  inner_product              96602     96862        260     17242379     17242379  0
+  307  load_evalkey               96862     96965        103     17242379     17377680  135301
+  308  inner_product              96965     97225        260     17377680     17377680  0
+  309  load_evalkey               97225     97328        103     17377680     17512981  135301
+  310  inner_product              97328     97588        260     17512981     17512981  0
+  311  load_evalkey               97588     97691        103     17512981     17648282  135301
+  312  inner_product              97691     97951        260     17648282     17648282  0
+  313  load_evalkey               97951     98054        103     17648282     17783583  135301
+  314  inner_product              98054     98314        260     17783583     17783583  0
+  315  load_evalkey               98314     98417        103     17783583     17918884  135301
+  316  inner_product              98417     98677        260     17918884     17918884  0
+  317  load_evalkey               98677     98780        103     17918884     18054185  135301
+  318  inner_product              98780     99040        260     18054185     18054185  0
+  319  load_evalkey               99040     99143        103     18054185     18189486  135301
+  320  inner_product              99143     99403        260     18189486     18189486  0
+  321  load_evalkey               99403     99506        103     18189486     18324787  135301
+  322  inner_product              99506     99766        260     18324787     18324787  0
+  323  load_evalkey               99766     99869        103     18324787     18460088  135301
+  324  inner_product              99869    100129        260     18460088     18460088  0
+  325  load_evalkey              100129    100232        103     18460088     18595389  135301
+  326  inner_product             100232    100492        260     18595389     18595389  0
+  327  load_evalkey              100492    100595        103     18595389     18730690  135301
+  328  inner_product             100595    100855        260     18730690     18730690  0
+  329  load_evalkey              100855    100958        103     18730690     18865991  135301
+  330  inner_product             100958    101218        260     18865991     18865991  0
+  331  load_evalkey              101218    101321        103     18865991     19001292  135301
+  332  inner_product             101321    101581        260     19001292     19001292  0
+  333  reduce_and_spill          101581    104678       3097     19001292       913356  0
+  334  intt                      104678    108786       4108       913356       913356  0
+  335  modup_bconv               108786    121485      12699       913356      6942668  6029312
+  336  load_evalkey              121485    121588        103      6942668      7077969  135301
+  337  inner_product             121588    121848        260      7077969      7077969  0
+  338  load_evalkey              121848    121951        103      7077969      7213270  135301
+  339  inner_product             121951    122211        260      7213270      7213270  0
+  340  load_evalkey              122211    122314        103      7213270      7348571  135301
+  341  inner_product             122314    122574        260      7348571      7348571  0
+  342  load_evalkey              122574    122677        103      7348571      7483872  135301
+  343  inner_product             122677    122937        260      7483872      7483872  0
+  344  load_evalkey              122937    123040        103      7483872      7619173  135301
+  345  inner_product             123040    123300        260      7619173      7619173  0
+  346  load_evalkey              123300    123403        103      7619173      7754474  135301
+  347  inner_product             123403    123663        260      7754474      7754474  0
+  348  load_evalkey              123663    123766        103      7754474      7889775  135301
+  349  inner_product             123766    124026        260      7889775      7889775  0
+  350  load_evalkey              124026    124129        103      7889775      8025076  135301
+  351  inner_product             124129    124389        260      8025076      8025076  0
+  352  load_evalkey              124389    124492        103      8025076      8160377  135301
+  353  inner_product             124492    124752        260      8160377      8160377  0
+  354  load_evalkey              124752    124855        103      8160377      8295678  135301
+  355  inner_product             124855    125115        260      8295678      8295678  0
+  356  load_evalkey              125115    125218        103      8295678      8430979  135301
+  357  inner_product             125218    125478        260      8430979      8430979  0
+  358  load_evalkey              125478    125581        103      8430979      8566280  135301
+  359  inner_product             125581    125841        260      8566280      8566280  0
+  360  load_evalkey              125841    125944        103      8566280      8701581  135301
+  361  inner_product             125944    126204        260      8701581      8701581  0
+  362  load_evalkey              126204    126307        103      8701581      8836882  135301
+  363  inner_product             126307    126567        260      8836882      8836882  0
+  364  load_evalkey              126567    126670        103      8836882      8972183  135301
+  365  inner_product             126670    126930        260      8972183      8972183  0
+  366  load_evalkey              126930    127033        103      8972183      9107484  135301
+  367  inner_product             127033    127293        260      9107484      9107484  0
+  368  load_evalkey              127293    127396        103      9107484      9242785  135301
+  369  inner_product             127396    127656        260      9242785      9242785  0
+  370  load_evalkey              127656    127759        103      9242785      9378086  135301
+  371  inner_product             127759    128019        260      9378086      9378086  0
+  372  load_evalkey              128019    128122        103      9378086      9513387  135301
+  373  inner_product             128122    128382        260      9513387      9513387  0
+  374  load_evalkey              128382    128485        103      9513387      9648688  135301
+  375  inner_product             128485    128745        260      9648688      9648688  0
+  376  load_evalkey              128745    128848        103      9648688      9783989  135301
+  377  inner_product             128848    129108        260      9783989      9783989  0
+  378  load_evalkey              129108    129211        103      9783989      9919290  135301
+  379  inner_product             129211    129471        260      9919290      9919290  0
+  380  load_evalkey              129471    129574        103      9919290     10054591  135301
+  381  inner_product             129574    129834        260     10054591     10054591  0
+  382  load_evalkey              129834    129937        103     10054591      4160580  135301
+  383  inner_product             129937    130197        260      4160580      4160580  0
+  384  load_evalkey              130197    130300        103      4160580      4295881  135301
+  385  inner_product             130300    130560        260      4295881      4295881  0
+  386  load_evalkey              130560    130663        103      4295881      4431182  135301
+  387  inner_product             130663    130923        260      4431182      4431182  0
+  388  load_evalkey              130923    131026        103      4431182      4566483  135301
+  389  inner_product             131026    131286        260      4566483      4566483  0
+  390  load_evalkey              131286    131389        103      4566483      4701784  135301
+  391  inner_product             131389    131649        260      4701784      4701784  0
+  392  load_evalkey              131649    131752        103      4701784      4837085  135301
+  393  inner_product             131752    132012        260      4837085      4837085  0
+  394  load_evalkey              132012    132115        103      4837085      4972386  135301
+  395  inner_product             132115    132375        260      4972386      4972386  0
+  396  load_evalkey              132375    132478        103      4972386      5107687  135301
+  397  inner_product             132478    132738        260      5107687      5107687  0
+  398  load_evalkey              132738    132841        103      5107687      5242988  135301
+  399  inner_product             132841    133101        260      5242988      5242988  0
+  400  load_evalkey              133101    133204        103      5242988      5378289  135301
+  401  inner_product             133204    133464        260      5378289      5378289  0
+  402  load_evalkey              133464    133567        103      5378289      5513590  135301
+  403  inner_product             133567    133827        260      5513590      5513590  0
+  404  load_evalkey              133827    133930        103      5513590      5648891  135301
+  405  inner_product             133930    134190        260      5648891      5648891  0
+  406  load_evalkey              134190    134293        103      5648891      5784192  135301
+  407  inner_product             134293    134553        260      5784192      5784192  0
+  408  load_evalkey              134553    134656        103      5784192      5919493  135301
+  409  inner_product             134656    134916        260      5919493      5919493  0
+  410  load_evalkey              134916    135019        103      5919493      6054794  135301
+  411  inner_product             135019    135279        260      6054794      6054794  0
+  412  load_evalkey              135279    135382        103      6054794      6190095  135301
+  413  inner_product             135382    135642        260      6190095      6190095  0
+  414  load_evalkey              135642    135745        103      6190095      6325396  135301
+  415  inner_product             135745    136005        260      6325396      6325396  0
+  416  load_evalkey              136005    136108        103      6325396      6460697  135301
+  417  inner_product             136108    136368        260      6460697      6460697  0
+  418  load_evalkey              136368    136471        103      6460697      6595998  135301
+  419  inner_product             136471    136731        260      6595998      6595998  0
+  420  load_evalkey              136731    136834        103      6595998      6731299  135301
+  421  inner_product             136834    137094        260      6731299      6731299  0
+  422  load_evalkey              137094    137197        103      6731299      6866600  135301
+  423  inner_product             137197    137457        260      6866600      6866600  0
+  424  load_evalkey              137457    137560        103      6866600      7001901  135301
+  425  inner_product             137560    137820        260      7001901      7001901  0
+  426  load_evalkey              137820    137923        103      7001901      7137202  135301
+  427  inner_product             137923    138183        260      7137202      7137202  0
+  428  reduce_and_spill          138183    141280       3097      7137202            0  0
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+2187,12582912
+2187,12582912
+2369,12845056
+2369,12845056
+2629,12845056
+2629,12845056
+2811,13107200
+2811,13107200
+3071,13107200
+3071,13107200
+3253,13369344
+3253,13369344
+3513,13369344
+3513,13369344
+3771,13107200
+3771,13107200
+4029,12845056
+4029,12845056
+4211,12582912
+4211,12582912
+4393,12845056
+4393,12845056
+4653,12845056
+4653,12845056
+4835,13107200
+4835,13107200
+5095,13107200
+5095,13107200
+5277,13369344
+5277,13369344
+5537,13369344
+5537,13369344
+5795,13107200
+5795,13107200
+6053,12845056
+6053,12845056
+6235,12582912
+6235,12582912
+6417,12845056
+6417,12845056
+6677,12845056
+6677,12845056
+6859,13107200
+6859,13107200
+7119,13107200
+7119,13107200
+7301,13369344
+7301,13369344
+7561,13369344
+7561,13369344
+7819,13107200
+7819,13107200
+8077,12845056
+8077,12845056
+8259,12582912
+8259,12582912
+8441,12845056
+8441,12845056
+8701,12845056
+8701,12845056
+8883,13107200
+8883,13107200
+9143,13107200
+9143,13107200
+9325,13369344
+9325,13369344
+9585,13369344
+9585,13369344
+9843,13107200
+9843,13107200
+10101,12845056
+10101,12845056
+10283,12582912
+10283,12582912
+10465,12845056
+10465,12845056
+10725,12845056
+10725,12845056
+10907,13107200
+10907,13107200
+11167,13107200
+11167,13107200
+11349,13369344
+11349,13369344
+11609,13369344
+11609,13369344
+11867,13107200
+11867,13107200
+12125,12845056
+12125,12845056
+12307,12582912
+12307,12582912
+12489,12845056
+12489,12845056
+12749,12845056
+12749,12845056
+12931,13107200
+12931,13107200
+13191,13107200
+13191,13107200
+13373,13369344
+13373,13369344
+13633,13369344
+13633,13369344
+13891,13107200
+13891,13107200
+14149,12845056
+14149,12845056
+14331,12582912
+14331,12582912
+14513,12845056
+14513,12845056
+14773,12845056
+14773,12845056
+14955,13107200
+14955,13107200
+15215,13107200
+15215,13107200
+15397,13369344
+15397,13369344
+15657,13369344
+15657,13369344
+15915,13107200
+15915,13107200
+16173,12845056
+16173,12845056
+16355,12582912
+16355,12582912
+16537,12845056
+16537,12845056
+16797,12845056
+16797,12845056
+16979,13107200
+16979,13107200
+17239,13107200
+17239,13107200
+17421,13369344
+17421,13369344
+17681,13369344
+17681,13369344
+17939,13107200
+17939,13107200
+18197,12845056
+18197,12845056
+18379,12582912
+18379,12582912
+18561,12845056
+18561,12845056
+18821,12845056
+18821,12845056
+19003,13107200
+19003,13107200
+19263,13107200
+19263,13107200
+19445,13369344
+19445,13369344
+19705,13369344
+19705,13369344
+19963,13107200
+19963,13107200
+20221,12845056
+20221,12845056
+20403,12582912
+20403,12582912
+20585,12845056
+20585,12845056
+20845,12845056
+20845,12845056
+21027,13107200
+21027,13107200
+21287,13107200
+21287,13107200
+21469,13369344
+21469,13369344
+21729,13369344
+21729,13369344
+21987,13107200
+21987,13107200
+22245,12845056
+22245,12845056
+22427,12582912
+22427,12582912
+22609,12845056
+22609,12845056
+22869,12845056
+22869,12845056
+23051,13107200
+23051,13107200
+23311,13107200
+23311,13107200
+23493,13369344
+23493,13369344
+23753,13369344
+23753,13369344
+24011,13107200
+24011,13107200
+24269,12845056
+24269,12845056
+24451,12582912
+24451,12582912
+24633,12845056
+24633,12845056
+24893,12845056
+24893,12845056
+25075,13107200
+25075,13107200
+25335,13107200
+25335,13107200
+25517,13369344
+25517,13369344
+25777,13369344
+25777,13369344
+26035,13107200
+26035,13107200
+26293,12845056
+26293,12845056
+26475,12582912
+26475,12582912
+26657,12845056
+26657,12845056
+26917,12845056
+26917,12845056
+27099,13107200
+27099,13107200
+27359,13107200
+27359,13107200
+27541,13369344
+27541,13369344
+27801,13369344
+27801,13369344
+28059,13107200
+28059,13107200
+28317,12845056
+28317,12845056
+28499,12582912
+28499,12582912
+28681,12845056
+28681,12845056
+28941,12845056
+28941,12845056
+29123,13107200
+29123,13107200
+29383,13107200
+29383,13107200
+29565,13369344
+29565,13369344
+29825,13369344
+29825,13369344
+30083,13107200
+30083,13107200
+30341,12845056
+30341,12845056
+30523,12582912
+30523,12582912
+30705,12845056
+30705,12845056
+30965,12845056
+30965,12845056
+31147,13107200
+31147,13107200
+31407,13107200
+31407,13107200
+31589,13369344
+31589,13369344
+31849,13369344
+31849,13369344
+32107,13107200
+32107,13107200
+32365,12845056
+32365,12845056
+32547,12582912
+32547,12582912
+32729,12845056
+32729,12845056
+32989,12845056
+32989,12845056
+33171,13107200
+33171,13107200
+33431,13107200
+33431,13107200
+33613,13369344
+33613,13369344
+33873,13369344
+33873,13369344
+34131,13107200
+34131,13107200
+34389,12845056
+34389,12845056
+34571,12582912
+34571,12582912
+38679,12582912
+38679,12582912
+51378,18612224
+51378,18612224
+51481,18747525
+51481,18747525
+51741,18747525
+51741,18747525
+51844,18882826
+51844,18882826
+52104,18882826
+52104,18882826
+52207,19018127
+52207,19018127
+52467,19018127
+52467,19018127
+52570,19153428
+52570,19153428
+52830,19153428
+52830,19153428
+52933,19288729
+52933,19288729
+53193,19288729
+53193,19288729
+53296,19424030
+53296,19424030
+53556,19424030
+53556,19424030
+53659,19559331
+53659,19559331
+53919,19559331
+53919,19559331
+54022,19694632
+54022,19694632
+54282,19694632
+54282,19694632
+54385,19829933
+54385,19829933
+54645,19829933
+54645,19829933
+54748,19965234
+54748,19965234
+55008,19965234
+55008,19965234
+55111,20100535
+55111,20100535
+55371,20100535
+55371,20100535
+55474,20235836
+55474,20235836
+55734,20235836
+55734,20235836
+55837,20371137
+55837,20371137
+56097,20371137
+56097,20371137
+56200,20506438
+56200,20506438
+56460,20506438
+56460,20506438
+56563,20641739
+56563,20641739
+56823,20641739
+56823,20641739
+56926,20777040
+56926,20777040
+57186,20777040
+57186,20777040
+57289,20912341
+57289,20912341
+57549,20912341
+57549,20912341
+57652,21047642
+57652,21047642
+57912,21047642
+57912,21047642
+58015,21182943
+58015,21182943
+58275,21182943
+58275,21182943
+58378,21318244
+58378,21318244
+58638,21318244
+58638,21318244
+58741,21453545
+58741,21453545
+59001,21453545
+59001,21453545
+59104,21588846
+59104,21588846
+59364,21588846
+59364,21588846
+59467,21724147
+59467,21724147
+59727,21724147
+59727,21724147
+59830,15830136
+59830,15830136
+60090,15830136
+60090,15830136
+60193,15965437
+60193,15965437
+60453,15965437
+60453,15965437
+60556,16100738
+60556,16100738
+60816,16100738
+60816,16100738
+60919,16236039
+60919,16236039
+61179,16236039
+61179,16236039
+61282,16371340
+61282,16371340
+61542,16371340
+61542,16371340
+61645,16506641
+61645,16506641
+61905,16506641
+61905,16506641
+62008,16641942
+62008,16641942
+62268,16641942
+62268,16641942
+62371,16777243
+62371,16777243
+62631,16777243
+62631,16777243
+62734,16912544
+62734,16912544
+62994,16912544
+62994,16912544
+63097,17047845
+63097,17047845
+63357,17047845
+63357,17047845
+63460,17183146
+63460,17183146
+63720,17183146
+63720,17183146
+63823,17318447
+63823,17318447
+64083,17318447
+64083,17318447
+64186,17453748
+64186,17453748
+64446,17453748
+64446,17453748
+64549,17589049
+64549,17589049
+64809,17589049
+64809,17589049
+64912,17724350
+64912,17724350
+65172,17724350
+65172,17724350
+65275,17859651
+65275,17859651
+65535,17859651
+65535,17859651
+65638,17994952
+65638,17994952
+65898,17994952
+65898,17994952
+66001,18130253
+66001,18130253
+66261,18130253
+66261,18130253
+66364,18265554
+66364,18265554
+66624,18265554
+66624,18265554
+66727,18400855
+66727,18400855
+66987,18400855
+66987,18400855
+67090,18536156
+67090,18536156
+67350,18536156
+67350,18536156
+67453,18671457
+67453,18671457
+67713,18671457
+67713,18671457
+67816,18806758
+67816,18806758
+68076,18806758
+68076,18806758
+72184,12777446
+72184,12777446
+84883,18806758
+84883,18806758
+84986,18942059
+84986,18942059
+85246,18942059
+85246,18942059
+85349,19077360
+85349,19077360
+85609,19077360
+85609,19077360
+85712,19212661
+85712,19212661
+85972,19212661
+85972,19212661
+86075,19347962
+86075,19347962
+86335,19347962
+86335,19347962
+86438,19483263
+86438,19483263
+86698,19483263
+86698,19483263
+86801,19618564
+86801,19618564
+87061,19618564
+87061,19618564
+87164,19753865
+87164,19753865
+87424,19753865
+87424,19753865
+87527,19889166
+87527,19889166
+87787,19889166
+87787,19889166
+87890,20024467
+87890,20024467
+88150,20024467
+88150,20024467
+88253,20159768
+88253,20159768
+88513,20159768
+88513,20159768
+88616,20295069
+88616,20295069
+88876,20295069
+88876,20295069
+88979,20430370
+88979,20430370
+89239,20430370
+89239,20430370
+89342,20565671
+89342,20565671
+89602,20565671
+89602,20565671
+89705,20700972
+89705,20700972
+89965,20700972
+89965,20700972
+90068,20836273
+90068,20836273
+90328,20836273
+90328,20836273
+90431,20971574
+90431,20971574
+90691,20971574
+90691,20971574
+90794,21106875
+90794,21106875
+91054,21106875
+91054,21106875
+91157,21242176
+91157,21242176
+91417,21242176
+91417,21242176
+91520,21377477
+91520,21377477
+91780,21377477
+91780,21377477
+91883,21512778
+91883,21512778
+92143,21512778
+92143,21512778
+92246,21648079
+92246,21648079
+92506,21648079
+92506,21648079
+92609,21783380
+92609,21783380
+92869,21783380
+92869,21783380
+92972,21918681
+92972,21918681
+93232,21918681
+93232,21918681
+93335,16024670
+93335,16024670
+93595,16024670
+93595,16024670
+93698,16159971
+93698,16159971
+93958,16159971
+93958,16159971
+94061,16295272
+94061,16295272
+94321,16295272
+94321,16295272
+94424,16430573
+94424,16430573
+94684,16430573
+94684,16430573
+94787,16565874
+94787,16565874
+95047,16565874
+95047,16565874
+95150,16701175
+95150,16701175
+95410,16701175
+95410,16701175
+95513,16836476
+95513,16836476
+95773,16836476
+95773,16836476
+95876,16971777
+95876,16971777
+96136,16971777
+96136,16971777
+96239,17107078
+96239,17107078
+96499,17107078
+96499,17107078
+96602,17242379
+96602,17242379
+96862,17242379
+96862,17242379
+96965,17377680
+96965,17377680
+97225,17377680
+97225,17377680
+97328,17512981
+97328,17512981
+97588,17512981
+97588,17512981
+97691,17648282
+97691,17648282
+97951,17648282
+97951,17648282
+98054,17783583
+98054,17783583
+98314,17783583
+98314,17783583
+98417,17918884
+98417,17918884
+98677,17918884
+98677,17918884
+98780,18054185
+98780,18054185
+99040,18054185
+99040,18054185
+99143,18189486
+99143,18189486
+99403,18189486
+99403,18189486
+99506,18324787
+99506,18324787
+99766,18324787
+99766,18324787
+99869,18460088
+99869,18460088
+100129,18460088
+100129,18460088
+100232,18595389
+100232,18595389
+100492,18595389
+100492,18595389
+100595,18730690
+100595,18730690
+100855,18730690
+100855,18730690
+100958,18865991
+100958,18865991
+101218,18865991
+101218,18865991
+101321,19001292
+101321,19001292
+101581,19001292
+101581,19001292
+104678,913356
+104678,913356
+108786,913356
+108786,913356
+121485,6942668
+121485,6942668
+121588,7077969
+121588,7077969
+121848,7077969
+121848,7077969
+121951,7213270
+121951,7213270
+122211,7213270
+122211,7213270
+122314,7348571
+122314,7348571
+122574,7348571
+122574,7348571
+122677,7483872
+122677,7483872
+122937,7483872
+122937,7483872
+123040,7619173
+123040,7619173
+123300,7619173
+123300,7619173
+123403,7754474
+123403,7754474
+123663,7754474
+123663,7754474
+123766,7889775
+123766,7889775
+124026,7889775
+124026,7889775
+124129,8025076
+124129,8025076
+124389,8025076
+124389,8025076
+124492,8160377
+124492,8160377
+124752,8160377
+124752,8160377
+124855,8295678
+124855,8295678
+125115,8295678
+125115,8295678
+125218,8430979
+125218,8430979
+125478,8430979
+125478,8430979
+125581,8566280
+125581,8566280
+125841,8566280
+125841,8566280
+125944,8701581
+125944,8701581
+126204,8701581
+126204,8701581
+126307,8836882
+126307,8836882
+126567,8836882
+126567,8836882
+126670,8972183
+126670,8972183
+126930,8972183
+126930,8972183
+127033,9107484
+127033,9107484
+127293,9107484
+127293,9107484
+127396,9242785
+127396,9242785
+127656,9242785
+127656,9242785
+127759,9378086
+127759,9378086
+128019,9378086
+128019,9378086
+128122,9513387
+128122,9513387
+128382,9513387
+128382,9513387
+128485,9648688
+128485,9648688
+128745,9648688
+128745,9648688
+128848,9783989
+128848,9783989
+129108,9783989
+129108,9783989
+129211,9919290
+129211,9919290
+129471,9919290
+129471,9919290
+129574,10054591
+129574,10054591
+129834,10054591
+129834,10054591
+129937,4160580
+129937,4160580
+130197,4160580
+130197,4160580
+130300,4295881
+130300,4295881
+130560,4295881
+130560,4295881
+130663,4431182
+130663,4431182
+130923,4431182
+130923,4431182
+131026,4566483
+131026,4566483
+131286,4566483
+131286,4566483
+131389,4701784
+131389,4701784
+131649,4701784
+131649,4701784
+131752,4837085
+131752,4837085
+132012,4837085
+132012,4837085
+132115,4972386
+132115,4972386
+132375,4972386
+132375,4972386
+132478,5107687
+132478,5107687
+132738,5107687
+132738,5107687
+132841,5242988
+132841,5242988
+133101,5242988
+133101,5242988
+133204,5378289
+133204,5378289
+133464,5378289
+133464,5378289
+133567,5513590
+133567,5513590
+133827,5513590
+133827,5513590
+133930,5648891
+133930,5648891
+134190,5648891
+134190,5648891
+134293,5784192
+134293,5784192
+134553,5784192
+134553,5784192
+134656,5919493
+134656,5919493
+134916,5919493
+134916,5919493
+135019,6054794
+135019,6054794
+135279,6054794
+135279,6054794
+135382,6190095
+135382,6190095
+135642,6190095
+135642,6190095
+135745,6325396
+135745,6325396
+136005,6325396
+136005,6325396
+136108,6460697
+136108,6460697
+136368,6460697
+136368,6460697
+136471,6595998
+136471,6595998
+136731,6595998
+136731,6595998
+136834,6731299
+136834,6731299
+137094,6731299
+137094,6731299
+137197,6866600
+137197,6866600
+137457,6866600
+137457,6866600
+137560,7001901
+137560,7001901
+137820,7001901
+137820,7001901
+137923,7137202
+137923,7137202
+138183,7137202
+138183,7137202
+141280,0
+
+--- Transfer vs Compute ---
+Transfer: 28049 cycles (19.8535%)
+Compute:  113231 cycles (80.1465%)
+====================================================
+
+Scheduler=fifo
+Backend=cycle_stub
+RuntimeBackend=cycle_stub
+Workload=synthetic
+Seed=123
+NumCards=1
+=== Request Metrics ===
+Completed requests: 1
+Mean latency(ns): 470934.0000
+P95 latency(ns): 470934
+P99 latency(ns): 470934
+Max latency(ns): 470934
+Mean queue time(ns): 0.0000
+Mean service time(ns): 470934.0000
+=== User Metrics ===
+User 0: completed=1, mean_latency(ns)=470934.0000, throughput(req/ns)=0.0000, reload_count=1
+=== Card Metrics ===
+Card 0: utilization=1.0000, reload_count=1, served_requests=1
+=== System Metrics ===
+Total throughput(req/ns): 0.0000
+Total reload count: 1
+Jain fairness index: 1.0000
+Simulation window(ns): [23, 470957], duration=470934
+PoolConfigSource=built-in default
+TreeConfigSource=built-in default
+HEParamsSource=built-in default
+=== CycleBackend Method Dispatch Stats ===
+EstimateCalls=1
+CycleFallbackCount=0
+CSVOutput=results/metrics_fab.csv

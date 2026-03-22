@@ -82,13 +82,13 @@ def run_sim(args):
         "--backend", "cycle_stub",
         "--workload", "synthetic",
         "--ks-method", args.ks_method,
-        "--disable-multi-card",
         "--seed", str(args.seed),
         "--num-users", str(args.num_users),
         "--requests-per-user", str(args.requests_per_user),
         "--inter-arrival", str(args.inter_arrival),
         "--num-cards", str(args.num_cards),
     ]
+    sim_args.append("--enable-multi-card" if args.enable_multi_card else "--disable-multi-card")
     sim_binaries = [
         "./build-cmake/keyaware_sim",
         "./build/keyaware_sim",
@@ -354,6 +354,16 @@ def parse_args():
     parser.add_argument("--requests-per-user", type=int, default=1)
     parser.add_argument("--inter-arrival", type=int, default=10)
     parser.add_argument("--num-cards", type=int, default=1)
+    multi_card_group = parser.add_mutually_exclusive_group()
+    multi_card_group.add_argument(
+        "--enable-multi-card",
+        dest="enable_multi_card",
+        action="store_true")
+    multi_card_group.add_argument(
+        "--disable-multi-card",
+        dest="enable_multi_card",
+        action="store_false")
+    parser.set_defaults(enable_multi_card=False)
     parser.add_argument("--bram-budget-bytes", type=int, default=31876710)
     parser.add_argument("--show", action="store_true")
     return parser.parse_args()

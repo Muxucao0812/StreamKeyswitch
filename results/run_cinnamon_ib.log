@@ -1,0 +1,233 @@
+=== Experiment Config ===
+Scheduler: fifo
+Backend: cycle_stub
+Workload: synthetic
+KeySwitchMethod: cinnamon
+Seed: 123
+NumCards: 3
+NumUsers: 1
+EnableMultiCard: true
+KeySwitchMultiBoardMode: input_broadcast
+SyntheticRequestsPerUser: 1
+SyntheticInterArrival: 300
+SyntheticStartTime: 0
+BurstBursts: 4
+BurstRequestsPerUserPerBurst: 2
+BurstIntraGap: 20
+BurstInterGap: 1200
+BurstStartTime: 0
+BurstLevel: 1
+NumPools: 1
+PoolConfigSource: built-in default
+TreeConfigSource: built-in default
+HEParamsSource: built-in default
+CSVOutput: results/metrics_cinnamon_ib.csv
+DumpLogicalGraph: true
+DumpRuntimePlan: true
+=========================
+Emitted group 0: root_load_input, kind=0, bytes=12058624, work_items=1, micro_ops=1, est_cycles/op=7555, total_est_cycles=7555, bram_live=0
+Emitted group 1: broadcast_send_card_1, kind=25, bytes=12058624, work_items=1, micro_ops=1, est_cycles/op=452229, total_est_cycles=452229, bram_live=0
+Emitted group 2: broadcast_recv_card_1, kind=26, bytes=12058624, work_items=1, micro_ops=1, est_cycles/op=452229, total_est_cycles=452229, bram_live=0
+Emitted group 3: broadcast_send_card_2, kind=25, bytes=12058624, work_items=1, micro_ops=1, est_cycles/op=452229, total_est_cycles=452229, bram_live=0
+Emitted group 4: broadcast_recv_card_2, kind=26, bytes=12058624, work_items=1, micro_ops=1, est_cycles/op=452229, total_est_cycles=452229, bram_live=0
+Emitted group 5: load_key_card_0, kind=0, bytes=8388608, work_items=1, micro_ops=1, est_cycles/op=5261, total_est_cycles=5261, bram_live=0
+Emitted group 6: intt_card_0, kind=4, bytes=262144, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=0
+Emitted group 7: bconv_card_0, kind=8, bytes=262144, work_items=1, micro_ops=1, est_cycles/op=276, total_est_cycles=276, bram_live=0
+Emitted group 8: ntt_card_0, kind=3, bytes=262144, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=0
+Emitted group 9: mul_card_0, kind=5, bytes=12058624, work_items=2, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=0
+Emitted group 10: load_key_card_1, kind=0, bytes=8388608, work_items=1, micro_ops=1, est_cycles/op=5261, total_est_cycles=5261, bram_live=0
+Emitted group 11: intt_card_1, kind=4, bytes=262144, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=0
+Emitted group 12: bconv_card_1, kind=8, bytes=262144, work_items=1, micro_ops=1, est_cycles/op=276, total_est_cycles=276, bram_live=0
+Emitted group 13: ntt_card_1, kind=3, bytes=262144, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=0
+Emitted group 14: mul_card_1, kind=5, bytes=12058624, work_items=2, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=0
+Emitted group 15: load_key_card_2, kind=0, bytes=8388608, work_items=1, micro_ops=1, est_cycles/op=5261, total_est_cycles=5261, bram_live=0
+Emitted group 16: intt_card_2, kind=4, bytes=262144, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=0
+Emitted group 17: bconv_card_2, kind=8, bytes=262144, work_items=1, micro_ops=1, est_cycles/op=276, total_est_cycles=276, bram_live=0
+Emitted group 18: ntt_card_2, kind=3, bytes=262144, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=0
+Emitted group 19: mul_card_2, kind=5, bytes=12058624, work_items=2, micro_ops=1, est_cycles/op=260, total_est_cycles=260, bram_live=0
+Emitted group 20: partial_send_card_1, kind=25, bytes=12058624, work_items=1, micro_ops=1, est_cycles/op=452229, total_est_cycles=452229, bram_live=0
+Emitted group 21: partial_recv_card_1, kind=26, bytes=12058624, work_items=1, micro_ops=1, est_cycles/op=452229, total_est_cycles=452229, bram_live=0
+Emitted group 22: partial_send_card_2, kind=25, bytes=12058624, work_items=1, micro_ops=1, est_cycles/op=452229, total_est_cycles=452229, bram_live=0
+Emitted group 23: partial_recv_card_2, kind=26, bytes=12058624, work_items=1, micro_ops=1, est_cycles/op=452229, total_est_cycles=452229, bram_live=0
+Emitted group 24: root_reduce, kind=27, bytes=36175872, work_items=3, micro_ops=1, est_cycles/op=1356626, total_est_cycles=1356626, bram_live=0
+Emitted group 25: root_barrier, kind=25, bytes=0, work_items=0, micro_ops=1, est_cycles/op=1, total_est_cycles=0, bram_live=0
+Emitted group 26: store_output, kind=1, bytes=12058624, work_items=1, micro_ops=1, est_cycles/op=7555, total_est_cycles=7555, bram_live=0
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           3194667
+Total latency (ns):     10648890
+Peak BRAM live (bytes): 0
+HBM read (bytes):       37224448
+HBM write (bytes):      12058624
+Dependency stalls:      3194666 cycles
+Resource stalls:        1 cycles
+Instruction groups:     27
+Total instructions:     27
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=23338 (0.73053%)  count=4  bytes=37224448
+  StoreHBM: cycles=7555 (0.236488%)  count=1  bytes=12058624
+  NTT: cycles=12324 (0.385768%)  count=3  bytes=786432
+  INTT: cycles=12324 (0.385768%)  count=3  bytes=786432
+  EweMul: cycles=780 (0.0244157%)  count=3  bytes=36175872
+  BConv: cycles=828 (0.0259182%)  count=3  bytes=786432
+  InterCardSend: cycles=1808917 (56.623%)  count=5  bytes=48234496
+  InterCardRecv: cycles=1808916 (56.623%)  count=4  bytes=48234496
+  InterCardReduce: cycles=1356626 (42.4653%)  count=1  bytes=36175872
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  root_load_input: kind=LoadHBM  one_limb_cycles=7555  groups=1  instrs=1
+  broadcast_send_card_1: kind=InterCardSend  one_limb_cycles=452229  groups=1  instrs=1
+  broadcast_recv_card_1: kind=InterCardRecv  one_limb_cycles=452229  groups=1  instrs=1
+  broadcast_send_card_2: kind=InterCardSend  one_limb_cycles=452229  groups=1  instrs=1
+  broadcast_recv_card_2: kind=InterCardRecv  one_limb_cycles=452229  groups=1  instrs=1
+  load_key_card_0: kind=LoadHBM  one_limb_cycles=5261  groups=1  instrs=1
+  intt_card_0: kind=INTT  one_limb_cycles=4108  groups=1  instrs=1
+  bconv_card_0: kind=BConv  one_limb_cycles=276  groups=1  instrs=1
+  ntt_card_0: kind=NTT  one_limb_cycles=4108  groups=1  instrs=1
+  mul_card_0: kind=EweMul  one_limb_cycles=260  groups=1  instrs=1
+  load_key_card_1: kind=LoadHBM  one_limb_cycles=5261  groups=1  instrs=1
+  intt_card_1: kind=INTT  one_limb_cycles=4108  groups=1  instrs=1
+  bconv_card_1: kind=BConv  one_limb_cycles=276  groups=1  instrs=1
+  ntt_card_1: kind=NTT  one_limb_cycles=4108  groups=1  instrs=1
+  mul_card_1: kind=EweMul  one_limb_cycles=260  groups=1  instrs=1
+  load_key_card_2: kind=LoadHBM  one_limb_cycles=5261  groups=1  instrs=1
+  intt_card_2: kind=INTT  one_limb_cycles=4108  groups=1  instrs=1
+  bconv_card_2: kind=BConv  one_limb_cycles=276  groups=1  instrs=1
+  ntt_card_2: kind=NTT  one_limb_cycles=4108  groups=1  instrs=1
+  mul_card_2: kind=EweMul  one_limb_cycles=260  groups=1  instrs=1
+  partial_send_card_1: kind=InterCardSend  one_limb_cycles=452229  groups=1  instrs=1
+  partial_recv_card_1: kind=InterCardRecv  one_limb_cycles=452229  groups=1  instrs=1
+  partial_send_card_2: kind=InterCardSend  one_limb_cycles=452229  groups=1  instrs=1
+  partial_recv_card_2: kind=InterCardRecv  one_limb_cycles=452229  groups=1  instrs=1
+  root_reduce: kind=InterCardReduce  one_limb_cycles=1356626  groups=1  instrs=1
+  root_barrier: kind=InterCardSend  one_limb_cycles=1  groups=1  instrs=1
+  store_output: kind=StoreHBM  one_limb_cycles=7555  groups=1  instrs=1
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  root_load_input                0      7555       7555            0            0  12058624
+   1  broadcast_send_card_1       7556    459785     452229            0            0  12058624
+   2  broadcast_recv_card_1     459785    912014     452229            0            0  12058624
+   3  broadcast_send_card_2       7555    459784     452229            0            0  12058624
+   4  broadcast_recv_card_2     459784    912013     452229            0            0  12058624
+   5  load_key_card_0             7555     12816       5261            0            0  8388608
+   6  intt_card_0                12816     16924       4108            0            0  262144
+   7  bconv_card_0               16924     17200        276            0            0  262144
+   8  ntt_card_0                 17200     21308       4108            0            0  262144
+   9  mul_card_0                 21308     21568        260            0            0  12058624
+  10  load_key_card_1           912014    917275       5261            0            0  8388608
+  11  intt_card_1               917275    921383       4108            0            0  262144
+  12  bconv_card_1              921383    921659        276            0            0  262144
+  13  ntt_card_1                921659    925767       4108            0            0  262144
+  14  mul_card_1                925767    926027        260            0            0  12058624
+  15  load_key_card_2           912013    917274       5261            0            0  8388608
+  16  intt_card_2               917274    921382       4108            0            0  262144
+  17  bconv_card_2              921382    921658        276            0            0  262144
+  18  ntt_card_2                921658    925766       4108            0            0  262144
+  19  mul_card_2                925766    926026        260            0            0  12058624
+  20  partial_send_card_1       926027   1378256     452229            0            0  12058624
+  21  partial_recv_card_1      1378256   1830485     452229            0            0  12058624
+  22  partial_send_card_2       926026   1378255     452229            0            0  12058624
+  23  partial_recv_card_2      1378255   1830484     452229            0            0  12058624
+  24  root_reduce              1830485   3187111    1356626            0            0  36175872
+  25  root_barrier             3187111   3187112          1            0            0  0
+  26  store_output             3187112   3194667       7555            0            0  12058624
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+7555,0
+7556,0
+459785,0
+459785,0
+912014,0
+7555,0
+459784,0
+459784,0
+912013,0
+7555,0
+12816,0
+12816,0
+16924,0
+16924,0
+17200,0
+17200,0
+21308,0
+21308,0
+21568,0
+912014,0
+917275,0
+917275,0
+921383,0
+921383,0
+921659,0
+921659,0
+925767,0
+925767,0
+926027,0
+912013,0
+917274,0
+917274,0
+921382,0
+921382,0
+921658,0
+921658,0
+925766,0
+925766,0
+926026,0
+926027,0
+1378256,0
+1378256,0
+1830485,0
+926026,0
+1378255,0
+1378255,0
+1830484,0
+1830485,0
+3187111,0
+3187111,0
+3187112,0
+3187112,0
+3194667,0
+
+--- Transfer vs Compute ---
+Transfer: 30893 cycles (0.967018%)
+Compute:  5000715 cycles (156.533%)
+====================================================
+
+Scheduler=fifo
+Backend=cycle_stub
+RuntimeBackend=cycle_stub
+Workload=synthetic
+Seed=123
+NumCards=3
+=== Request Metrics ===
+Completed requests: 1
+Mean latency(ns): 10648890.0000
+P95 latency(ns): 10648890
+P99 latency(ns): 10648890
+Max latency(ns): 10648890
+Mean queue time(ns): 0.0000
+Mean service time(ns): 10648890.0000
+=== User Metrics ===
+User 0: completed=1, mean_latency(ns)=10648890.0000, throughput(req/ns)=0.0000, reload_count=3
+=== Card Metrics ===
+Card 0: utilization=1.0000, reload_count=1, served_requests=1
+Card 1: utilization=1.0000, reload_count=1, served_requests=1
+Card 2: utilization=1.0000, reload_count=1, served_requests=1
+=== System Metrics ===
+Total throughput(req/ns): 0.0000
+Total reload count: 3
+Jain fairness index: 1.0000
+Simulation window(ns): [23, 10648913], duration=10648890
+PoolConfigSource=built-in default
+TreeConfigSource=built-in default
+HEParamsSource=built-in default
+=== CycleBackend Method Dispatch Stats ===
+EstimateCalls=1
+CycleFallbackCount=0
+CSVOutput=results/metrics_cinnamon_ib.csv
