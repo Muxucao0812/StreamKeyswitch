@@ -32,9 +32,7 @@ inline uint32_t DecideCardCountForRequest(
     const Request& req,
     uint64_t per_card_memory_bytes = kAlveoU280HbmBytes
 ) {
-    if (req.ks_profile.method == KeySwitchMethod::SingleBoardClassic) {
-        return 1;
-    }
+
 
     const uint32_t recommended_cards = RecommendCardCountForRequest(req, per_card_memory_bytes);
     const uint32_t preferred_cards = std::max<uint32_t>(1, req.ks_profile.preferred_cards);

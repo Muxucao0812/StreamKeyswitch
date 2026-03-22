@@ -10,29 +10,6 @@
 
 namespace {
 
-struct DigitShard {
-    uint32_t begin = 0;
-    uint32_t count = 0;
-};
-
-std::vector<DigitShard> BuildDigitShards(
-    uint32_t total_digits,
-    uint32_t cards) {
-
-    const uint32_t safe_digits = std::max<uint32_t>(1, total_digits);
-    const uint32_t safe_cards = std::max<uint32_t>(1, std::min<uint32_t>(cards, safe_digits));
-    std::vector<DigitShard> shards;
-    shards.reserve(safe_cards);
-    for (uint32_t idx = 0; idx < safe_cards; ++idx) {
-        const uint32_t begin = static_cast<uint32_t>(
-            (static_cast<uint64_t>(idx) * safe_digits) / safe_cards);
-        const uint32_t end = static_cast<uint32_t>(
-            (static_cast<uint64_t>(idx + 1) * safe_digits) / safe_cards);
-        shards.push_back(DigitShard{begin, end - begin});
-    }
-    return shards;
-}
-
 uint64_t ScaleBytesByRatio(
     uint64_t total_bytes,
     uint32_t part,
@@ -97,7 +74,7 @@ CycleProgram BuildCinnamonOutputAggregationProgram(
         "cinnamon_output_aggregation_keyswitch");
 
     const uint32_t active_cards = std::max<uint32_t>(1, problem.active_cards);
-    const std::vector<DigitShard> shards = BuildDigitShards(problem.digits, active_cards);
+    const std::vector<DigitShard>& shards = problem.digit_shards;
     if (shards.size() != active_cards) {
         return CycleProgram{};
     }

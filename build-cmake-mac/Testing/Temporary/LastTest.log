@@ -1,0 +1,2069 @@
+Start testing: Mar 22 20:12 CST
+----------------------------------------------------------
+1/2 Testing: keyaware_cycle_tests
+1/2 Test: keyaware_cycle_tests
+Command: "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac/keyaware_cycle_tests"
+Directory: /Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac
+"keyaware_cycle_tests" start time: Mar 22 20:12 CST
+Output:
+----------------------------------------------------------
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:391 Assertion failed: execution.tile_plan.key_persistent
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:545 Assertion failed: !arch.CanIssue(CycleInstructionKind::EweMul, cycle)
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:545 Assertion failed: !arch.CanIssue(CycleInstructionKind::EweMul, cycle)
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:545 Assertion failed: !arch.CanIssue(CycleInstructionKind::EweMul, cycle)
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:634 Assertion failed: timing1->start_cycle == static_cast<uint64_t>(0) (actual=1, expected=0)
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:635 Assertion failed: timing0->finish_cycle == static_cast<uint64_t>(5) (actual=6, expected=5)
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:636 Assertion failed: timing1->finish_cycle == static_cast<uint64_t>(5) (actual=7, expected=5)
+Emitted group 0: load_input, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 1: modup_intt, kind=4, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=4108, total_est_cycles=8204, bram_live=1024
+Emitted group 2: modup_bconv, kind=8, bytes=2048, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=2048
+Emitted group 3: modup_ntt, kind=3, bytes=2048, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=2048
+Emitted group 4: innerprod_load_key_all, kind=0, bytes=2736, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=20, bram_live=4784
+Emitted group 5: innerprod_mul_all, kind=5, bytes=4784, work_items=0, micro_ops=12, est_cycles/op=260, total_est_cycles=3076, bram_live=6144
+Emitted group 6: innerprod_spill_partial, kind=1, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=22, bram_live=0
+Emitted group 7: load_input, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 8: modup_intt, kind=4, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=4108, total_est_cycles=8204, bram_live=1024
+Emitted group 9: modup_bconv, kind=8, bytes=2048, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=2048
+Emitted group 10: modup_ntt, kind=3, bytes=2048, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=2048
+Emitted group 11: innerprod_load_key_all, kind=0, bytes=2736, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=20, bram_live=4784
+Emitted group 12: innerprod_mul_all, kind=5, bytes=4784, work_items=0, micro_ops=12, est_cycles/op=260, total_est_cycles=3076, bram_live=6144
+Emitted group 13: innerprod_spill_partial, kind=1, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=22, bram_live=0
+Emitted group 14: load_input, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 15: modup_intt, kind=4, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=4108, total_est_cycles=8204, bram_live=1024
+Emitted group 16: modup_bconv, kind=8, bytes=2048, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=2048
+Emitted group 17: modup_ntt, kind=3, bytes=2048, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=2048
+Emitted group 18: innerprod_load_key_all, kind=0, bytes=2736, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=20, bram_live=4784
+Emitted group 19: innerprod_mul_all, kind=5, bytes=4784, work_items=0, micro_ops=12, est_cycles/op=260, total_est_cycles=3076, bram_live=6144
+Emitted group 20: reduce_reload_partial_rhs, kind=0, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=22, bram_live=12288
+Emitted group 21: reduce_cross_digit_add, kind=6, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=258, total_est_cycles=3074, bram_live=6144
+Emitted group 22: reduce_reload_partial_rhs, kind=0, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=22, bram_live=12288
+Emitted group 23: reduce_cross_digit_add, kind=6, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=258, total_est_cycles=3074, bram_live=6144
+Emitted group 24: moddown_spill_2l, kind=1, bytes=4096, work_items=0, micro_ops=8, est_cycles/op=19, total_est_cycles=21, bram_live=2048
+Emitted group 25: moddown_intt, kind=4, bytes=2048, work_items=0, micro_ops=4, est_cycles/op=4108, total_est_cycles=16396, bram_live=2048
+Emitted group 26: moddown_bconv, kind=8, bytes=6144, work_items=0, micro_ops=32, est_cycles/op=276, total_est_cycles=8212, bram_live=4096
+Emitted group 27: moddown_ntt, kind=3, bytes=4096, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4096
+Emitted group 28: moddown_reload_2l, kind=0, bytes=4096, work_items=0, micro_ops=8, est_cycles/op=19, total_est_cycles=21, bram_live=4096
+Emitted group 29: moddown_subtract, kind=7, bytes=4096, work_items=0, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=4096
+Emitted group 30: moddown_store_output, kind=1, bytes=4096, work_items=0, micro_ops=8, est_cycles/op=19, total_est_cycles=21, bram_live=0
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           57381
+Total latency (ns):     191270
+Peak BRAM live (bytes): 12288
+HBM read (bytes):       27664
+HBM write (bytes):      20480
+Dependency stalls:      35769 cycles
+Resource stalls:        21612 cycles
+Instruction groups:     31
+Total instructions:     262
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=401 (0.698838%)  count=74  bytes=27664
+  StoreHBM: cycles=202 (0.352033%)  count=40  bytes=20480
+  NTT: cycles=32870 (57.2838%)  count=26  bytes=10234
+  INTT: cycles=16438 (28.6471%)  count=10  bytes=5120
+  EweMul: cycles=2349 (4.09369%)  count=36  bytes=14328
+  EweAdd: cycles=1554 (2.70821%)  count=24  bytes=12288
+  EweSub: cycles=519 (0.904481%)  count=8  bytes=4096
+  BConv: cycles=3048 (5.31186%)  count=44  bytes=12288
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=19  groups=3  instrs=6
+  modup_intt: kind=INTT  one_limb_cycles=4108  groups=3  instrs=6
+  modup_bconv: kind=BConv  one_limb_cycles=276  groups=3  instrs=12
+  modup_ntt: kind=NTT  one_limb_cycles=4108  groups=3  instrs=18
+  innerprod_load_key_all: kind=LoadHBM  one_limb_cycles=19  groups=3  instrs=36
+  innerprod_mul_all: kind=EweMul  one_limb_cycles=260  groups=3  instrs=36
+  innerprod_spill_partial: kind=StoreHBM  one_limb_cycles=19  groups=2  instrs=24
+  reduce_reload_partial_rhs: kind=LoadHBM  one_limb_cycles=19  groups=2  instrs=24
+  reduce_cross_digit_add: kind=EweAdd  one_limb_cycles=258  groups=2  instrs=24
+  moddown_spill_2l: kind=StoreHBM  one_limb_cycles=19  groups=1  instrs=8
+  moddown_intt: kind=INTT  one_limb_cycles=4108  groups=1  instrs=4
+  moddown_bconv: kind=BConv  one_limb_cycles=276  groups=1  instrs=32
+  moddown_ntt: kind=NTT  one_limb_cycles=4108  groups=1  instrs=8
+  moddown_reload_2l: kind=LoadHBM  one_limb_cycles=19  groups=1  instrs=8
+  moddown_subtract: kind=EweSub  one_limb_cycles=258  groups=1  instrs=8
+  moddown_store_output: kind=StoreHBM  one_limb_cycles=19  groups=1  instrs=8
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input                     0        20         20            0         1024  1024
+   1  modup_intt                    20      4129       4109         1024         1024  1024
+   2  modup_bconv                 4129      4408        279         1024         2048  2048
+   3  modup_ntt                   4408     12625       8217         2048         2048  2048
+   4  innerprod_load_key_all     12625     12685         60         2048         4784  2736
+   5  innerprod_mul_all          12685     13468        783         4784         6144  4784
+   6  innerprod_spill_partial    13468     13528         60         6144            0  6144
+   7  load_input                 13528     13548         20            0         1024  1024
+   8  modup_intt                 13548     17657       4109         1024         1024  1024
+   9  modup_bconv                17657     17936        279         1024         2048  2048
+  10  modup_ntt                  17936     26153       8217         2048         2048  2048
+  11  innerprod_load_key_all     26153     26213         60         2048         4784  2736
+  12  innerprod_mul_all          26213     26996        783         4784         6144  4784
+  13  innerprod_spill_partial    26996     27056         60         6144            0  6144
+  14  load_input                 27056     27076         20            0         1024  1024
+  15  modup_intt                 27076     31185       4109         1024         1024  1024
+  16  modup_bconv                31185     31464        279         1024         2048  2048
+  17  modup_ntt                  31464     39681       8217         2048         2048  2048
+  18  innerprod_load_key_all     39681     39741         60         2048         4784  2736
+  19  innerprod_mul_all          39741     40524        783         4784         6144  4784
+  20  reduce_reload_partial_rhs   40524     40584         60         6144        12288  6144
+  21  reduce_cross_digit_add     40584     41361        777        12288         6144  6144
+  22  reduce_reload_partial_rhs   41361     41421         60         6144        12288  6144
+  23  reduce_cross_digit_add     41421     42198        777        12288         6144  6144
+  24  moddown_spill_2l           42198     42239         41         6144         2048  4096
+  25  moddown_intt               42239     46350       4111         2048         2048  2048
+  26  moddown_bconv              46350     48561       2211         2048         4096  6144
+  27  moddown_ntt                48561     56780       8219         4096         4096  4096
+  28  moddown_reload_2l          56780     56821         41         4096         4096  4096
+  29  moddown_subtract           56821     57340        519         4096         4096  4096
+  30  moddown_store_output       57340     57381         41         4096            0  4096
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+20,1024
+20,1024
+4129,1024
+4129,1024
+4408,2048
+4408,2048
+12625,2048
+12625,2048
+12685,4784
+12685,4784
+13468,6144
+13468,6144
+13528,0
+13528,0
+13548,1024
+13548,1024
+17657,1024
+17657,1024
+17936,2048
+17936,2048
+26153,2048
+26153,2048
+26213,4784
+26213,4784
+26996,6144
+26996,6144
+27056,0
+27056,0
+27076,1024
+27076,1024
+31185,1024
+31185,1024
+31464,2048
+31464,2048
+39681,2048
+39681,2048
+39741,4784
+39741,4784
+40524,6144
+40524,6144
+40584,12288
+40584,12288
+41361,6144
+41361,6144
+41421,12288
+41421,12288
+42198,6144
+42198,6144
+42239,2048
+42239,2048
+46350,2048
+46350,2048
+48561,4096
+48561,4096
+56780,4096
+56780,4096
+56821,4096
+56821,4096
+57340,4096
+57340,4096
+57381,0
+
+--- Transfer vs Compute ---
+Transfer: 603 cycles (1.05087%)
+Compute:  56778 cycles (98.9491%)
+====================================================
+
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:703 Assertion failed: result.tile_count >= 1
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:713 Assertion failed: result.hbm_read_bytes == result.key_host_to_hbm_bytes + result.key_hbm_to_bram_bytes + result.ct_hbm_to_bram_bytes (actual=27664, expected=0)
+Emitted group 0: load_input, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 1: modup_intt, kind=4, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=4108, total_est_cycles=8204, bram_live=1024
+Emitted group 2: modup_bconv, kind=8, bytes=2048, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=2048
+Emitted group 3: modup_ntt, kind=3, bytes=2048, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=2048
+Emitted group 4: innerprod_load_key_all, kind=0, bytes=2736, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=20, bram_live=4784
+Emitted group 5: innerprod_mul_all, kind=5, bytes=4784, work_items=0, micro_ops=12, est_cycles/op=260, total_est_cycles=3076, bram_live=6144
+Emitted group 6: innerprod_spill_partial, kind=1, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=22, bram_live=0
+Emitted group 7: load_input, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 8: modup_intt, kind=4, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=4108, total_est_cycles=8204, bram_live=1024
+Emitted group 9: modup_bconv, kind=8, bytes=2048, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=2048
+Emitted group 10: modup_ntt, kind=3, bytes=2048, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=2048
+Emitted group 11: innerprod_load_key_all, kind=0, bytes=2736, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=20, bram_live=4784
+Emitted group 12: innerprod_mul_all, kind=5, bytes=4784, work_items=0, micro_ops=12, est_cycles/op=260, total_est_cycles=3076, bram_live=6144
+Emitted group 13: innerprod_spill_partial, kind=1, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=22, bram_live=0
+Emitted group 14: load_input, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 15: modup_intt, kind=4, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=4108, total_est_cycles=8204, bram_live=1024
+Emitted group 16: modup_bconv, kind=8, bytes=2048, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=2048
+Emitted group 17: modup_ntt, kind=3, bytes=2048, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=2048
+Emitted group 18: innerprod_load_key_all, kind=0, bytes=2736, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=20, bram_live=4784
+Emitted group 19: innerprod_mul_all, kind=5, bytes=4784, work_items=0, micro_ops=12, est_cycles/op=260, total_est_cycles=3076, bram_live=6144
+Emitted group 20: reduce_reload_partial_rhs, kind=0, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=22, bram_live=12288
+Emitted group 21: reduce_cross_digit_add, kind=6, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=258, total_est_cycles=3074, bram_live=6144
+Emitted group 22: reduce_reload_partial_rhs, kind=0, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=22, bram_live=12288
+Emitted group 23: reduce_cross_digit_add, kind=6, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=258, total_est_cycles=3074, bram_live=6144
+Emitted group 24: moddown_spill_2l, kind=1, bytes=4096, work_items=0, micro_ops=8, est_cycles/op=19, total_est_cycles=21, bram_live=2048
+Emitted group 25: moddown_intt, kind=4, bytes=2048, work_items=0, micro_ops=4, est_cycles/op=4108, total_est_cycles=16396, bram_live=2048
+Emitted group 26: moddown_bconv, kind=8, bytes=6144, work_items=0, micro_ops=32, est_cycles/op=276, total_est_cycles=8212, bram_live=4096
+Emitted group 27: moddown_ntt, kind=3, bytes=4096, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4096
+Emitted group 28: moddown_reload_2l, kind=0, bytes=4096, work_items=0, micro_ops=8, est_cycles/op=19, total_est_cycles=21, bram_live=4096
+Emitted group 29: moddown_subtract, kind=7, bytes=4096, work_items=0, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=4096
+Emitted group 30: moddown_store_output, kind=1, bytes=4096, work_items=0, micro_ops=8, est_cycles/op=19, total_est_cycles=21, bram_live=0
+Emitted group 0: load_input, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 1: load_input, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=2048
+Emitted group 2: load_input, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=3072
+Emitted group 3: ola_intt_digits_stub, kind=4, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=4108, total_est_cycles=8204, bram_live=3072
+Emitted group 4: ola_intt_digits_stub, kind=4, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=4108, total_est_cycles=8204, bram_live=3072
+Emitted group 5: ola_intt_digits_stub, kind=4, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=4108, total_est_cycles=8204, bram_live=3072
+Emitted group 6: ola_spill_digit_stub, kind=1, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=2048
+Emitted group 7: ola_spill_digit_stub, kind=1, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 8: ola_bconv_digits_stub, kind=8, bytes=3072, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=3072
+Emitted group 9: ola_spill_digit_stub, kind=1, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=19, total_est_cycles=20, bram_live=0
+Emitted group 10: ola_reload_digit_stub, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 11: ola_bconv_digits_stub, kind=8, bytes=3072, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=3072
+Emitted group 12: ola_spill_digit_stub, kind=1, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=19, total_est_cycles=20, bram_live=0
+Emitted group 13: ola_reload_digit_stub, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 14: ola_bconv_digits_stub, kind=8, bytes=3072, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=3072
+Emitted group 15: ola_ntt_digits_stub, kind=3, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=3072
+Emitted group 16: ola_reload_digit_stub, kind=0, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=19, total_est_cycles=20, bram_live=6144
+Emitted group 17: ola_ntt_digits_stub, kind=3, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=6144
+Emitted group 18: ola_reload_digit_stub, kind=0, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=19, total_est_cycles=20, bram_live=9216
+Emitted group 19: ola_ntt_digits_stub, kind=3, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=9216
+Emitted group 20: ola_innerprod_load_key_stub, kind=0, bytes=2736, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=20, bram_live=11952
+Emitted group 21: ola_innerprod_mul_stub, kind=5, bytes=5808, work_items=0, micro_ops=12, est_cycles/op=260, total_est_cycles=3076, bram_live=15360
+Emitted group 22: ola_innerprod_load_key_stub, kind=0, bytes=2736, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=20, bram_live=18096
+Emitted group 23: ola_innerprod_mul_stub, kind=5, bytes=5808, work_items=0, micro_ops=12, est_cycles/op=260, total_est_cycles=3076, bram_live=21504
+Emitted group 24: ola_innerprod_accumulate_stub, kind=6, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=258, total_est_cycles=3074, bram_live=15360
+Emitted group 25: ola_innerprod_load_key_stub, kind=0, bytes=2736, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=20, bram_live=18096
+Emitted group 26: ola_innerprod_mul_stub, kind=5, bytes=5808, work_items=0, micro_ops=12, est_cycles/op=260, total_est_cycles=3076, bram_live=21504
+Emitted group 27: ola_innerprod_accumulate_stub, kind=6, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=258, total_est_cycles=3074, bram_live=15360
+Emitted group 28: ola_intt_digits_stub, kind=4, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=15360
+Emitted group 29: ola_intt_digits_stub, kind=4, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=15360
+Emitted group 30: ola_intt_digits_stub, kind=4, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=15360
+Emitted group 31: ola_spill_poly_stub, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=13312
+Emitted group 32: ola_spill_poly_stub, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=11264
+Emitted group 33: ola_modup_stub, kind=8, bytes=6144, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=11264
+Emitted group 34: ola_modup_stub, kind=8, bytes=6144, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=11264
+Emitted group 35: ola_ntt_digits_stub, kind=3, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=11264
+Emitted group 36: ola_ntt_digits_stub, kind=3, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=11264
+Emitted group 37: load_input, kind=0, bytes=2048, work_items=0, micro_ops=4, est_cycles/op=19, total_est_cycles=20, bram_live=13312
+Emitted group 38: ola_reduce_cross_digit_stub, kind=6, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=258, total_est_cycles=3074, bram_live=13312
+Emitted group 39: load_input, kind=0, bytes=2048, work_items=0, micro_ops=4, est_cycles/op=19, total_est_cycles=20, bram_live=15360
+Emitted group 40: ola_reduce_cross_digit_stub, kind=6, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=258, total_est_cycles=3074, bram_live=15360
+Emitted group 0: load_input, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 1: load_input, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=2048
+Emitted group 2: load_input, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=3072
+Emitted group 3: load_input, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=4096
+Emitted group 4: ola_intt_digits_stub, kind=4, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=4108, total_est_cycles=8204, bram_live=4096
+Emitted group 5: ola_intt_digits_stub, kind=4, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=4108, total_est_cycles=8204, bram_live=4096
+Emitted group 6: ola_intt_digits_stub, kind=4, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=4108, total_est_cycles=8204, bram_live=4096
+Emitted group 7: ola_intt_digits_stub, kind=4, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=4108, total_est_cycles=8204, bram_live=4096
+Emitted group 8: ola_spill_digit_stub, kind=1, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=3072
+Emitted group 9: ola_spill_digit_stub, kind=1, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=2048
+Emitted group 10: ola_spill_digit_stub, kind=1, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 11: ola_bconv_digits_stub, kind=8, bytes=3072, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=3072
+Emitted group 12: ola_spill_digit_stub, kind=1, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=19, total_est_cycles=20, bram_live=0
+Emitted group 13: ola_reload_digit_stub, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 14: ola_bconv_digits_stub, kind=8, bytes=3072, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=3072
+Emitted group 15: ola_spill_digit_stub, kind=1, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=19, total_est_cycles=20, bram_live=0
+Emitted group 16: ola_reload_digit_stub, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 17: ola_bconv_digits_stub, kind=8, bytes=3072, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=3072
+Emitted group 18: ola_spill_digit_stub, kind=1, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=19, total_est_cycles=20, bram_live=0
+Emitted group 19: ola_reload_digit_stub, kind=0, bytes=1024, work_items=0, micro_ops=2, est_cycles/op=19, total_est_cycles=19, bram_live=1024
+Emitted group 20: ola_bconv_digits_stub, kind=8, bytes=3072, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=3072
+Emitted group 21: ola_ntt_digits_stub, kind=3, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=3072
+Emitted group 22: ola_reload_digit_stub, kind=0, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=19, total_est_cycles=20, bram_live=6144
+Emitted group 23: ola_ntt_digits_stub, kind=3, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=6144
+Emitted group 24: ola_reload_digit_stub, kind=0, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=19, total_est_cycles=20, bram_live=9216
+Emitted group 25: ola_ntt_digits_stub, kind=3, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=9216
+Emitted group 26: ola_reload_digit_stub, kind=0, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=19, total_est_cycles=20, bram_live=12288
+Emitted group 27: ola_ntt_digits_stub, kind=3, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=12288
+Emitted group 28: ola_innerprod_load_key_stub, kind=0, bytes=2052, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=20, bram_live=14340
+Emitted group 29: ola_innerprod_mul_stub, kind=5, bytes=5124, work_items=0, micro_ops=12, est_cycles/op=260, total_est_cycles=3076, bram_live=18432
+Emitted group 30: ola_innerprod_load_key_stub, kind=0, bytes=2052, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=20, bram_live=20484
+Emitted group 31: ola_innerprod_mul_stub, kind=5, bytes=5124, work_items=0, micro_ops=12, est_cycles/op=260, total_est_cycles=3076, bram_live=24576
+Emitted group 32: ola_innerprod_accumulate_stub, kind=6, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=258, total_est_cycles=3074, bram_live=18432
+Emitted group 33: ola_innerprod_load_key_stub, kind=0, bytes=2052, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=20, bram_live=20484
+Emitted group 34: ola_innerprod_mul_stub, kind=5, bytes=5124, work_items=0, micro_ops=12, est_cycles/op=260, total_est_cycles=3076, bram_live=24576
+Emitted group 35: ola_innerprod_accumulate_stub, kind=6, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=258, total_est_cycles=3074, bram_live=18432
+Emitted group 36: ola_innerprod_load_key_stub, kind=0, bytes=2052, work_items=0, micro_ops=12, est_cycles/op=19, total_est_cycles=20, bram_live=20484
+Emitted group 37: ola_innerprod_mul_stub, kind=5, bytes=5124, work_items=0, micro_ops=12, est_cycles/op=260, total_est_cycles=3076, bram_live=24576
+Emitted group 38: ola_innerprod_accumulate_stub, kind=6, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=258, total_est_cycles=3074, bram_live=18432
+Emitted group 39: ola_intt_digits_stub, kind=4, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=18432
+Emitted group 40: ola_intt_digits_stub, kind=4, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=18432
+Emitted group 41: ola_intt_digits_stub, kind=4, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=18432
+Emitted group 42: ola_intt_digits_stub, kind=4, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=18432
+Emitted group 43: ola_spill_poly_stub, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=16384
+Emitted group 44: ola_spill_poly_stub, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=14336
+Emitted group 45: ola_modup_stub, kind=8, bytes=6144, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=14336
+Emitted group 46: ola_modup_stub, kind=8, bytes=6144, work_items=0, micro_ops=4, est_cycles/op=276, total_est_cycles=1044, bram_live=14336
+Emitted group 47: ola_ntt_digits_stub, kind=3, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=14336
+Emitted group 48: ola_ntt_digits_stub, kind=3, bytes=3072, work_items=0, micro_ops=6, est_cycles/op=4108, total_est_cycles=24588, bram_live=14336
+Emitted group 49: load_input, kind=0, bytes=2048, work_items=0, micro_ops=4, est_cycles/op=19, total_est_cycles=20, bram_live=16384
+Emitted group 50: ola_reduce_cross_digit_stub, kind=6, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=258, total_est_cycles=3074, bram_live=16384
+Emitted group 51: load_input, kind=0, bytes=2048, work_items=0, micro_ops=4, est_cycles/op=19, total_est_cycles=20, bram_live=18432
+Emitted group 52: ola_reduce_cross_digit_stub, kind=6, bytes=6144, work_items=0, micro_ops=12, est_cycles/op=258, total_est_cycles=3074, bram_live=18432
+Emitted group 0: load_input, kind=0, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=4096
+Emitted group 1: modup_intt, kind=4, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=52, total_est_cycles=92, bram_live=4096
+Emitted group 2: modup_bconv, kind=8, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=24, total_est_cycles=36, bram_live=8192
+Emitted group 3: modup_ntt, kind=3, bytes=8192, work_items=0, micro_ops=3, est_cycles/op=52, total_est_cycles=132, bram_live=8192
+Emitted group 4: innerprod_load_key_all, kind=0, bytes=513, work_items=0, micro_ops=3, est_cycles/op=19, total_est_cycles=19, bram_live=8705
+Emitted group 5: innerprod_mul_all, kind=5, bytes=8705, work_items=0, micro_ops=3, est_cycles/op=8, total_est_cycles=16, bram_live=6144
+Emitted group 6: moddown_spill_2l, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=4096
+Emitted group 7: moddown_intt, kind=4, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=52, total_est_cycles=92, bram_live=4096
+Emitted group 8: moddown_bconv, kind=8, bytes=6144, work_items=0, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=2048
+Emitted group 9: moddown_ntt, kind=3, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=2048
+Emitted group 10: moddown_reload_2l, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=2048
+Emitted group 11: moddown_subtract, kind=7, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=2048
+Emitted group 12: moddown_store_output, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=0
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           382
+Total latency (ns):     1274
+Peak BRAM live (bytes): 14849
+HBM read (bytes):       6657
+HBM write (bytes):      4096
+Dependency stalls:      369 cycles
+Resource stalls:        13 cycles
+Instruction groups:     13
+Total instructions:     26
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=62 (16.2304%)  count=6  bytes=6657
+  StoreHBM: cycles=40 (10.4712%)  count=2  bytes=4096
+  NTT: cycles=106 (27.7487%)  count=4  bytes=10238
+  INTT: cycles=106 (27.7487%)  count=4  bytes=8192
+  EweMul: cycles=10 (2.6178%)  count=3  bytes=8703
+  EweSub: cycles=6 (1.57068%)  count=1  bytes=2048
+  BConv: cycles=52 (13.6126%)  count=6  bytes=14336
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=2
+  modup_intt: kind=INTT  one_limb_cycles=52  groups=1  instrs=2
+  modup_bconv: kind=BConv  one_limb_cycles=24  groups=1  instrs=4
+  modup_ntt: kind=NTT  one_limb_cycles=52  groups=1  instrs=3
+  innerprod_load_key_all: kind=LoadHBM  one_limb_cycles=19  groups=1  instrs=3
+  innerprod_mul_all: kind=EweMul  one_limb_cycles=8  groups=1  instrs=3
+  moddown_spill_2l: kind=StoreHBM  one_limb_cycles=20  groups=1  instrs=1
+  moddown_intt: kind=INTT  one_limb_cycles=52  groups=1  instrs=2
+  moddown_bconv: kind=BConv  one_limb_cycles=24  groups=1  instrs=2
+  moddown_ntt: kind=NTT  one_limb_cycles=52  groups=1  instrs=1
+  moddown_reload_2l: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=1
+  moddown_subtract: kind=EweSub  one_limb_cycles=6  groups=1  instrs=1
+  moddown_store_output: kind=StoreHBM  one_limb_cycles=20  groups=1  instrs=1
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input                     0        21         21            0         4096  4096
+   1  modup_intt                    21        74         53         4096         4096  4096
+   2  modup_bconv                   74       101         27         4096         8192  8192
+   3  modup_ntt                    101       155         54         8192         8192  8192
+   4  innerprod_load_key_all       155       176         21         8192         8705  513
+   5  innerprod_mul_all            176       186         10         8705         6144  8705
+   6  moddown_spill_2l             186       206         20         6144         4096  2048
+   7  moddown_intt                 206       259         53         4096         4096  4096
+   8  moddown_bconv                259       284         25         4096         2048  6144
+   9  moddown_ntt                  284       336         52         2048         2048  2048
+  10  moddown_reload_2l            336       356         20         2048         2048  2048
+  11  moddown_subtract             356       362          6         2048         2048  2048
+  12  moddown_store_output         362       382         20         2048            0  2048
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+21,4096
+21,4096
+74,4096
+74,4096
+101,8192
+101,8192
+155,8192
+155,8192
+176,8705
+176,8705
+186,6144
+186,6144
+206,4096
+206,4096
+259,4096
+259,4096
+284,2048
+284,2048
+336,2048
+336,2048
+356,2048
+356,2048
+362,2048
+362,2048
+382,0
+
+--- Transfer vs Compute ---
+Transfer: 102 cycles (26.7016%)
+Compute:  280 cycles (73.2984%)
+====================================================
+
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:931 Assertion failed: result.dependency_stall_cycles == static_cast<uint64_t>(0) (actual=369, expected=0)
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:932 Assertion failed: result.resource_stall_cycles == static_cast<uint64_t>(0) (actual=13, expected=0)
+Step 1: load ct to BRAM, total bytes: 0
+Emitted group 0: load_input, kind=0, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=4096
+Step 2: load evalkey to BRAM and do computation
+Emitted group 1: load_evalkey, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=6144
+Emitted group 2: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=6144
+Emitted group 3: Spill_InnerProduct_Result, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=4096
+Emitted group 4: load_evalkey, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=6144
+Emitted group 5: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=6144
+Emitted group 6: Spill_InnerProduct_Result, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=4096
+Step 3: INTT and ModDown for digit 0
+Emitted group 7: intt, kind=4, bytes=0, work_items=0, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=4096
+Emitted group 8: modup_bconv, kind=8, bytes=2048, work_items=0, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=6144
+Emitted group 9: load_evalkey, kind=0, bytes=171, work_items=0, micro_ops=1, est_cycles/op=19, total_est_cycles=19, bram_live=6315
+Emitted group 10: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=6315
+Emitted group 11: load_evalkey, kind=0, bytes=171, work_items=0, micro_ops=1, est_cycles/op=19, total_est_cycles=19, bram_live=4438
+Emitted group 12: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=4438
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           248
+Total latency (ns):     827
+Peak BRAM live (bytes): 6486
+HBM read (bytes):       8534
+HBM write (bytes):      4096
+Dependency stalls:      246 cycles
+Resource stalls:        2 cycles
+Instruction groups:     13
+Total instructions:     15
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=99 (39.9194%)  count=6  bytes=8534
+  StoreHBM: cycles=40 (16.129%)  count=2  bytes=4096
+  INTT: cycles=52 (20.9677%)  count=1  bytes=0
+  EweMul: cycles=32 (12.9032%)  count=4  bytes=0
+  BConv: cycles=25 (10.0806%)  count=2  bytes=2048
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=2
+  load_evalkey: kind=LoadHBM  one_limb_cycles(avg/min/max)=19/19/20  groups=4  instrs=4
+  inner_product: kind=EweMul  one_limb_cycles=8  groups=4  instrs=4
+  Spill_InnerProduct_Result: kind=StoreHBM  one_limb_cycles=20  groups=2  instrs=2
+  intt: kind=INTT  one_limb_cycles=52  groups=1  instrs=1
+  modup_bconv: kind=BConv  one_limb_cycles=24  groups=1  instrs=2
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input                     0        21         21            0         4096  4096
+   1  load_evalkey                  21        41         20         4096         6144  2048
+   2  inner_product                 41        49          8         6144         6144  0
+   3  Spill_InnerProduct_Result      49        69         20         6144         4096  2048
+   4  load_evalkey                  69        89         20         4096         6144  2048
+   5  inner_product                 89        97          8         6144         6144  0
+   6  Spill_InnerProduct_Result      97       117         20         6144         4096  2048
+   7  intt                         117       169         52         4096         4096  0
+   8  modup_bconv                  169       194         25         4096         6144  2048
+   9  load_evalkey                 194       213         19         6144         6315  171
+  10  inner_product                213       221          8         6315         6315  0
+  11  load_evalkey                 221       240         19         6315         4438  171
+  12  inner_product                240       248          8         4438         4438  0
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+21,4096
+21,4096
+41,6144
+41,6144
+49,6144
+49,6144
+69,4096
+69,4096
+89,6144
+89,6144
+97,6144
+97,6144
+117,4096
+117,4096
+169,4096
+169,4096
+194,6144
+194,6144
+213,6315
+213,6315
+221,6315
+221,6315
+240,4438
+240,4438
+248,4438
+
+--- Transfer vs Compute ---
+Transfer: 139 cycles (56.0484%)
+Compute:  109 cycles (43.9516%)
+====================================================
+
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:931 Assertion failed: result.dependency_stall_cycles == static_cast<uint64_t>(0) (actual=246, expected=0)
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:932 Assertion failed: result.resource_stall_cycles == static_cast<uint64_t>(0) (actual=2, expected=0)
+Step 1: load ct to BRAM, total bytes: 2048
+Emitted group 0: load_input, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=2048
+Step 2: INTT for all limbs
+Emitted group 1: intt_all_limbs, kind=4, bytes=0, work_items=0, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=2048
+Step 3: BConv NTT Innerprod
+Emitted group 2: bconv, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=4096
+Emitted group 3: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=4096
+Emitted group 4: mul_evalkey, kind=5, bytes=0, work_items=1, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=6144
+Emitted group 5: store_intermediate, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=2048
+Emitted group 6: bconv, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=4096
+Emitted group 7: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=4096
+Emitted group 8: mul_evalkey, kind=5, bytes=0, work_items=1, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=6144
+Emitted group 9: store_intermediate, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=2048
+Emitted group 10: bconv, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=4096
+Emitted group 11: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=4096
+Emitted group 12: mul_evalkey, kind=5, bytes=0, work_items=1, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=6144
+Emitted group 13: store_intermediate, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=2048
+Step 4.1: load intermediate result to BRAM
+Emitted group 14: load_intermediate, kind=0, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=4096
+Step 4.1: INTT for intermediate result
+Emitted group 15: intt_intermediate, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=52, total_est_cycles=92, bram_live=4096
+Step 4.1: bconv for intermediate result
+Emitted group 16: bconv_intermediate, kind=8, bytes=0, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=4096
+Step 4.1: Load ct from HBM to BRAM
+Emitted group 17: load_ct_for_sub, kind=0, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=4096
+Step 4.1: subtract
+Emitted group 18: subtract_intermediate, kind=7, bytes=0, work_items=1, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=4096
+Step 4.1: store subtracted result back to HBM
+Emitted group 19: store_subtracted_intermediate, kind=1, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=2048
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           532
+Total latency (ns):     1774
+Peak BRAM live (bytes): 6144
+HBM read (bytes):       8192
+HBM write (bytes):      8192
+Dependency stalls:      526 cycles
+Resource stalls:        6 cycles
+Instruction groups:     20
+Total instructions:     26
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=61 (11.4662%)  count=4  bytes=8192
+  StoreHBM: cycles=80 (15.0376%)  count=4  bytes=8192
+  NTT: cycles=156 (29.3233%)  count=3  bytes=0
+  INTT: cycles=105 (19.7368%)  count=3  bytes=0
+  EweMul: cycles=24 (4.51128%)  count=3  bytes=0
+  EweSub: cycles=6 (1.12782%)  count=1  bytes=0
+  BConv: cycles=100 (18.797%)  count=8  bytes=12288
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=1
+  intt_all_limbs: kind=INTT  one_limb_cycles=52  groups=1  instrs=1
+  bconv: kind=BConv  one_limb_cycles=24  groups=3  instrs=6
+  NTT: kind=NTT  one_limb_cycles=52  groups=3  instrs=3
+  mul_evalkey: kind=EweMul  one_limb_cycles=8  groups=3  instrs=3
+  store_intermediate: kind=StoreHBM  one_limb_cycles=20  groups=3  instrs=3
+  load_intermediate: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=2
+  intt_intermediate: kind=INTT  one_limb_cycles=52  groups=1  instrs=2
+  bconv_intermediate: kind=BConv  one_limb_cycles=24  groups=1  instrs=2
+  load_ct_for_sub: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=1
+  subtract_intermediate: kind=EweSub  one_limb_cycles=6  groups=1  instrs=1
+  store_subtracted_intermediate: kind=StoreHBM  one_limb_cycles=20  groups=1  instrs=1
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input                     0        20         20            0         2048  2048
+   1  intt_all_limbs                20        72         52         2048         2048  0
+   2  bconv                         72        97         25         2048         4096  4096
+   3  NTT                           97       149         52         4096         4096  0
+   4  mul_evalkey                  149       157          8         4096         6144  0
+   5  store_intermediate           157       177         20         6144         2048  2048
+   6  bconv                        177       202         25         2048         4096  4096
+   7  NTT                          202       254         52         4096         4096  0
+   8  mul_evalkey                  254       262          8         4096         6144  0
+   9  store_intermediate           262       282         20         6144         2048  2048
+  10  bconv                        282       307         25         2048         4096  4096
+  11  NTT                          307       359         52         4096         4096  0
+  12  mul_evalkey                  359       367          8         4096         6144  0
+  13  store_intermediate           367       387         20         6144         2048  2048
+  14  load_intermediate            387       408         21         2048         4096  4096
+  15  intt_intermediate            408       461         53         4096         4096  0
+  16  bconv_intermediate           461       486         25         4096         4096  0
+  17  load_ct_for_sub              486       506         20         4096         4096  2048
+  18  subtract_intermediate        506       512          6         4096         4096  0
+  19  store_subtracted_intermediate     512       532         20         4096         2048  2048
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+20,2048
+20,2048
+72,2048
+72,2048
+97,4096
+97,4096
+149,4096
+149,4096
+157,6144
+157,6144
+177,2048
+177,2048
+202,4096
+202,4096
+254,4096
+254,4096
+262,6144
+262,6144
+282,2048
+282,2048
+307,4096
+307,4096
+359,4096
+359,4096
+367,6144
+367,6144
+387,2048
+387,2048
+408,4096
+408,4096
+461,4096
+461,4096
+486,4096
+486,4096
+506,4096
+506,4096
+512,4096
+512,4096
+532,2048
+
+--- Transfer vs Compute ---
+Transfer: 141 cycles (26.5038%)
+Compute:  391 cycles (73.4962%)
+====================================================
+
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:931 Assertion failed: result.dependency_stall_cycles == static_cast<uint64_t>(0) (actual=526, expected=0)
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:932 Assertion failed: result.resource_stall_cycles == static_cast<uint64_t>(0) (actual=6, expected=0)
+Emitted group 0: load_input, kind=0, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=4096
+Emitted group 1: ola_intt_digits_stub, kind=4, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=52, total_est_cycles=92, bram_live=4096
+Emitted group 2: ola_bconv_digits_stub, kind=8, bytes=6144, work_items=0, micro_ops=4, est_cycles/op=24, total_est_cycles=36, bram_live=6144
+Emitted group 3: ola_ntt_digits_stub, kind=3, bytes=6144, work_items=0, micro_ops=3, est_cycles/op=52, total_est_cycles=132, bram_live=6144
+Emitted group 4: ola_innerprod_load_key_stub, kind=0, bytes=513, work_items=0, micro_ops=3, est_cycles/op=19, total_est_cycles=19, bram_live=6657
+Emitted group 5: ola_innerprod_mul_stub, kind=5, bytes=6657, work_items=0, micro_ops=3, est_cycles/op=8, total_est_cycles=16, bram_live=12288
+Emitted group 6: ola_intt_digits_stub, kind=4, bytes=6144, work_items=0, micro_ops=3, est_cycles/op=52, total_est_cycles=132, bram_live=12288
+Emitted group 7: ola_spill_poly_stub, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=10240
+Emitted group 8: ola_modup_stub, kind=8, bytes=6144, work_items=0, micro_ops=4, est_cycles/op=24, total_est_cycles=36, bram_live=10240
+Emitted group 9: ola_ntt_digits_stub, kind=3, bytes=6144, work_items=0, micro_ops=3, est_cycles/op=52, total_est_cycles=132, bram_live=10240
+Emitted group 10: load_input, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=12288
+Emitted group 11: ola_reduce_cross_digit_stub, kind=6, bytes=6144, work_items=0, micro_ops=3, est_cycles/op=6, total_est_cycles=14, bram_live=12288
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           369
+Total latency (ns):     1230
+Peak BRAM live (bytes): 12801
+HBM read (bytes):       6657
+HBM write (bytes):      2048
+Dependency stalls:      349 cycles
+Resource stalls:        20 cycles
+Instruction groups:     12
+Total instructions:     32
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=62 (16.8022%)  count=6  bytes=6657
+  StoreHBM: cycles=20 (5.42005%)  count=1  bytes=2048
+  NTT: cycles=108 (29.2683%)  count=6  bytes=12288
+  INTT: cycles=107 (28.9973%)  count=5  bytes=10240
+  EweMul: cycles=10 (2.71003%)  count=3  bytes=6657
+  EweAdd: cycles=8 (2.16802%)  count=3  bytes=6144
+  BConv: cycles=54 (14.6341%)  count=8  bytes=12288
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=20  groups=2  instrs=3
+  ola_intt_digits_stub: kind=INTT  one_limb_cycles=52  groups=2  instrs=5
+  ola_bconv_digits_stub: kind=BConv  one_limb_cycles=24  groups=1  instrs=4
+  ola_ntt_digits_stub: kind=NTT  one_limb_cycles=52  groups=2  instrs=6
+  ola_innerprod_load_key_stub: kind=LoadHBM  one_limb_cycles=19  groups=1  instrs=3
+  ola_innerprod_mul_stub: kind=EweMul  one_limb_cycles=8  groups=1  instrs=3
+  ola_spill_poly_stub: kind=StoreHBM  one_limb_cycles=20  groups=1  instrs=1
+  ola_modup_stub: kind=BConv  one_limb_cycles=24  groups=1  instrs=4
+  ola_reduce_cross_digit_stub: kind=EweAdd  one_limb_cycles=6  groups=1  instrs=3
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input                     0        21         21            0         4096  4096
+   1  ola_intt_digits_stub          21        74         53         4096         4096  4096
+   2  ola_bconv_digits_stub         74       101         27         4096         6144  6144
+   3  ola_ntt_digits_stub          101       155         54         6144         6144  6144
+   4  ola_innerprod_load_key_stub     155       176         21         6144         6657  513
+   5  ola_innerprod_mul_stub       176       186         10         6657        12288  6657
+   6  ola_intt_digits_stub         186       240         54        12288        12288  6144
+   7  ola_spill_poly_stub          240       260         20        12288        10240  2048
+   8  ola_modup_stub               260       287         27        10240        10240  6144
+   9  ola_ntt_digits_stub          287       341         54        10240        10240  6144
+  10  load_input                   341       361         20        10240        12288  2048
+  11  ola_reduce_cross_digit_stub     361       369          8        12288        12288  6144
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+21,4096
+21,4096
+74,4096
+74,4096
+101,6144
+101,6144
+155,6144
+155,6144
+176,6657
+176,6657
+186,12288
+186,12288
+240,12288
+240,12288
+260,10240
+260,10240
+287,10240
+287,10240
+341,10240
+341,10240
+361,12288
+361,12288
+369,12288
+
+--- Transfer vs Compute ---
+Transfer: 82 cycles (22.2222%)
+Compute:  287 cycles (77.7778%)
+====================================================
+
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:931 Assertion failed: result.dependency_stall_cycles == static_cast<uint64_t>(0) (actual=349, expected=0)
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:932 Assertion failed: result.resource_stall_cycles == static_cast<uint64_t>(0) (actual=20, expected=0)
+Building HERA program with ct 1, p 1, digit_num 1, digit_limbs 2, l 1, lk 3
+Step 1: load ct to BRAM, total bytes: 2048
+Emitted group 0: load_input, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=2048
+Step 2: INTT for all limbs
+Emitted group 1: intt_all_limbs, kind=4, bytes=0, work_items=0, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=2048
+Step 3: BConv for 2*k limbs
+Step 3.1: bconv for 2*k limbs
+Emitted group 2: bconv_2k_limbs, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=2048
+Step 3.1: NTT for limb
+Emitted group 3: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=4096
+Step 3.1: send eval key limb
+Emitted group 4: send_eval_key_limb, kind=0, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=4096
+Step 3.1: inner product for one limb
+Emitted group 5: inner_product_limb, kind=5, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=6144
+Step 3.2: bconv for 2*k limbs
+Emitted group 6: bconv_2k_limbs, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=4096
+Step 3.2: NTT for limb
+Emitted group 7: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=6144
+Step 3.2: send eval key limb
+Emitted group 8: send_eval_key_limb, kind=0, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=6144
+Step 3.2: inner product for one limb
+Emitted group 9: inner_product_limb, kind=5, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=8192
+Step 4 : INTT for 2*k limbs
+Emitted group 10: intt_2k_limbs, kind=4, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=52, total_est_cycles=92, bram_live=6144
+Step 4.1: BConv for one limb
+Emitted group 11: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=6144
+Step 4.1: NTT for limb
+Emitted group 12: ntt_one_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=8192
+Step 4.1: send eval key limb
+Emitted group 13: send_eval_key_limb, kind=0, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=8192
+Step 4.1: inner product for one limb
+Emitted group 14: inner_product_limb, kind=5, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=10240
+Emitted group 15: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=10240
+Step 4.1: NTT for limb
+Emitted group 16: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=12288
+Emitted group 17: final_subtract_limb, kind=7, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=12288
+Step 4.1: send result back to HBM
+Emitted group 18: store_result, kind=1, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=10240
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           543
+Total latency (ns):     1810
+Peak BRAM live (bytes): 12288
+HBM read (bytes):       8192
+HBM write (bytes):      4096
+Dependency stalls:      538 cycles
+Resource stalls:        5 cycles
+Instruction groups:     19
+Total instructions:     24
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=80 (14.733%)  count=4  bytes=8192
+  StoreHBM: cycles=20 (3.68324%)  count=1  bytes=2048
+  NTT: cycles=208 (38.3057%)  count=4  bytes=8192
+  INTT: cycles=105 (19.337%)  count=3  bytes=4096
+  EweMul: cycles=24 (4.41989%)  count=3  bytes=6144
+  EweSub: cycles=6 (1.10497%)  count=1  bytes=2048
+  BConv: cycles=100 (18.4162%)  count=8  bytes=16384
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=1
+  intt_all_limbs: kind=INTT  one_limb_cycles=52  groups=1  instrs=1
+  bconv_2k_limbs: kind=BConv  one_limb_cycles=24  groups=2  instrs=4
+  ntt_limb: kind=NTT  one_limb_cycles=52  groups=3  instrs=3
+  send_eval_key_limb: kind=LoadHBM  one_limb_cycles=20  groups=3  instrs=3
+  inner_product_limb: kind=EweMul  one_limb_cycles=8  groups=3  instrs=3
+  intt_2k_limbs: kind=INTT  one_limb_cycles=52  groups=1  instrs=2
+  bconv_one_limb: kind=BConv  one_limb_cycles=24  groups=2  instrs=4
+  ntt_one_limb: kind=NTT  one_limb_cycles=52  groups=1  instrs=1
+  final_subtract_limb: kind=EweSub  one_limb_cycles=6  groups=1  instrs=1
+  store_result: kind=StoreHBM  one_limb_cycles=20  groups=1  instrs=1
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input                     0        20         20            0         2048  2048
+   1  intt_all_limbs                20        72         52         2048         2048  0
+   2  bconv_2k_limbs                72        97         25         2048         2048  4096
+   3  ntt_limb                      97       149         52         2048         4096  2048
+   4  send_eval_key_limb           149       169         20         4096         4096  2048
+   5  inner_product_limb           169       177          8         4096         6144  2048
+   6  bconv_2k_limbs               177       202         25         6144         4096  4096
+   7  ntt_limb                     202       254         52         4096         6144  2048
+   8  send_eval_key_limb           254       274         20         6144         6144  2048
+   9  inner_product_limb           274       282          8         6144         8192  2048
+  10  intt_2k_limbs                282       335         53         8192         6144  4096
+  11  bconv_one_limb               335       360         25         6144         6144  4096
+  12  ntt_one_limb                 360       412         52         6144         8192  2048
+  13  send_eval_key_limb           412       432         20         8192         8192  2048
+  14  inner_product_limb           432       440          8         8192        10240  2048
+  15  bconv_one_limb               440       465         25        10240        10240  4096
+  16  ntt_limb                     465       517         52        10240        12288  2048
+  17  final_subtract_limb          517       523          6        12288        12288  2048
+  18  store_result                 523       543         20        12288        10240  2048
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+20,2048
+20,2048
+72,2048
+72,2048
+97,2048
+97,2048
+149,4096
+149,4096
+169,4096
+169,4096
+177,6144
+177,6144
+202,4096
+202,4096
+254,6144
+254,6144
+274,6144
+274,6144
+282,8192
+282,8192
+335,6144
+335,6144
+360,6144
+360,6144
+412,8192
+412,8192
+432,8192
+432,8192
+440,10240
+440,10240
+465,10240
+465,10240
+517,12288
+517,12288
+523,12288
+523,12288
+543,10240
+
+--- Transfer vs Compute ---
+Transfer: 106 cycles (19.5212%)
+Compute:  437 cycles (80.4788%)
+====================================================
+
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:931 Assertion failed: result.dependency_stall_cycles == static_cast<uint64_t>(0) (actual=538, expected=0)
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:932 Assertion failed: result.resource_stall_cycles == static_cast<uint64_t>(0) (actual=5, expected=0)
+Emitted group 0: load_input, kind=0, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=4096
+Emitted group 1: modup_intt, kind=4, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=52, total_est_cycles=92, bram_live=4096
+Emitted group 2: modup_bconv, kind=8, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=24, total_est_cycles=36, bram_live=8192
+Emitted group 3: modup_ntt, kind=3, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=52, total_est_cycles=172, bram_live=8192
+Emitted group 4: innerprod_load_key_all, kind=0, bytes=1024, work_items=0, micro_ops=8, est_cycles/op=19, total_est_cycles=19, bram_live=9216
+Emitted group 5: innerprod_mul_all, kind=5, bytes=9216, work_items=0, micro_ops=8, est_cycles/op=8, total_est_cycles=36, bram_live=16384
+Emitted group 6: innerprod_spill_partial, kind=1, bytes=16384, work_items=0, micro_ops=8, est_cycles/op=20, total_est_cycles=29, bram_live=0
+Emitted group 7: load_input, kind=0, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=4096
+Emitted group 8: modup_intt, kind=4, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=52, total_est_cycles=92, bram_live=4096
+Emitted group 9: modup_bconv, kind=8, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=24, total_est_cycles=36, bram_live=8192
+Emitted group 10: modup_ntt, kind=3, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=52, total_est_cycles=172, bram_live=8192
+Emitted group 11: innerprod_load_key_all, kind=0, bytes=1024, work_items=0, micro_ops=8, est_cycles/op=19, total_est_cycles=19, bram_live=9216
+Emitted group 12: innerprod_mul_all, kind=5, bytes=9216, work_items=0, micro_ops=8, est_cycles/op=8, total_est_cycles=36, bram_live=16384
+Emitted group 13: reduce_reload_partial_rhs, kind=0, bytes=16384, work_items=0, micro_ops=8, est_cycles/op=20, total_est_cycles=29, bram_live=32768
+Emitted group 14: reduce_cross_digit_add, kind=6, bytes=16384, work_items=0, micro_ops=8, est_cycles/op=6, total_est_cycles=34, bram_live=16384
+Emitted group 15: moddown_spill_2l, kind=1, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=20, total_est_cycles=24, bram_live=8192
+Emitted group 16: moddown_intt, kind=4, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=52, total_est_cycles=172, bram_live=8192
+Emitted group 17: moddown_bconv, kind=8, bytes=16384, work_items=0, micro_ops=16, est_cycles/op=24, total_est_cycles=84, bram_live=8192
+Emitted group 18: moddown_ntt, kind=3, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=52, total_est_cycles=172, bram_live=8192
+Emitted group 19: moddown_reload_2l, kind=0, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=20, total_est_cycles=24, bram_live=8192
+Emitted group 20: moddown_subtract, kind=7, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=6, total_est_cycles=18, bram_live=8192
+Emitted group 21: moddown_store_output, kind=1, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=20, total_est_cycles=24, bram_live=0
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           820
+Total latency (ns):     2734
+Peak BRAM live (bytes): 32768
+HBM read (bytes):       34816
+HBM write (bytes):      32768
+Dependency stalls:      590 cycles
+Resource stalls:        230 cycles
+Instruction groups:     22
+Total instructions:     120
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=190 (23.1707%)  count=32  bytes=34816
+  StoreHBM: cycles=89 (10.8537%)  count=16  bytes=32768
+  NTT: cycles=165 (20.122%)  count=12  bytes=24576
+  INTT: cycles=161 (19.6341%)  count=8  bytes=16384
+  EweMul: cycles=38 (4.63415%)  count=16  bytes=18432
+  EweAdd: cycles=15 (1.82927%)  count=8  bytes=16384
+  EweSub: cycles=9 (1.09756%)  count=4  bytes=8192
+  BConv: cycles=153 (18.6585%)  count=24  bytes=32768
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=20  groups=2  instrs=4
+  modup_intt: kind=INTT  one_limb_cycles=52  groups=2  instrs=4
+  modup_bconv: kind=BConv  one_limb_cycles=24  groups=2  instrs=8
+  modup_ntt: kind=NTT  one_limb_cycles=52  groups=2  instrs=8
+  innerprod_load_key_all: kind=LoadHBM  one_limb_cycles=19  groups=2  instrs=16
+  innerprod_mul_all: kind=EweMul  one_limb_cycles=8  groups=2  instrs=16
+  innerprod_spill_partial: kind=StoreHBM  one_limb_cycles=20  groups=1  instrs=8
+  reduce_reload_partial_rhs: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=8
+  reduce_cross_digit_add: kind=EweAdd  one_limb_cycles=6  groups=1  instrs=8
+  moddown_spill_2l: kind=StoreHBM  one_limb_cycles=20  groups=1  instrs=4
+  moddown_intt: kind=INTT  one_limb_cycles=52  groups=1  instrs=4
+  moddown_bconv: kind=BConv  one_limb_cycles=24  groups=1  instrs=16
+  moddown_ntt: kind=NTT  one_limb_cycles=52  groups=1  instrs=4
+  moddown_reload_2l: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=4
+  moddown_subtract: kind=EweSub  one_limb_cycles=6  groups=1  instrs=4
+  moddown_store_output: kind=StoreHBM  one_limb_cycles=20  groups=1  instrs=4
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input                     0        21         21            0         4096  4096
+   1  modup_intt                    21        74         53         4096         4096  4096
+   2  modup_bconv                   74       101         27         4096         8192  8192
+   3  modup_ntt                    101       156         55         8192         8192  8192
+   4  innerprod_load_key_all       156       197         41         8192         9216  1024
+   5  innerprod_mul_all            197       216         19         9216        16384  9216
+   6  innerprod_spill_partial      216       259         43        16384            0  16384
+   7  load_input                   259       280         21            0         4096  4096
+   8  modup_intt                   280       333         53         4096         4096  4096
+   9  modup_bconv                  333       360         27         4096         8192  8192
+  10  modup_ntt                    360       415         55         8192         8192  8192
+  11  innerprod_load_key_all       415       456         41         8192         9216  1024
+  12  innerprod_mul_all            456       475         19         9216        16384  9216
+  13  reduce_reload_partial_rhs     475       518         43        16384        32768  16384
+  14  reduce_cross_digit_add       518       533         15        32768        16384  16384
+  15  moddown_spill_2l             533       556         23        16384         8192  8192
+  16  moddown_intt                 556       611         55         8192         8192  8192
+  17  moddown_bconv                611       710         99         8192         8192  16384
+  18  moddown_ntt                  710       765         55         8192         8192  8192
+  19  moddown_reload_2l            765       788         23         8192         8192  8192
+  20  moddown_subtract             788       797          9         8192         8192  8192
+  21  moddown_store_output         797       820         23         8192            0  8192
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+21,4096
+21,4096
+74,4096
+74,4096
+101,8192
+101,8192
+156,8192
+156,8192
+197,9216
+197,9216
+216,16384
+216,16384
+259,0
+259,0
+280,4096
+280,4096
+333,4096
+333,4096
+360,8192
+360,8192
+415,8192
+415,8192
+456,9216
+456,9216
+475,16384
+475,16384
+518,32768
+518,32768
+533,16384
+533,16384
+556,8192
+556,8192
+611,8192
+611,8192
+710,8192
+710,8192
+765,8192
+765,8192
+788,8192
+788,8192
+797,8192
+797,8192
+820,0
+
+--- Transfer vs Compute ---
+Transfer: 279 cycles (34.0244%)
+Compute:  541 cycles (65.9756%)
+====================================================
+
+Step 1: load ct to BRAM, total bytes: 0
+Emitted group 0: load_input, kind=0, bytes=16384, work_items=0, micro_ops=8, est_cycles/op=20, total_est_cycles=29, bram_live=16384
+Step 2: load evalkey to BRAM and do computation
+Emitted group 1: load_evalkey, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=18432
+Emitted group 2: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=18432
+Emitted group 3: load_evalkey, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=20480
+Emitted group 4: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=20480
+Emitted group 5: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=18432
+Emitted group 6: Spill_InnerProduct_Result, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=16384
+Emitted group 7: load_evalkey, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=18432
+Emitted group 8: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=18432
+Emitted group 9: load_evalkey, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=20480
+Emitted group 10: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=20480
+Emitted group 11: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=18432
+Emitted group 12: Spill_InnerProduct_Result, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=16384
+Emitted group 13: load_evalkey, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=18432
+Emitted group 14: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=18432
+Emitted group 15: load_evalkey, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=20480
+Emitted group 16: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=20480
+Emitted group 17: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=18432
+Emitted group 18: Spill_InnerProduct_Result, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=16384
+Emitted group 19: load_evalkey, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=18432
+Emitted group 20: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=18432
+Emitted group 21: load_evalkey, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=20480
+Emitted group 22: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=20480
+Emitted group 23: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=18432
+Emitted group 24: Spill_InnerProduct_Result, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=16384
+Step 3: INTT and ModDown for digit 0
+Emitted group 25: intt, kind=4, bytes=0, work_items=0, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=16384
+Emitted group 26: modup_bconv, kind=8, bytes=4096, work_items=0, micro_ops=4, est_cycles/op=24, total_est_cycles=36, bram_live=20480
+Emitted group 27: load_evalkey, kind=0, bytes=128, work_items=0, micro_ops=1, est_cycles/op=19, total_est_cycles=19, bram_live=20608
+Emitted group 28: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=20608
+Emitted group 29: load_evalkey, kind=0, bytes=128, work_items=0, micro_ops=1, est_cycles/op=19, total_est_cycles=19, bram_live=20736
+Emitted group 30: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=20736
+Emitted group 31: load_evalkey, kind=0, bytes=128, work_items=0, micro_ops=1, est_cycles/op=19, total_est_cycles=19, bram_live=16768
+Emitted group 32: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=16768
+Emitted group 33: load_evalkey, kind=0, bytes=128, work_items=0, micro_ops=1, est_cycles/op=19, total_est_cycles=19, bram_live=16896
+Emitted group 34: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=16896
+Step 3: INTT and ModDown for digit 1
+Emitted group 35: intt, kind=4, bytes=0, work_items=0, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=12800
+Emitted group 36: modup_bconv, kind=8, bytes=4096, work_items=0, micro_ops=4, est_cycles/op=24, total_est_cycles=36, bram_live=16896
+Emitted group 37: load_evalkey, kind=0, bytes=128, work_items=0, micro_ops=1, est_cycles/op=19, total_est_cycles=19, bram_live=17024
+Emitted group 38: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=17024
+Emitted group 39: load_evalkey, kind=0, bytes=128, work_items=0, micro_ops=1, est_cycles/op=19, total_est_cycles=19, bram_live=17152
+Emitted group 40: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=17152
+Emitted group 41: load_evalkey, kind=0, bytes=128, work_items=0, micro_ops=1, est_cycles/op=19, total_est_cycles=19, bram_live=13184
+Emitted group 42: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=13184
+Emitted group 43: load_evalkey, kind=0, bytes=128, work_items=0, micro_ops=1, est_cycles/op=19, total_est_cycles=19, bram_live=13312
+Emitted group 44: inner_product, kind=5, bytes=0, work_items=0, micro_ops=1, est_cycles/op=8, total_est_cycles=8, bram_live=13312
+Emitted group 45: reduce_and_spill, kind=6, bytes=0, work_items=0, micro_ops=4, est_cycles/op=6, total_est_cycles=18, bram_live=1024
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           754
+Total latency (ns):     2514
+Peak BRAM live (bytes): 20864
+HBM read (bytes):       33792
+HBM write (bytes):      8192
+Dependency stalls:      722 cycles
+Resource stalls:        32 cycles
+Instruction groups:     46
+Total instructions:     62
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=355 (47.0822%)  count=24  bytes=33792
+  StoreHBM: cycles=80 (10.6101%)  count=4  bytes=8192
+  INTT: cycles=104 (13.7931%)  count=2  bytes=0
+  EweMul: cycles=128 (16.9761%)  count=16  bytes=0
+  EweAdd: cycles=33 (4.37666%)  count=8  bytes=0
+  BConv: cycles=54 (7.1618%)  count=8  bytes=8192
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=8
+  load_evalkey: kind=LoadHBM  one_limb_cycles(avg/min/max)=19/19/20  groups=16  instrs=16
+  inner_product: kind=EweMul  one_limb_cycles=8  groups=16  instrs=16
+  reduce_and_spill: kind=EweAdd  one_limb_cycles=6  groups=5  instrs=8
+  Spill_InnerProduct_Result: kind=StoreHBM  one_limb_cycles=20  groups=4  instrs=4
+  intt: kind=INTT  one_limb_cycles=52  groups=2  instrs=2
+  modup_bconv: kind=BConv  one_limb_cycles=24  groups=2  instrs=8
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input                     0        43         43            0        16384  16384
+   1  load_evalkey                  43        63         20        16384        18432  2048
+   2  inner_product                 63        71          8        18432        18432  0
+   3  load_evalkey                  71        91         20        18432        20480  2048
+   4  inner_product                 91        99          8        20480        20480  0
+   5  reduce_and_spill              99       105          6        20480        18432  0
+   6  Spill_InnerProduct_Result     105       125         20        18432        16384  2048
+   7  load_evalkey                 125       145         20        16384        18432  2048
+   8  inner_product                145       153          8        18432        18432  0
+   9  load_evalkey                 153       173         20        18432        20480  2048
+  10  inner_product                173       181          8        20480        20480  0
+  11  reduce_and_spill             181       187          6        20480        18432  0
+  12  Spill_InnerProduct_Result     187       207         20        18432        16384  2048
+  13  load_evalkey                 207       227         20        16384        18432  2048
+  14  inner_product                227       235          8        18432        18432  0
+  15  load_evalkey                 235       255         20        18432        20480  2048
+  16  inner_product                255       263          8        20480        20480  0
+  17  reduce_and_spill             263       269          6        20480        18432  0
+  18  Spill_InnerProduct_Result     269       289         20        18432        16384  2048
+  19  load_evalkey                 289       309         20        16384        18432  2048
+  20  inner_product                309       317          8        18432        18432  0
+  21  load_evalkey                 317       337         20        18432        20480  2048
+  22  inner_product                337       345          8        20480        20480  0
+  23  reduce_and_spill             345       351          6        20480        18432  0
+  24  Spill_InnerProduct_Result     351       371         20        18432        16384  2048
+  25  intt                         371       423         52        16384        16384  0
+  26  modup_bconv                  423       450         27        16384        20480  4096
+  27  load_evalkey                 450       469         19        20480        20608  128
+  28  inner_product                469       477          8        20608        20608  0
+  29  load_evalkey                 477       496         19        20608        20736  128
+  30  inner_product                496       504          8        20736        20736  0
+  31  load_evalkey                 504       523         19        20736        16768  128
+  32  inner_product                523       531          8        16768        16768  0
+  33  load_evalkey                 531       550         19        16768        16896  128
+  34  inner_product                550       558          8        16896        16896  0
+  35  intt                         558       610         52        16896        12800  0
+  36  modup_bconv                  610       637         27        12800        16896  4096
+  37  load_evalkey                 637       656         19        16896        17024  128
+  38  inner_product                656       664          8        17024        17024  0
+  39  load_evalkey                 664       683         19        17024        17152  128
+  40  inner_product                683       691          8        17152        17152  0
+  41  load_evalkey                 691       710         19        17152        13184  128
+  42  inner_product                710       718          8        13184        13184  0
+  43  load_evalkey                 718       737         19        13184        13312  128
+  44  inner_product                737       745          8        13312        13312  0
+  45  reduce_and_spill             745       754          9        13312         1024  0
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+43,16384
+43,16384
+63,18432
+63,18432
+71,18432
+71,18432
+91,20480
+91,20480
+99,20480
+99,20480
+105,18432
+105,18432
+125,16384
+125,16384
+145,18432
+145,18432
+153,18432
+153,18432
+173,20480
+173,20480
+181,20480
+181,20480
+187,18432
+187,18432
+207,16384
+207,16384
+227,18432
+227,18432
+235,18432
+235,18432
+255,20480
+255,20480
+263,20480
+263,20480
+269,18432
+269,18432
+289,16384
+289,16384
+309,18432
+309,18432
+317,18432
+317,18432
+337,20480
+337,20480
+345,20480
+345,20480
+351,18432
+351,18432
+371,16384
+371,16384
+423,16384
+423,16384
+450,20480
+450,20480
+469,20608
+469,20608
+477,20608
+477,20608
+496,20736
+496,20736
+504,20736
+504,20736
+523,16768
+523,16768
+531,16768
+531,16768
+550,16896
+550,16896
+558,16896
+558,16896
+610,12800
+610,12800
+637,16896
+637,16896
+656,17024
+656,17024
+664,17024
+664,17024
+683,17152
+683,17152
+691,17152
+691,17152
+710,13184
+710,13184
+718,13184
+718,13184
+737,13312
+737,13312
+745,13312
+745,13312
+754,1024
+
+--- Transfer vs Compute ---
+Transfer: 435 cycles (57.6923%)
+Compute:  319 cycles (42.3077%)
+====================================================
+
+Step 1: load ct to BRAM, total bytes: 8192
+Emitted group 0: load_input, kind=0, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=20, total_est_cycles=24, bram_live=4096
+Step 2: INTT for all limbs
+Emitted group 1: intt_all_limbs, kind=4, bytes=0, work_items=0, micro_ops=4, est_cycles/op=52, total_est_cycles=172, bram_live=4096
+Step 3: BConv NTT Innerprod
+Emitted group 2: bconv, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=6144
+Emitted group 3: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=6144
+Emitted group 4: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=8192
+Emitted group 5: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=10240
+Emitted group 6: bconv, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=10240
+Emitted group 7: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=10240
+Emitted group 8: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=12288
+Emitted group 9: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=14336
+Emitted group 10: accumulate, kind=6, bytes=8192, work_items=2, micro_ops=4, est_cycles/op=6, total_est_cycles=18, bram_live=12288
+Emitted group 11: store_intermediate, kind=1, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=4096
+Emitted group 12: bconv, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=6144
+Emitted group 13: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=6144
+Emitted group 14: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=8192
+Emitted group 15: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=10240
+Emitted group 16: bconv, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=10240
+Emitted group 17: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=10240
+Emitted group 18: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=12288
+Emitted group 19: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=14336
+Emitted group 20: accumulate, kind=6, bytes=8192, work_items=2, micro_ops=4, est_cycles/op=6, total_est_cycles=18, bram_live=12288
+Emitted group 21: store_intermediate, kind=1, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=4096
+Emitted group 22: bconv, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=6144
+Emitted group 23: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=6144
+Emitted group 24: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=8192
+Emitted group 25: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=10240
+Emitted group 26: bconv, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=10240
+Emitted group 27: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=10240
+Emitted group 28: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=12288
+Emitted group 29: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=14336
+Emitted group 30: accumulate, kind=6, bytes=8192, work_items=2, micro_ops=4, est_cycles/op=6, total_est_cycles=18, bram_live=12288
+Emitted group 31: store_intermediate, kind=1, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=4096
+Emitted group 32: bconv, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=6144
+Emitted group 33: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=6144
+Emitted group 34: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=8192
+Emitted group 35: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=10240
+Emitted group 36: bconv, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=10240
+Emitted group 37: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=10240
+Emitted group 38: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=12288
+Emitted group 39: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=14336
+Emitted group 40: accumulate, kind=6, bytes=8192, work_items=2, micro_ops=4, est_cycles/op=6, total_est_cycles=18, bram_live=12288
+Emitted group 41: store_intermediate, kind=1, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=4096
+Step 4.1: load intermediate result to BRAM
+Emitted group 42: load_intermediate, kind=0, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=0
+Step 4.1: INTT for intermediate result
+Emitted group 43: intt_intermediate, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=52, total_est_cycles=92, bram_live=0
+Step 4.1: bconv for intermediate result
+Emitted group 44: bconv_intermediate, kind=8, bytes=0, work_items=2, micro_ops=4, est_cycles/op=24, total_est_cycles=36, bram_live=0
+Step 4.1: Load ct from HBM to BRAM
+Emitted group 45: load_ct_for_sub, kind=0, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=4096
+Step 4.1: subtract
+Emitted group 46: subtract_intermediate, kind=7, bytes=0, work_items=2, micro_ops=2, est_cycles/op=6, total_est_cycles=10, bram_live=4096
+Step 4.1: store subtracted result back to HBM
+Emitted group 47: store_subtracted_intermediate, kind=1, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=0
+Step 4.2: load intermediate result to BRAM
+Emitted group 48: load_intermediate, kind=0, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=0
+Step 4.2: INTT for intermediate result
+Emitted group 49: intt_intermediate, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=52, total_est_cycles=92, bram_live=0
+Step 4.2: bconv for intermediate result
+Emitted group 50: bconv_intermediate, kind=8, bytes=0, work_items=2, micro_ops=4, est_cycles/op=24, total_est_cycles=36, bram_live=0
+Step 4.2: Load ct from HBM to BRAM
+Emitted group 51: load_ct_for_sub, kind=0, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=4096
+Step 4.2: subtract
+Emitted group 52: subtract_intermediate, kind=7, bytes=0, work_items=2, micro_ops=2, est_cycles/op=6, total_est_cycles=10, bram_live=4096
+Step 4.2: store subtracted result back to HBM
+Emitted group 53: store_subtracted_intermediate, kind=1, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=0
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           1258
+Total latency (ns):     4194
+Peak BRAM live (bytes): 14336
+HBM read (bytes):       24576
+HBM write (bytes):      24576
+Dependency stalls:      1196 cycles
+Resource stalls:        62 cycles
+Instruction groups:     54
+Total instructions:     116
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=107 (8.50556%)  count=12  bytes=24576
+  StoreHBM: cycles=126 (10.0159%)  count=12  bytes=24576
+  NTT: cycles=416 (33.0684%)  count=8  bytes=0
+  INTT: cycles=161 (12.7981%)  count=8  bytes=0
+  EweMul: cycles=144 (11.4467%)  count=32  bytes=0
+  EweAdd: cycles=36 (2.86169%)  count=16  bytes=32768
+  EweSub: cycles=14 (1.11288%)  count=4  bytes=0
+  BConv: cycles=254 (20.1908%)  count=24  bytes=32768
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=4
+  intt_all_limbs: kind=INTT  one_limb_cycles=52  groups=1  instrs=4
+  bconv: kind=BConv  one_limb_cycles=24  groups=8  instrs=16
+  NTT: kind=NTT  one_limb_cycles=52  groups=8  instrs=8
+  mul_evalkey: kind=EweMul  one_limb_cycles=8  groups=16  instrs=32
+  accumulate: kind=EweAdd  one_limb_cycles=6  groups=4  instrs=16
+  store_intermediate: kind=StoreHBM  one_limb_cycles=20  groups=4  instrs=8
+  load_intermediate: kind=LoadHBM  one_limb_cycles=20  groups=2  instrs=4
+  intt_intermediate: kind=INTT  one_limb_cycles=52  groups=2  instrs=4
+  bconv_intermediate: kind=BConv  one_limb_cycles=24  groups=2  instrs=8
+  load_ct_for_sub: kind=LoadHBM  one_limb_cycles=20  groups=2  instrs=4
+  subtract_intermediate: kind=EweSub  one_limb_cycles=6  groups=2  instrs=4
+  store_subtracted_intermediate: kind=StoreHBM  one_limb_cycles=20  groups=2  instrs=4
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input                     0        23         23            0         4096  8192
+   1  intt_all_limbs                23        78         55         4096         4096  0
+   2  bconv                         78       103         25         4096         6144  4096
+   3  NTT                          103       155         52         6144         6144  0
+   4  mul_evalkey                  155       164          9         6144         8192  0
+   5  mul_evalkey                  164       173          9         8192        10240  0
+   6  bconv                        173       198         25        10240        10240  4096
+   7  NTT                          198       250         52        10240        10240  0
+   8  mul_evalkey                  250       259          9        10240        12288  0
+   9  mul_evalkey                  259       268          9        12288        14336  0
+  10  accumulate                   268       277          9        14336        12288  8192
+  11  store_intermediate           277       298         21        12288         4096  4096
+  12  bconv                        298       323         25         4096         6144  4096
+  13  NTT                          323       375         52         6144         6144  0
+  14  mul_evalkey                  375       384          9         6144         8192  0
+  15  mul_evalkey                  384       393          9         8192        10240  0
+  16  bconv                        393       418         25        10240        10240  4096
+  17  NTT                          418       470         52        10240        10240  0
+  18  mul_evalkey                  470       479          9        10240        12288  0
+  19  mul_evalkey                  479       488          9        12288        14336  0
+  20  accumulate                   488       497          9        14336        12288  8192
+  21  store_intermediate           497       518         21        12288         4096  4096
+  22  bconv                        518       543         25         4096         6144  4096
+  23  NTT                          543       595         52         6144         6144  0
+  24  mul_evalkey                  595       604          9         6144         8192  0
+  25  mul_evalkey                  604       613          9         8192        10240  0
+  26  bconv                        613       638         25        10240        10240  4096
+  27  NTT                          638       690         52        10240        10240  0
+  28  mul_evalkey                  690       699          9        10240        12288  0
+  29  mul_evalkey                  699       708          9        12288        14336  0
+  30  accumulate                   708       717          9        14336        12288  8192
+  31  store_intermediate           717       738         21        12288         4096  4096
+  32  bconv                        738       763         25         4096         6144  4096
+  33  NTT                          763       815         52         6144         6144  0
+  34  mul_evalkey                  815       824          9         6144         8192  0
+  35  mul_evalkey                  824       833          9         8192        10240  0
+  36  bconv                        833       858         25        10240        10240  4096
+  37  NTT                          858       910         52        10240        10240  0
+  38  mul_evalkey                  910       919          9        10240        12288  0
+  39  mul_evalkey                  919       928          9        12288        14336  0
+  40  accumulate                   928       937          9        14336        12288  8192
+  41  store_intermediate           937       958         21        12288         4096  4096
+  42  load_intermediate            958       979         21         4096            0  4096
+  43  intt_intermediate            979      1032         53            0            0  0
+  44  bconv_intermediate          1032      1059         27            0            0  0
+  45  load_ct_for_sub             1059      1080         21            0         4096  4096
+  46  subtract_intermediate       1080      1087          7         4096         4096  0
+  47  store_subtracted_intermediate    1087      1108         21         4096            0  4096
+  48  load_intermediate           1108      1129         21            0            0  4096
+  49  intt_intermediate           1129      1182         53            0            0  0
+  50  bconv_intermediate          1182      1209         27            0            0  0
+  51  load_ct_for_sub             1209      1230         21            0         4096  4096
+  52  subtract_intermediate       1230      1237          7         4096         4096  0
+  53  store_subtracted_intermediate    1237      1258         21         4096            0  4096
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+23,4096
+23,4096
+78,4096
+78,4096
+103,6144
+103,6144
+155,6144
+155,6144
+164,8192
+164,8192
+173,10240
+173,10240
+198,10240
+198,10240
+250,10240
+250,10240
+259,12288
+259,12288
+268,14336
+268,14336
+277,12288
+277,12288
+298,4096
+298,4096
+323,6144
+323,6144
+375,6144
+375,6144
+384,8192
+384,8192
+393,10240
+393,10240
+418,10240
+418,10240
+470,10240
+470,10240
+479,12288
+479,12288
+488,14336
+488,14336
+497,12288
+497,12288
+518,4096
+518,4096
+543,6144
+543,6144
+595,6144
+595,6144
+604,8192
+604,8192
+613,10240
+613,10240
+638,10240
+638,10240
+690,10240
+690,10240
+699,12288
+699,12288
+708,14336
+708,14336
+717,12288
+717,12288
+738,4096
+738,4096
+763,6144
+763,6144
+815,6144
+815,6144
+824,8192
+824,8192
+833,10240
+833,10240
+858,10240
+858,10240
+910,10240
+910,10240
+919,12288
+919,12288
+928,14336
+928,14336
+937,12288
+937,12288
+958,4096
+958,4096
+979,0
+979,0
+1032,0
+1032,0
+1059,0
+1059,0
+1080,4096
+1080,4096
+1087,4096
+1087,4096
+1108,0
+1108,0
+1129,0
+1129,0
+1182,0
+1182,0
+1209,0
+1209,0
+1230,4096
+1230,4096
+1237,4096
+1237,4096
+1258,0
+
+--- Transfer vs Compute ---
+Transfer: 233 cycles (18.5215%)
+Compute:  1025 cycles (81.4785%)
+====================================================
+
+Building HERA program with ct 1, p 2, digit_num 2, digit_limbs 2, l 2, lk 4
+Step 1: load ct to BRAM, total bytes: 8192
+Emitted group 0: load_input, kind=0, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=20, total_est_cycles=24, bram_live=8192
+Step 2: INTT for all limbs
+Emitted group 1: intt_all_limbs, kind=4, bytes=0, work_items=0, micro_ops=4, est_cycles/op=52, total_est_cycles=172, bram_live=8192
+Step 3: BConv for 2*k limbs
+Step 3.1: bconv for 2*k limbs
+Emitted group 2: bconv_2k_limbs, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=8192
+Step 3.1: NTT for limb
+Emitted group 3: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=10240
+Step 3.1: send eval key limb
+Emitted group 4: send_eval_key_limb, kind=0, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=10240
+Step 3.1: inner product for one limb
+Emitted group 5: inner_product_limb, kind=5, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=14336
+Step 3.1: bconv for 2*k limbs
+Emitted group 6: bconv_2k_limbs, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=12288
+Step 3.1: NTT for limb
+Emitted group 7: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=14336
+Step 3.1: send eval key limb
+Emitted group 8: send_eval_key_limb, kind=0, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=14336
+Step 3.1: inner product for one limb
+Emitted group 9: inner_product_limb, kind=5, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=18432
+Step 3.1: Accumulate result to previous limb
+Emitted group 10: accumulate_limb, kind=6, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=6, total_est_cycles=10, bram_live=16384
+Step 3.2: bconv for 2*k limbs
+Emitted group 11: bconv_2k_limbs, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=12288
+Step 3.2: NTT for limb
+Emitted group 12: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=14336
+Step 3.2: send eval key limb
+Emitted group 13: send_eval_key_limb, kind=0, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=14336
+Step 3.2: inner product for one limb
+Emitted group 14: inner_product_limb, kind=5, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=18432
+Step 3.2: bconv for 2*k limbs
+Emitted group 15: bconv_2k_limbs, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=16384
+Step 3.2: NTT for limb
+Emitted group 16: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=18432
+Step 3.2: send eval key limb
+Emitted group 17: send_eval_key_limb, kind=0, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=18432
+Step 3.2: inner product for one limb
+Emitted group 18: inner_product_limb, kind=5, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=22528
+Step 3.2: Accumulate result to previous limb
+Emitted group 19: accumulate_limb, kind=6, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=6, total_est_cycles=10, bram_live=20480
+Step 4 : INTT for 2*k limbs
+Emitted group 20: intt_2k_limbs, kind=4, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=52, total_est_cycles=92, bram_live=16384
+Emitted group 21: intt_2k_limbs, kind=4, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=52, total_est_cycles=92, bram_live=16384
+Step 4.1: BConv for one limb
+Emitted group 22: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=16384
+Step 4.1: NTT for limb
+Emitted group 23: ntt_one_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=18432
+Step 4.1: send eval key limb
+Emitted group 24: send_eval_key_limb, kind=0, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=18432
+Step 4.1: inner product for one limb
+Emitted group 25: inner_product_limb, kind=5, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=22528
+Emitted group 26: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=20480
+Step 4.1: NTT for limb
+Emitted group 27: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=22528
+Emitted group 28: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=22528
+Step 4.1: NTT for limb
+Emitted group 29: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=24576
+Emitted group 30: final_subtract_limb, kind=7, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=24576
+Step 4.1: send result back to HBM
+Emitted group 31: store_result, kind=1, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=22528
+Emitted group 32: final_subtract_limb, kind=7, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=20480
+Step 4.1: send result back to HBM
+Emitted group 33: store_result, kind=1, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=18432
+Emitted group 34: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=16384
+Step 4.1: NTT for limb
+Emitted group 35: ntt_one_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=18432
+Step 4.1: send eval key limb
+Emitted group 36: send_eval_key_limb, kind=0, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=18432
+Step 4.1: inner product for one limb
+Emitted group 37: inner_product_limb, kind=5, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=22528
+Step 4.1: Accumulate result to previous limb
+Emitted group 38: accumulate_limb, kind=6, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=6, total_est_cycles=10, bram_live=20480
+Emitted group 39: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=16384
+Step 4.1: NTT for limb
+Emitted group 40: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=18432
+Emitted group 41: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=18432
+Step 4.1: NTT for limb
+Emitted group 42: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=20480
+Emitted group 43: final_subtract_limb, kind=7, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=20480
+Step 4.1: send result back to HBM
+Emitted group 44: store_result, kind=1, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=18432
+Emitted group 45: final_subtract_limb, kind=7, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=16384
+Step 4.1: send result back to HBM
+Emitted group 46: store_result, kind=1, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=14336
+Step 4.2: BConv for one limb
+Emitted group 47: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=12288
+Step 4.2: NTT for limb
+Emitted group 48: ntt_one_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=14336
+Step 4.2: send eval key limb
+Emitted group 49: send_eval_key_limb, kind=0, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=14336
+Step 4.2: inner product for one limb
+Emitted group 50: inner_product_limb, kind=5, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=18432
+Emitted group 51: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=16384
+Step 4.2: NTT for limb
+Emitted group 52: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=18432
+Emitted group 53: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=18432
+Step 4.2: NTT for limb
+Emitted group 54: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=20480
+Emitted group 55: final_subtract_limb, kind=7, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=20480
+Step 4.2: send result back to HBM
+Emitted group 56: store_result, kind=1, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=18432
+Emitted group 57: final_subtract_limb, kind=7, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=16384
+Step 4.2: send result back to HBM
+Emitted group 58: store_result, kind=1, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=14336
+Emitted group 59: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=12288
+Step 4.2: NTT for limb
+Emitted group 60: ntt_one_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=14336
+Step 4.2: send eval key limb
+Emitted group 61: send_eval_key_limb, kind=0, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=14336
+Step 4.2: inner product for one limb
+Emitted group 62: inner_product_limb, kind=5, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=8, total_est_cycles=12, bram_live=18432
+Step 4.2: Accumulate result to previous limb
+Emitted group 63: accumulate_limb, kind=6, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=6, total_est_cycles=10, bram_live=16384
+Emitted group 64: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=12288
+Step 4.2: NTT for limb
+Emitted group 65: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=14336
+Emitted group 66: bconv_one_limb, kind=8, bytes=4096, work_items=2, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=14336
+Step 4.2: NTT for limb
+Emitted group 67: ntt_limb, kind=3, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=16384
+Emitted group 68: final_subtract_limb, kind=7, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=16384
+Step 4.2: send result back to HBM
+Emitted group 69: store_result, kind=1, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=14336
+Emitted group 70: final_subtract_limb, kind=7, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=12288
+Step 4.2: send result back to HBM
+Emitted group 71: store_result, kind=1, bytes=2048, work_items=1, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=10240
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           1892
+Total latency (ns):     6307
+Peak BRAM live (bytes): 24576
+HBM read (bytes):       40960
+HBM write (bytes):      32768
+Dependency stalls:      1848 cycles
+Resource stalls:        44 cycles
+Instruction groups:     72
+Total instructions:     116
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=191 (10.0951%)  count=20  bytes=40960
+  StoreHBM: cycles=160 (8.45666%)  count=8  bytes=16384
+  NTT: cycles=832 (43.9746%)  count=16  bytes=32768
+  INTT: cycles=161 (8.50951%)  count=8  bytes=8192
+  EweMul: cycles=72 (3.8055%)  count=16  bytes=32768
+  EweAdd: cycles=28 (1.47992%)  count=8  bytes=16384
+  EweSub: cycles=48 (2.537%)  count=8  bytes=16384
+  BConv: cycles=400 (21.1416%)  count=32  bytes=65536
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=4
+  intt_all_limbs: kind=INTT  one_limb_cycles=52  groups=1  instrs=4
+  bconv_2k_limbs: kind=BConv  one_limb_cycles=24  groups=4  instrs=8
+  ntt_limb: kind=NTT  one_limb_cycles=52  groups=12  instrs=12
+  send_eval_key_limb: kind=LoadHBM  one_limb_cycles=20  groups=8  instrs=16
+  inner_product_limb: kind=EweMul  one_limb_cycles=8  groups=8  instrs=16
+  accumulate_limb: kind=EweAdd  one_limb_cycles=6  groups=4  instrs=8
+  intt_2k_limbs: kind=INTT  one_limb_cycles=52  groups=2  instrs=4
+  bconv_one_limb: kind=BConv  one_limb_cycles=24  groups=12  instrs=24
+  ntt_one_limb: kind=NTT  one_limb_cycles=52  groups=4  instrs=4
+  final_subtract_limb: kind=EweSub  one_limb_cycles=6  groups=8  instrs=8
+  store_result: kind=StoreHBM  one_limb_cycles=20  groups=8  instrs=8
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input                     0        23         23            0         8192  8192
+   1  intt_all_limbs                23        78         55         8192         8192  0
+   2  bconv_2k_limbs                78       103         25         8192         8192  4096
+   3  ntt_limb                     103       155         52         8192        10240  2048
+   4  send_eval_key_limb           155       176         21        10240        10240  4096
+   5  inner_product_limb           176       185          9        10240        14336  4096
+   6  bconv_2k_limbs               185       210         25        14336        12288  4096
+   7  ntt_limb                     210       262         52        12288        14336  2048
+   8  send_eval_key_limb           262       283         21        14336        14336  4096
+   9  inner_product_limb           283       292          9        14336        18432  4096
+  10  accumulate_limb              292       299          7        18432        16384  4096
+  11  bconv_2k_limbs               299       324         25        16384        12288  4096
+  12  ntt_limb                     324       376         52        12288        14336  2048
+  13  send_eval_key_limb           376       397         21        14336        14336  4096
+  14  inner_product_limb           397       406          9        14336        18432  4096
+  15  bconv_2k_limbs               406       431         25        18432        16384  4096
+  16  ntt_limb                     431       483         52        16384        18432  2048
+  17  send_eval_key_limb           483       504         21        18432        18432  4096
+  18  inner_product_limb           504       513          9        18432        22528  4096
+  19  accumulate_limb              513       520          7        22528        20480  4096
+  20  intt_2k_limbs                520       573         53        20480        16384  4096
+  21  intt_2k_limbs                573       626         53        16384        16384  4096
+  22  bconv_one_limb               626       651         25        16384        16384  4096
+  23  ntt_one_limb                 651       703         52        16384        18432  2048
+  24  send_eval_key_limb           703       724         21        18432        18432  4096
+  25  inner_product_limb           724       733          9        18432        22528  4096
+  26  bconv_one_limb               733       758         25        22528        20480  4096
+  27  ntt_limb                     758       810         52        20480        22528  2048
+  28  bconv_one_limb               810       835         25        22528        22528  4096
+  29  ntt_limb                     835       887         52        22528        24576  2048
+  30  final_subtract_limb          887       893          6        24576        24576  2048
+  31  store_result                 893       913         20        24576        22528  2048
+  32  final_subtract_limb          913       919          6        22528        20480  2048
+  33  store_result                 919       939         20        20480        18432  2048
+  34  bconv_one_limb               939       964         25        18432        16384  4096
+  35  ntt_one_limb                 964      1016         52        16384        18432  2048
+  36  send_eval_key_limb          1016      1037         21        18432        18432  4096
+  37  inner_product_limb          1037      1046          9        18432        22528  4096
+  38  accumulate_limb             1046      1053          7        22528        20480  4096
+  39  bconv_one_limb              1053      1078         25        20480        16384  4096
+  40  ntt_limb                    1078      1130         52        16384        18432  2048
+  41  bconv_one_limb              1130      1155         25        18432        18432  4096
+  42  ntt_limb                    1155      1207         52        18432        20480  2048
+  43  final_subtract_limb         1207      1213          6        20480        20480  2048
+  44  store_result                1213      1233         20        20480        18432  2048
+  45  final_subtract_limb         1233      1239          6        18432        16384  2048
+  46  store_result                1239      1259         20        16384        14336  2048
+  47  bconv_one_limb              1259      1284         25        14336        12288  4096
+  48  ntt_one_limb                1284      1336         52        12288        14336  2048
+  49  send_eval_key_limb          1336      1357         21        14336        14336  4096
+  50  inner_product_limb          1357      1366          9        14336        18432  4096
+  51  bconv_one_limb              1366      1391         25        18432        16384  4096
+  52  ntt_limb                    1391      1443         52        16384        18432  2048
+  53  bconv_one_limb              1443      1468         25        18432        18432  4096
+  54  ntt_limb                    1468      1520         52        18432        20480  2048
+  55  final_subtract_limb         1520      1526          6        20480        20480  2048
+  56  store_result                1526      1546         20        20480        18432  2048
+  57  final_subtract_limb         1546      1552          6        18432        16384  2048
+  58  store_result                1552      1572         20        16384        14336  2048
+  59  bconv_one_limb              1572      1597         25        14336        12288  4096
+  60  ntt_one_limb                1597      1649         52        12288        14336  2048
+  61  send_eval_key_limb          1649      1670         21        14336        14336  4096
+  62  inner_product_limb          1670      1679          9        14336        18432  4096
+  63  accumulate_limb             1679      1686          7        18432        16384  4096
+  64  bconv_one_limb              1686      1711         25        16384        12288  4096
+  65  ntt_limb                    1711      1763         52        12288        14336  2048
+  66  bconv_one_limb              1763      1788         25        14336        14336  4096
+  67  ntt_limb                    1788      1840         52        14336        16384  2048
+  68  final_subtract_limb         1840      1846          6        16384        16384  2048
+  69  store_result                1846      1866         20        16384        14336  2048
+  70  final_subtract_limb         1866      1872          6        14336        12288  2048
+  71  store_result                1872      1892         20        12288        10240  2048
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+23,8192
+23,8192
+78,8192
+78,8192
+103,8192
+103,8192
+155,10240
+155,10240
+176,10240
+176,10240
+185,14336
+185,14336
+210,12288
+210,12288
+262,14336
+262,14336
+283,14336
+283,14336
+292,18432
+292,18432
+299,16384
+299,16384
+324,12288
+324,12288
+376,14336
+376,14336
+397,14336
+397,14336
+406,18432
+406,18432
+431,16384
+431,16384
+483,18432
+483,18432
+504,18432
+504,18432
+513,22528
+513,22528
+520,20480
+520,20480
+573,16384
+573,16384
+626,16384
+626,16384
+651,16384
+651,16384
+703,18432
+703,18432
+724,18432
+724,18432
+733,22528
+733,22528
+758,20480
+758,20480
+810,22528
+810,22528
+835,22528
+835,22528
+887,24576
+887,24576
+893,24576
+893,24576
+913,22528
+913,22528
+919,20480
+919,20480
+939,18432
+939,18432
+964,16384
+964,16384
+1016,18432
+1016,18432
+1037,18432
+1037,18432
+1046,22528
+1046,22528
+1053,20480
+1053,20480
+1078,16384
+1078,16384
+1130,18432
+1130,18432
+1155,18432
+1155,18432
+1207,20480
+1207,20480
+1213,20480
+1213,20480
+1233,18432
+1233,18432
+1239,16384
+1239,16384
+1259,14336
+1259,14336
+1284,12288
+1284,12288
+1336,14336
+1336,14336
+1357,14336
+1357,14336
+1366,18432
+1366,18432
+1391,16384
+1391,16384
+1443,18432
+1443,18432
+1468,18432
+1468,18432
+1520,20480
+1520,20480
+1526,20480
+1526,20480
+1546,18432
+1546,18432
+1552,16384
+1552,16384
+1572,14336
+1572,14336
+1597,12288
+1597,12288
+1649,14336
+1649,14336
+1670,14336
+1670,14336
+1679,18432
+1679,18432
+1686,16384
+1686,16384
+1711,12288
+1711,12288
+1763,14336
+1763,14336
+1788,14336
+1788,14336
+1840,16384
+1840,16384
+1846,16384
+1846,16384
+1866,14336
+1866,14336
+1872,12288
+1872,12288
+1892,10240
+
+--- Transfer vs Compute ---
+Transfer: 399 cycles (21.0888%)
+Compute:  1493 cycles (78.9112%)
+====================================================
+
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:1024 Assertion failed: poseidon_result.reload_bytes > 0
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:1025 Assertion failed: fab_result.bram_read_bytes > 0 || fab_result.bram_write_bytes > 0
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:1026 Assertion failed: fast_result.bram_read_bytes > 0 || fast_result.bram_write_bytes > 0
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:1027 Assertion failed: hera_result.direct_forward_count > poseidon_result.direct_forward_count
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/tests/cycle_sim_tests.cpp:1028 Assertion failed: hera_result.transfer_cycles < poseidon_result.transfer_cycles
+Emitted group 0: load_input, kind=0, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=20, total_est_cycles=21, bram_live=4096
+Emitted group 1: modup_intt, kind=4, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=52, total_est_cycles=92, bram_live=4096
+Emitted group 2: modup_bconv, kind=8, bytes=8192, work_items=0, micro_ops=4, est_cycles/op=24, total_est_cycles=36, bram_live=8192
+Emitted group 3: modup_ntt, kind=3, bytes=8192, work_items=0, micro_ops=3, est_cycles/op=52, total_est_cycles=132, bram_live=8192
+Emitted group 4: innerprod_load_key_all, kind=0, bytes=513, work_items=0, micro_ops=3, est_cycles/op=19, total_est_cycles=19, bram_live=8705
+Emitted group 5: innerprod_mul_all, kind=5, bytes=8705, work_items=0, micro_ops=3, est_cycles/op=8, total_est_cycles=16, bram_live=6144
+Emitted group 6: moddown_spill_2l, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=4096
+Emitted group 7: moddown_intt, kind=4, bytes=4096, work_items=0, micro_ops=2, est_cycles/op=52, total_est_cycles=92, bram_live=4096
+Emitted group 8: moddown_bconv, kind=8, bytes=6144, work_items=0, micro_ops=2, est_cycles/op=24, total_est_cycles=28, bram_live=2048
+Emitted group 9: moddown_ntt, kind=3, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=52, total_est_cycles=52, bram_live=2048
+Emitted group 10: moddown_reload_2l, kind=0, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=2048
+Emitted group 11: moddown_subtract, kind=7, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=6, total_est_cycles=6, bram_live=2048
+Emitted group 12: moddown_store_output, kind=1, bytes=2048, work_items=0, micro_ops=1, est_cycles/op=20, total_est_cycles=20, bram_live=0
+
+========== Detailed Execution Statistics ==========
+
+--- Summary ---
+Total cycles:           382
+Total latency (ns):     1274
+Peak BRAM live (bytes): 14849
+HBM read (bytes):       6657
+HBM write (bytes):      4096
+Dependency stalls:      369 cycles
+Resource stalls:        13 cycles
+Instruction groups:     13
+Total instructions:     26
+
+--- Cycle Breakdown by Instruction Kind ---
+  LoadHBM: cycles=62 (16.2304%)  count=6  bytes=6657
+  StoreHBM: cycles=40 (10.4712%)  count=2  bytes=4096
+  NTT: cycles=106 (27.7487%)  count=4  bytes=10238
+  INTT: cycles=106 (27.7487%)  count=4  bytes=8192
+  EweMul: cycles=10 (2.6178%)  count=3  bytes=8703
+  EweSub: cycles=6 (1.57068%)  count=1  bytes=2048
+  BConv: cycles=52 (13.6126%)  count=6  bytes=14336
+
+--- EstimateCycle (1-Limb Input) by Operation ---
+  load_input: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=2
+  modup_intt: kind=INTT  one_limb_cycles=52  groups=1  instrs=2
+  modup_bconv: kind=BConv  one_limb_cycles=24  groups=1  instrs=4
+  modup_ntt: kind=NTT  one_limb_cycles=52  groups=1  instrs=3
+  innerprod_load_key_all: kind=LoadHBM  one_limb_cycles=19  groups=1  instrs=3
+  innerprod_mul_all: kind=EweMul  one_limb_cycles=8  groups=1  instrs=3
+  moddown_spill_2l: kind=StoreHBM  one_limb_cycles=20  groups=1  instrs=1
+  moddown_intt: kind=INTT  one_limb_cycles=52  groups=1  instrs=2
+  moddown_bconv: kind=BConv  one_limb_cycles=24  groups=1  instrs=2
+  moddown_ntt: kind=NTT  one_limb_cycles=52  groups=1  instrs=1
+  moddown_reload_2l: kind=LoadHBM  one_limb_cycles=20  groups=1  instrs=1
+  moddown_subtract: kind=EweSub  one_limb_cycles=6  groups=1  instrs=1
+  moddown_store_output: kind=StoreHBM  one_limb_cycles=20  groups=1  instrs=1
+
+--- Group Timeline ---
+  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
+   0  load_input                     0        21         21            0         4096  4096
+   1  modup_intt                    21        74         53         4096         4096  4096
+   2  modup_bconv                   74       101         27         4096         8192  8192
+   3  modup_ntt                    101       155         54         8192         8192  8192
+   4  innerprod_load_key_all       155       176         21         8192         8705  513
+   5  innerprod_mul_all            176       186         10         8705         6144  8705
+   6  moddown_spill_2l             186       206         20         6144         4096  2048
+   7  moddown_intt                 206       259         53         4096         4096  4096
+   8  moddown_bconv                259       284         25         4096         2048  6144
+   9  moddown_ntt                  284       336         52         2048         2048  2048
+  10  moddown_reload_2l            336       356         20         2048         2048  2048
+  11  moddown_subtract             356       362          6         2048         2048  2048
+  12  moddown_store_output         362       382         20         2048            0  2048
+
+--- BRAM Timeline (cycle, live_bytes) ---
+# cycle,bram_bytes
+0,0
+0,0
+21,4096
+21,4096
+74,4096
+74,4096
+101,8192
+101,8192
+155,8192
+155,8192
+176,8705
+176,8705
+186,6144
+186,6144
+206,4096
+206,4096
+259,4096
+259,4096
+284,2048
+284,2048
+336,2048
+336,2048
+356,2048
+356,2048
+362,2048
+362,2048
+382,0
+
+--- Transfer vs Compute ---
+Transfer: 102 cycles (26.7016%)
+Compute:  280 cycles (73.2984%)
+====================================================
+
+ The program is not generated
+<end of output>
+Test time =   0.93 sec
+----------------------------------------------------------
+Test Failed.
+"keyaware_cycle_tests" end time: Mar 22 20:12 CST
+"keyaware_cycle_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Mar 22 20:12 CST

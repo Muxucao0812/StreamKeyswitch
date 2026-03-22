@@ -166,16 +166,6 @@ const char* ToString(KeySwitchMethod method) {
         return "output_centric";
     case KeySwitchMethod::MaxParallel:
         return "max_parallel";
-    case KeySwitchMethod::SingleBoardClassic:
-        return "single_board_classic";
-    case KeySwitchMethod::SingleBoardFused:
-        return "single_board_fused";
-    case KeySwitchMethod::ScaleOutLimb:
-        return "scaleout_limb";
-    case KeySwitchMethod::ScaleOutDigit:
-        return "scaleout_digit";
-    case KeySwitchMethod::ScaleOutCiphertext:
-        return "scaleout_ciphertext";
     }
     return "poseidon";
 }
@@ -598,7 +588,7 @@ ParseExperimentConfigResult ParseExperimentConfig(int argc, char** argv) {
                 if (!ParseKeySwitchMethod(value_text, &method)) {
                     result.error_message =
                         "Invalid --ks-method: " + value_text
-                        + " (expected poseidon|fab|fast|ola|hera|cinnamon|cinnamon_ib|cinnamon_oa|max_parallel|digit_centric|output_centric)";
+                        + " (expected poseidon|fab|fast|ola|hera|cinnamon_ib|cinnamon_oa|max_parallel|digit_centric|output_centric)";
                     return result;
                 }
                 config.keyswitch_method = method;

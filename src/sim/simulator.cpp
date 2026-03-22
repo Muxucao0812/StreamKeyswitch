@@ -3,49 +3,6 @@
 #include <iostream>
 #include <unordered_set>
 
-namespace {
-
-const char* ToString(KeySwitchMethod method) {
-    switch (method) {
-    case KeySwitchMethod::Auto:
-        return "Auto";
-    case KeySwitchMethod::SingleBoardClassic:
-        return "SingleBoardClassic";
-    case KeySwitchMethod::SingleBoardFused:
-        return "SingleBoardFused";
-    case KeySwitchMethod::ScaleOutLimb:
-        return "ScaleOutLimb";
-    case KeySwitchMethod::ScaleOutDigit:
-        return "ScaleOutDigit";
-    case KeySwitchMethod::ScaleOutCiphertext:
-        return "ScaleOutCiphertext";
-    case KeySwitchMethod::Poseidon:
-        return "Poseidon";
-    case KeySwitchMethod::OLA:
-        return "OLA";
-    case KeySwitchMethod::FAB:
-        return "FAB";
-    case KeySwitchMethod::FAST:
-        return "FAST";
-    case KeySwitchMethod::HERA:
-        return "HERA";
-    case KeySwitchMethod::DigitCentric:
-        return "DigitCentric";
-    case KeySwitchMethod::OutputCentric:
-        return "OutputCentric";
-    case KeySwitchMethod::MaxParallel:
-        return "MaxParallel";
-    case KeySwitchMethod::Cinnamon:
-        return "Cinnamon";
-    case KeySwitchMethod::CinnamonIB:
-        return "CinnamonIB";
-    case KeySwitchMethod::CinnamonOA:
-        return "CinnamonOA";
-    }
-    return "Unknown";
-}
-
-} // namespace
 
 Simulator::Simulator(
     SystemState initial_state,
@@ -104,36 +61,7 @@ void Simulator::TryDispatch() {
         const Request& req = request_table_.at(plan.request_id);
 
         ExecutionResult result = backend_->Estimate(req, plan, state_);
-        if (result.fallback_reason != KeySwitchFallbackReason::None
-            && result.fallback_reason_message.empty()) {
-            result.fallback_reason_message = ToString(result.fallback_reason);
-        }
-        if (result.degraded_reason != KeySwitchFallbackReason::None
-            && result.degraded_reason_message.empty()) {
-            result.degraded_reason_message = ToString(result.degraded_reason);
-        }
-        if (result.fallback_used || result.method_degraded) {
-            const bool degraded_only = !result.fallback_used && result.method_degraded;
-            std::cerr
-                << "[keyswitch] request=" << req.request_id
-                << " status=" << (degraded_only ? "degraded" : "fallback")
-                << " fallback_used=" << (result.fallback_used ? 1 : 0)
-                << " method_degraded=" << (result.method_degraded ? 1 : 0)
-                << " unsupported_method=" << (result.unsupported_method ? 1 : 0)
-                << " unsupported_config=" << (result.unsupported_config ? 1 : 0)
-                << " compatibility_fallback=" << (result.compatibility_fallback ? 1 : 0)
-                << " requested_method=" << ToString(result.requested_method)
-                << " effective_method=" << ToString(result.effective_method)
-                << " reason="
-                << (degraded_only
-                    ? (result.degraded_reason_message.empty()
-                        ? ToString(result.degraded_reason)
-                        : result.degraded_reason_message)
-                    : (result.fallback_reason_message.empty()
-                        ? ToString(result.fallback_reason)
-                        : result.fallback_reason_message))
-                << "\n";
-        }
+        
         const Time dispatch_start_time = state_.now;
         result.breakdown.queue_time = (dispatch_start_time >= req.arrival_time) ? 
                                             (dispatch_start_time - req.arrival_time) 

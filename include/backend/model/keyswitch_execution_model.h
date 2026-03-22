@@ -13,6 +13,17 @@
 #include <string>
 #include <vector>
 
+// Cinnamon 类多卡执行的 digit 分片描述。
+struct DigitShard {
+    uint32_t begin = 0;
+    uint32_t count = 0;
+};
+
+// 将 total_digits 尽量均衡地分到 cards 张卡上，允许不整除。
+std::vector<DigitShard> BuildDigitShards(
+    uint32_t total_digits,
+    uint32_t cards);
+
 // KeySwitch 问题描述：由请求 + 执行计划 + 系统状态归一化后的规模信息。
 // 该结构是后续 tile 规划与执行图构建的基础输入。
 struct KeySwitchProblem {
@@ -28,6 +39,7 @@ struct KeySwitchProblem {
     KeyPlacement key_placement = KeyPlacement::StreamFromHBM;
     CollectiveStrategy collective_strategy = CollectiveStrategy::None;
     uint32_t active_cards = 1;
+    std::vector<DigitShard> digit_shards;
 
     // 并行资源与数据维度。
     uint32_t cards = 1;

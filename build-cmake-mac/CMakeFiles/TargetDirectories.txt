@@ -1,0 +1,4 @@
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac/CMakeFiles/keyaware_core.dir
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac/CMakeFiles/keyaware_sim.dir
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac/CMakeFiles/edit_cache.dir
+/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac/CMakeFiles/rebuild_cache.dir

@@ -46,4 +46,4 @@ Emitted group 17: modup_ntt, kind=3, bytes=4194304, work_items=0, micro_ops=31, 
 Emitted group 18: innerprod_load_key_all, kind=0, bytes=8388662, work_items=0, micro_ops=62, est_cycles/op=103, total_est_cycles=5261, bram_live=12582966
 Emitted group 19: innerprod_mul_all, kind=5, bytes=12582966, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=16252928
 Emitted group 20: reduce_reload_partial_rhs, kind=0, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=182, total_est_cycles=10177, bram_live=32505856
-CycleBackend: BuildProgram failed for method 
+ The program is not generated

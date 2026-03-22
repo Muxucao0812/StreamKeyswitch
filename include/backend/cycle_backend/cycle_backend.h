@@ -46,9 +46,8 @@ private:
         const ExecutionPlan& plan,
         const SystemState& state,
         KeySwitchMethod method,
-        KeySwitchExecution* execution,
-        KeySwitchFallbackReason* fallback_reason,
-        std::string* fallback_reason_message) const;
+        KeySwitchExecution* execution
+    ) const;
 
     // 阶段 2：运行 cycle 级仿真。
     CycleSimStats Simulate(const CycleProgram& program) const;

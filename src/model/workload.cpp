@@ -112,15 +112,6 @@ Request WorkloadBuilder::BuildRequest(
     const uint32_t cards_by_working_set = RecommendCardCountForRequest(req);
     req.ks_profile.preferred_cards = cards_by_working_set;
 
-    if (keyswitch_method_ == KeySwitchMethod::SingleBoardClassic) {
-        req.ks_profile.preferred_cards = 1;
-        req.ks_profile.max_cards = 1;
-    } else if (req.latency_sensitive) {
-        req.ks_profile.max_cards = std::max<uint32_t>(cards_by_working_set, 4);
-    } else {
-        req.ks_profile.max_cards = cards_by_working_set;
-    }
-
     return req;
 }
 

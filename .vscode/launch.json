@@ -38,6 +38,42 @@
       ]
     },
     {
+      "name": "Debug keyaware_sim (macOS, poseidon, single-card)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake-mac/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "fifo",
+        "--backend",
+        "cycle_stub",
+        "--workload",
+        "synthetic",
+        "--ks-method",
+        "poseidon",
+        "--ks-multi-board-mode",
+        "auto",
+        "--disable-multi-card",
+        "--seed",
+        "42",
+        "--num-users",
+        "1",
+        "--requests-per-user",
+        "1",
+        "--inter-arrival",
+        "10",
+        "--num-cards",
+        "1"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "preLaunchTask": "build keyaware debug (mac)",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    },
+    {
       "name": "Debug keyaware_sim (Linux, fab, single-card)",
       "type": "lldb",
       "request": "launch",
@@ -69,6 +105,42 @@
       "cwd": "${workspaceFolder}",
       "terminal": "integrated",
       "preLaunchTask": "build keyaware debug (linux)",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    },
+    {
+      "name": "Debug keyaware_sim (macOS, fab, single-card)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake-mac/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "fifo",
+        "--backend",
+        "cycle_stub",
+        "--workload",
+        "synthetic",
+        "--ks-method",
+        "fab",
+        "--ks-multi-board-mode",
+        "auto",
+        "--disable-multi-card",
+        "--seed",
+        "42",
+        "--num-users",
+        "1",
+        "--requests-per-user",
+        "1",
+        "--inter-arrival",
+        "10",
+        "--num-cards",
+        "1"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "preLaunchTask": "build keyaware debug (mac)",
       "sourceLanguages": [
         "cpp"
       ]
@@ -110,6 +182,42 @@
       ]
     },
     {
+      "name": "Debug keyaware_sim (macOS, fast, single-card)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake-mac/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "fifo",
+        "--backend",
+        "cycle_stub",
+        "--workload",
+        "synthetic",
+        "--ks-method",
+        "fast",
+        "--ks-multi-board-mode",
+        "auto",
+        "--disable-multi-card",
+        "--seed",
+        "42",
+        "--num-users",
+        "1",
+        "--requests-per-user",
+        "1",
+        "--inter-arrival",
+        "10",
+        "--num-cards",
+        "1"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "preLaunchTask": "build keyaware debug (mac)",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    },
+    {
       "name": "Debug keyaware_sim (Linux, ola, single-card)",
       "type": "lldb",
       "request": "launch",
@@ -141,6 +249,42 @@
       "cwd": "${workspaceFolder}",
       "terminal": "integrated",
       "preLaunchTask": "build keyaware debug (linux)",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    },
+    {
+      "name": "Debug keyaware_sim (macOS, ola, single-card)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake-mac/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "fifo",
+        "--backend",
+        "cycle_stub",
+        "--workload",
+        "synthetic",
+        "--ks-method",
+        "ola",
+        "--ks-multi-board-mode",
+        "auto",
+        "--disable-multi-card",
+        "--seed",
+        "42",
+        "--num-users",
+        "1",
+        "--requests-per-user",
+        "1",
+        "--inter-arrival",
+        "10",
+        "--num-cards",
+        "1"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "preLaunchTask": "build keyaware debug (mac)",
       "sourceLanguages": [
         "cpp"
       ]
@@ -182,6 +326,42 @@
       ]
     },
     {
+      "name": "Debug keyaware_sim (macOS, hera, single-card)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake-mac/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "fifo",
+        "--backend",
+        "cycle_stub",
+        "--workload",
+        "synthetic",
+        "--ks-method",
+        "hera",
+        "--ks-multi-board-mode",
+        "auto",
+        "--disable-multi-card",
+        "--seed",
+        "42",
+        "--num-users",
+        "1",
+        "--requests-per-user",
+        "1",
+        "--inter-arrival",
+        "10",
+        "--num-cards",
+        "1"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "preLaunchTask": "build keyaware debug (mac)",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    },
+    {
       "name": "Debug keyaware_sim (Linux, max_parallel, single-card)",
       "type": "lldb",
       "request": "launch",
@@ -213,6 +393,42 @@
       "cwd": "${workspaceFolder}",
       "terminal": "integrated",
       "preLaunchTask": "build keyaware debug (linux)",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    },
+    {
+      "name": "Debug keyaware_sim (macOS, max_parallel, single-card)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake-mac/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "fifo",
+        "--backend",
+        "cycle_stub",
+        "--workload",
+        "synthetic",
+        "--ks-method",
+        "max_parallel",
+        "--ks-multi-board-mode",
+        "auto",
+        "--disable-multi-card",
+        "--seed",
+        "42",
+        "--num-users",
+        "1",
+        "--requests-per-user",
+        "1",
+        "--inter-arrival",
+        "10",
+        "--num-cards",
+        "1"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "preLaunchTask": "build keyaware debug (mac)",
       "sourceLanguages": [
         "cpp"
       ]
@@ -254,6 +470,42 @@
       ]
     },
     {
+      "name": "Debug keyaware_sim (macOS, digit_centric, single-card)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake-mac/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "fifo",
+        "--backend",
+        "cycle_stub",
+        "--workload",
+        "synthetic",
+        "--ks-method",
+        "digit_centric",
+        "--ks-multi-board-mode",
+        "auto",
+        "--disable-multi-card",
+        "--seed",
+        "42",
+        "--num-users",
+        "1",
+        "--requests-per-user",
+        "1",
+        "--inter-arrival",
+        "10",
+        "--num-cards",
+        "1"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "preLaunchTask": "build keyaware debug (mac)",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    },
+    {
       "name": "Debug keyaware_sim (Linux, output_centric, single-card)",
       "type": "lldb",
       "request": "launch",
@@ -290,6 +542,42 @@
       ]
     },
     {
+      "name": "Debug keyaware_sim (macOS, output_centric, single-card)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake-mac/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "fifo",
+        "--backend",
+        "cycle_stub",
+        "--workload",
+        "synthetic",
+        "--ks-method",
+        "output_centric",
+        "--ks-multi-board-mode",
+        "auto",
+        "--disable-multi-card",
+        "--seed",
+        "42",
+        "--num-users",
+        "1",
+        "--requests-per-user",
+        "1",
+        "--inter-arrival",
+        "10",
+        "--num-cards",
+        "1"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "preLaunchTask": "build keyaware debug (mac)",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    },
+    {
       "name": "Debug keyaware_sim (Linux, cinnamon output_aggregation, 8 cards)",
       "type": "lldb",
       "request": "launch",
@@ -302,7 +590,7 @@
         "--workload",
         "synthetic",
         "--ks-method",
-        "cinnamonOA",
+        "cinnamon_oa",
         "--ks-multi-board-mode",
         "output_aggregation",
         "--enable-multi-card",
@@ -326,6 +614,42 @@
       ]
     },
     {
+      "name": "Debug keyaware_sim (macOS, cinnamon output_aggregation, 8 cards)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake-mac/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "fifo",
+        "--backend",
+        "cycle_stub",
+        "--workload",
+        "synthetic",
+        "--ks-method",
+        "cinnamon_oa",
+        "--ks-multi-board-mode",
+        "output_aggregation",
+        "--enable-multi-card",
+        "--seed",
+        "42",
+        "--num-users",
+        "1",
+        "--requests-per-user",
+        "1",
+        "--inter-arrival",
+        "10",
+        "--num-cards",
+        "8"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "preLaunchTask": "build keyaware debug (mac)",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    },
+    {
       "name": "Debug keyaware_sim (Linux, cinnamon input_broadcast, 8 cards)",
       "type": "lldb",
       "request": "launch",
@@ -338,7 +662,7 @@
         "--workload",
         "synthetic",
         "--ks-method",
-        "cinnamonIB",
+        "cinnamon_ib",
         "--ks-multi-board-mode",
         "input_broadcast",
         "--enable-multi-card",
@@ -357,6 +681,42 @@
       "cwd": "${workspaceFolder}",
       "terminal": "integrated",
       "preLaunchTask": "build keyaware debug (linux)",
+      "sourceLanguages": [
+        "cpp"
+      ]
+    },
+    {
+      "name": "Debug keyaware_sim (macOS, cinnamon input_broadcast, 8 cards)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-cmake-mac/keyaware_sim",
+      "args": [
+        "--scheduler",
+        "fifo",
+        "--backend",
+        "cycle_stub",
+        "--workload",
+        "synthetic",
+        "--ks-method",
+        "cinnamon_ib",
+        "--ks-multi-board-mode",
+        "input_broadcast",
+        "--enable-multi-card",
+        "--seed",
+        "42",
+        "--num-users",
+        "1",
+        "--requests-per-user",
+        "1",
+        "--inter-arrival",
+        "10",
+        "--num-cards",
+        "8"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "terminal": "integrated",
+      "preLaunchTask": "build keyaware debug (mac)",
       "sourceLanguages": [
         "cpp"
       ]

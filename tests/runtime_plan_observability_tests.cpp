@@ -115,6 +115,14 @@ bool ContainsText(const std::string& text, const std::string& pattern) {
     return text.find(pattern) != std::string::npos;
 }
 
+uint32_t SumDigitShardCounts(const std::vector<DigitShard>& shards) {
+    uint32_t total = 0;
+    for (const DigitShard& shard : shards) {
+        total += shard.count;
+    }
+    return total;
+}
+
 void TestRuntimePlanSummarySelfConsistent(testfw::TestContext& ctx) {
     const SystemState state = MakeState(/*num_cards=*/1);
     KeySwitchExecutionModel model;
@@ -294,6 +302,81 @@ void TestDegradedCinnamonMatchesSingleBoardRuntimeSummary(testfw::TestContext& c
     EXPECT_EQ(ctx, single_summary.hbm_write_bytes, degraded_summary.hbm_write_bytes);
 }
 
+void TestBuildProblemCinnamonBuildsEvenDigitShards(testfw::TestContext& ctx) {
+    const SystemState state = MakeState(/*num_cards=*/4);
+    KeySwitchExecutionModel model;
+
+    Request req = MakeRequest(/*request_id=*/702, /*user_id=*/41, KeySwitchMethod::CinnamonOA);
+    req.ks_profile.num_digits = 8;
+    req.ks_profile.scale_out_cards = 4;
+    const ExecutionPlan plan = MakePlan(req.request_id, /*num_cards=*/4);
+
+    const KeySwitchProblem problem = model.BuildProblem(req, plan, state);
+    EXPECT_TRUE(ctx, problem.valid);
+    EXPECT_EQ(ctx, problem.active_cards, static_cast<uint32_t>(4));
+    EXPECT_EQ(ctx, problem.digit_shards.size(), static_cast<std::size_t>(4));
+    EXPECT_EQ(ctx, SumDigitShardCounts(problem.digit_shards), static_cast<uint32_t>(8));
+    EXPECT_EQ(ctx, problem.digit_shards[0].count, static_cast<uint32_t>(2));
+    EXPECT_EQ(ctx, problem.digit_shards[1].count, static_cast<uint32_t>(2));
+    EXPECT_EQ(ctx, problem.digit_shards[2].count, static_cast<uint32_t>(2));
+    EXPECT_EQ(ctx, problem.digit_shards[3].count, static_cast<uint32_t>(2));
+}
+
+void TestBuildProblemCinnamonBuildsUnevenDigitShards(testfw::TestContext& ctx) {
+    const SystemState state = MakeState(/*num_cards=*/3);
+    KeySwitchExecutionModel model;
+
+    Request req = MakeRequest(/*request_id=*/703, /*user_id=*/42, KeySwitchMethod::CinnamonOA);
+    req.ks_profile.num_digits = 10;
+    req.ks_profile.scale_out_cards = 3;
+    const ExecutionPlan plan = MakePlan(req.request_id, /*num_cards=*/3);
+
+    const KeySwitchProblem problem = model.BuildProblem(req, plan, state);
+    EXPECT_TRUE(ctx, problem.valid);
+    EXPECT_EQ(ctx, problem.active_cards, static_cast<uint32_t>(3));
+    EXPECT_EQ(ctx, problem.digit_shards.size(), static_cast<std::size_t>(3));
+    EXPECT_EQ(ctx, SumDigitShardCounts(problem.digit_shards), static_cast<uint32_t>(10));
+    EXPECT_EQ(ctx, problem.digit_shards[0].begin, static_cast<uint32_t>(0));
+    EXPECT_EQ(ctx, problem.digit_shards[0].count, static_cast<uint32_t>(3));
+    EXPECT_EQ(ctx, problem.digit_shards[1].begin, static_cast<uint32_t>(3));
+    EXPECT_EQ(ctx, problem.digit_shards[1].count, static_cast<uint32_t>(3));
+    EXPECT_EQ(ctx, problem.digit_shards[2].begin, static_cast<uint32_t>(6));
+    EXPECT_EQ(ctx, problem.digit_shards[2].count, static_cast<uint32_t>(4));
+}
+
+void TestBuildProblemCapsActiveCardsByDigits(testfw::TestContext& ctx) {
+    const SystemState state = MakeState(/*num_cards=*/8);
+    KeySwitchExecutionModel model;
+
+    Request req = MakeRequest(/*request_id=*/704, /*user_id=*/43, KeySwitchMethod::CinnamonOA);
+    req.ks_profile.num_digits = 2;
+    req.ks_profile.scale_out_cards = 8;
+    const ExecutionPlan plan = MakePlan(req.request_id, /*num_cards=*/8);
+
+    const KeySwitchProblem problem = model.BuildProblem(req, plan, state);
+    EXPECT_TRUE(ctx, problem.valid);
+    EXPECT_EQ(ctx, problem.active_cards, static_cast<uint32_t>(2));
+    EXPECT_EQ(ctx, problem.cards, static_cast<uint32_t>(2));
+    EXPECT_EQ(ctx, problem.digit_shards.size(), static_cast<std::size_t>(2));
+    EXPECT_EQ(ctx, SumDigitShardCounts(problem.digit_shards), static_cast<uint32_t>(2));
+}
+
+void TestBuildProblemSingleBoardLeavesDigitShardsEmpty(testfw::TestContext& ctx) {
+    const SystemState state = MakeState(/*num_cards=*/1);
+    KeySwitchExecutionModel model;
+
+    Request req = MakeRequest(/*request_id=*/705, /*user_id=*/44, KeySwitchMethod::Poseidon);
+    req.ks_profile.num_digits = 4;
+    req.ks_profile.scale_out_cards = 4;
+    const ExecutionPlan plan = MakePlan(req.request_id, /*num_cards=*/1);
+
+    const KeySwitchProblem problem = model.BuildProblem(req, plan, state);
+    EXPECT_TRUE(ctx, problem.valid);
+    EXPECT_EQ(ctx, problem.active_cards, static_cast<uint32_t>(1));
+    EXPECT_EQ(ctx, problem.cards, static_cast<uint32_t>(1));
+    EXPECT_TRUE(ctx, problem.digit_shards.empty());
+}
+
 } // namespace
 
 int main() {
@@ -306,6 +389,10 @@ int main() {
         {"ValidationRejectsDuplicateStepId", TestValidationRejectsDuplicateStepId},
         {"ValidationRejectsReloadWithoutSpill", TestValidationRejectsReloadWithoutSpill},
         {"DegradedCinnamonMatchesSingleBoardRuntimeSummary", TestDegradedCinnamonMatchesSingleBoardRuntimeSummary},
+        {"BuildProblemCinnamonBuildsEvenDigitShards", TestBuildProblemCinnamonBuildsEvenDigitShards},
+        {"BuildProblemCinnamonBuildsUnevenDigitShards", TestBuildProblemCinnamonBuildsUnevenDigitShards},
+        {"BuildProblemCapsActiveCardsByDigits", TestBuildProblemCapsActiveCardsByDigits},
+        {"BuildProblemSingleBoardLeavesDigitShardsEmpty", TestBuildProblemSingleBoardLeavesDigitShardsEmpty},
     };
 
     for (const auto& test : tests) {

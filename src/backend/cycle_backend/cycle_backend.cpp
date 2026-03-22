@@ -18,6 +18,7 @@
 #include <ostream>
 #include <string>
 
+
 namespace {
 
 template <typename T>
@@ -618,7 +619,8 @@ KeySwitchMethod CycleBackend::ResolveKeySwitchMethod(
 ExecutionResult CycleBackend::Estimate(
     const Request& req,
     const ExecutionPlan& plan,
-    const SystemState& state) const {
+    const SystemState& state
+) const {
 
     ++stats_.estimate_calls;
 
@@ -637,45 +639,13 @@ CycleProgram CycleBackend::BuildProgram(
     const ExecutionPlan& plan,
     const SystemState& state,
     KeySwitchMethod method,
-    KeySwitchExecution* execution,
-    KeySwitchFallbackReason* fallback_reason,
-    std::string* fallback_reason_message) const {
+    KeySwitchExecution* execution
+) const {
 
-    if (execution != nullptr) {
-        *execution = KeySwitchExecution{};
-    }
-    if (fallback_reason != nullptr) {
-        *fallback_reason = KeySwitchFallbackReason::None;
-    }
-    if (fallback_reason_message != nullptr) {
-        fallback_reason_message->clear();
-    }
-
+ 
     KeySwitchMethod program_method = method;
     KeySwitchProblem problem;
-    if (IsCinnamonMethod(method)) {
-        const KeySwitchExecution built = execution_model_.Build(req, plan, state);
-        if (execution != nullptr) {
-            *execution = built;
-        }
-        if (!built.valid) {
-            if (fallback_reason != nullptr) {
-                *fallback_reason =
-                    (built.fallback_reason == KeySwitchFallbackReason::None)
-                    ? KeySwitchFallbackReason::TilePlanInvalid
-                    : built.fallback_reason;
-            }
-            return CycleProgram{};
-        }
-        problem = built.problem;
-        program_method = (built.effective_method == KeySwitchMethod::Auto)
-            ? built.method
-            : built.effective_method;
-    } else {
-        Request method_req = req;
-        method_req.ks_profile.method = method;
-        problem = execution_model_.BuildProblem(method_req, plan, state);
-    }
+    problem = execution_model_.BuildProblem(req, plan, state);
 
     if (!problem.valid) {
         return CycleProgram{};
@@ -698,11 +668,6 @@ CycleProgram CycleBackend::BuildProgram(
         return BuildOutputCentricProgram(problem, hw_model_);
     case KeySwitchMethod::MaxParallel:
         return BuildMaxParallelProgram(problem, hw_model_);
-    case KeySwitchMethod::Cinnamon:
-        if (problem.multi_board_mode == MultiBoardMode::InputBroadcast) {
-            return BuildCinnamonInputBroadcastProgram(problem, hw_model_);
-        }
-        return BuildCinnamonOutputAggregationProgram(problem, hw_model_);
     case KeySwitchMethod::CinnamonIB:
         return BuildCinnamonInputBroadcastProgram(problem, hw_model_);
     case KeySwitchMethod::CinnamonOA:
@@ -820,45 +785,18 @@ ExecutionResult CycleBackend::EstimateMethod(
 
     // 1. 构建 CycleProgram：memory-aware 调度 + 直接生成硬件指令。
     KeySwitchExecution execution{};
-    KeySwitchFallbackReason build_fallback_reason = KeySwitchFallbackReason::None;
-    std::string build_fallback_reason_message;
+   
     const CycleProgram program = BuildProgram(
         req,
         plan,
         state,
         method,
-        &execution,
-        &build_fallback_reason,
-        &build_fallback_reason_message);
+        &execution
+    );
 
     if (program.empty()) {
-        const KeySwitchMethod effective =
-            (execution.effective_method == KeySwitchMethod::Auto)
-            ? method
-            : execution.effective_method;
-        const KeySwitchFallbackReason reason =
-            (build_fallback_reason == KeySwitchFallbackReason::None)
-            ? KeySwitchFallbackReason::TilePlanInvalid
-            : build_fallback_reason;
-
-        ExecutionResult fallback = MakeFallbackResult(req, effective, reason);
-        fallback.fallback_reason_message = build_fallback_reason_message;
-        if (IsCinnamonMethod(method)) {
-            fallback.requested_method =
-                (execution.requested_method == KeySwitchMethod::Auto)
-                ? req.ks_profile.method
-                : execution.requested_method;
-            fallback.effective_method = effective;
-            fallback.method_degraded = execution.method_degraded;
-            fallback.degraded_reason = execution.degraded_reason;
-            fallback.tiled_execution = execution.tiled_execution;
-            fallback.key_resident_hit = execution.key_resident_hit;
-            fallback.key_persistent_bram = execution.key_persistent_bram;
-            fallback.tile_count = execution.tile_count;
-            fallback.working_set_bytes = execution.working_set_bytes;
-        }
-        NormalizeStatusFlags(&fallback);
-        return fallback;
+      std::cout << " The program is not generated" << std::endl;
+      exit(1);
     }
 
     // 2. 运行 cycle 级仿真。

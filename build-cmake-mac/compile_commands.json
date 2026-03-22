@@ -1,0 +1,200 @@
+[
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/common/experiment_config.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/common/experiment_config.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/common/experiment_config.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/common/experiment_config.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/common/config_loader.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/common/config_loader.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/common/config_loader.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/common/config_loader.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/common/he_params_loader.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/common/he_params_loader.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/common/he_params_loader.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/common/he_params_loader.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/model/workload.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/model/workload.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/model/workload.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/model/workload.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/hw/hardware_model.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/hw/hardware_model.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/hw/hardware_model.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/hw/hardware_model.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_sim/arch.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_sim/arch.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_sim/arch.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_sim/arch.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_sim/driver.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_sim/driver.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_sim/driver.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_sim/driver.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_sim/lowering.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_sim/lowering.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_sim/lowering.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_sim/lowering.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/step_graph_runtime.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/step_graph_runtime.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/step_graph_runtime.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/step_graph_runtime.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/runtime_planner.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/runtime_planner.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/runtime_planner.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/runtime_planner.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/model/keyswitch_execution_model.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/model/keyswitch_execution_model.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/model/keyswitch_execution_model.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/model/keyswitch_execution_model.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/primitive_simulator.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/primitive_simulator.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/primitive_simulator.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/primitive_simulator.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_primitives.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_primitives.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_primitives.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_primitives.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_fab.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_fab.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fab.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_fast.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_fast.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_fast.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_hera.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_hera.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_hera.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_digit_centric.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_digit_centric.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_digit_centric.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_output_centric.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_output_centric.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_output_centric.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_max_parallel.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_max_parallel.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_max_parallel.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_ib.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_cinnamon_oa.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_ola.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_ola.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_ola.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_poseidon.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/backend/cycle_backend/cycle_backend_poseidon.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/backend/cycle_backend/cycle_backend_poseidon.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/scheduler/fifo_scheduler.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/scheduler/fifo_scheduler.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/scheduler/fifo_scheduler.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/scheduler/affinity_scheduler.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/scheduler/affinity_scheduler.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/scheduler/affinity_scheduler.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/scheduler/affinity_scheduler.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/scheduler/static_partition_scheduler.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/scheduler/static_partition_scheduler.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/scheduler/static_partition_scheduler.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/scheduler/static_partition_scheduler.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/scheduler/score_scheduler.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/scheduler/score_scheduler.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/scheduler/score_scheduler.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/scheduler/score_scheduler.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/scheduler/pool_scheduler.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/scheduler/pool_scheduler.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/scheduler/pool_scheduler.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/scheduler/pool_scheduler.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/scheduler/hierarchical_scheduler.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/scheduler/hierarchical_scheduler.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/scheduler/hierarchical_scheduler.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/scheduler/hierarchical_scheduler.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/sim/metrics.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/sim/metrics.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/sim/metrics.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/sim/simulator.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/sim/simulator.cpp",
+  "output": "CMakeFiles/keyaware_core.dir/src/sim/simulator.cpp.o"
+},
+{
+  "directory": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/build-cmake-mac",
+  "command": "/usr/bin/c++ -DKEYAWARE_ALWAYS_DUMP_LOGICAL_GRAPH=1 -DKEYAWARE_ALWAYS_DUMP_RUNTIME_PLAN=1 -I/Users/mengxiangchen/Documents/Code/StreamKeyswitch/include -g -std=c++17 -arch arm64 -Wall -Wextra -Wpedantic -o CMakeFiles/keyaware_sim.dir/src/main.cpp.o -c /Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/main.cpp",
+  "file": "/Users/mengxiangchen/Documents/Code/StreamKeyswitch/src/main.cpp",
+  "output": "CMakeFiles/keyaware_sim.dir/src/main.cpp.o"
+}
+]

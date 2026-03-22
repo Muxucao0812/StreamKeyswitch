@@ -125,30 +125,34 @@ uint32_t EffectiveScaleOutCards(
     return std::max<uint32_t>(1, std::min<uint32_t>(hint, assigned));
 }
 
-struct DigitShard {
-    uint32_t begin = 0;
-    uint32_t count = 0;
-};
-
-std::vector<DigitShard> BuildDigitShards(
-    uint32_t total_digits,
-    uint32_t cards) {
-
-    std::vector<DigitShard> shards;
-    const uint32_t safe_digits = std::max<uint32_t>(1, total_digits);
-    const uint32_t safe_cards = std::max<uint32_t>(1, std::min<uint32_t>(cards, safe_digits));
-    shards.reserve(safe_cards);
-    for (uint32_t idx = 0; idx < safe_cards; ++idx) {
-        const uint32_t begin = static_cast<uint32_t>(
-            (static_cast<uint64_t>(idx) * safe_digits) / safe_cards);
-        const uint32_t end = static_cast<uint32_t>(
-            (static_cast<uint64_t>(idx + 1) * safe_digits) / safe_cards);
-        DigitShard shard;
-        shard.begin = begin;
-        shard.count = end - begin;
-        shards.push_back(shard);
+bool UsesDigitShardedMultiBoardMethod(KeySwitchMethod method) {
+    switch (method) {
+    case KeySwitchMethod::Cinnamon:
+    case KeySwitchMethod::CinnamonIB:
+    case KeySwitchMethod::CinnamonOA:
+        return true;
+    default:
+        return false;
     }
-    return shards;
+}
+
+bool HasValidDigitShards(
+    const std::vector<DigitShard>& shards,
+    uint32_t total_digits,
+    uint32_t active_cards) {
+
+    if (active_cards == 0 || shards.size() != active_cards) {
+        return false;
+    }
+
+    uint32_t expected_begin = 0;
+    for (const DigitShard& shard : shards) {
+        if (shard.count == 0 || shard.begin != expected_begin) {
+            return false;
+        }
+        expected_begin += shard.count;
+    }
+    return expected_begin == total_digits;
 }
 
 uint64_t ScaleBytesByRatio(
@@ -876,6 +880,24 @@ void TryUpdateBestCandidate(
 
 } // namespace
 
+std::vector<DigitShard> BuildDigitShards(
+    uint32_t total_digits,
+    uint32_t cards) {
+
+    std::vector<DigitShard> shards;
+    const uint32_t safe_digits = std::max<uint32_t>(1, total_digits);
+    const uint32_t safe_cards = std::max<uint32_t>(1, std::min<uint32_t>(cards, safe_digits));
+    shards.reserve(safe_cards);
+    for (uint32_t idx = 0; idx < safe_cards; ++idx) {
+        const uint32_t begin = static_cast<uint32_t>(
+            (static_cast<uint64_t>(idx) * safe_digits) / safe_cards);
+        const uint32_t end = static_cast<uint32_t>(
+            (static_cast<uint64_t>(idx + 1) * safe_digits) / safe_cards);
+        shards.push_back(DigitShard{begin, end - begin});
+    }
+    return shards;
+}
+
 const char* ToString(LogicalNodeKind kind) {
     switch (kind) {
     case LogicalNodeKind::Input:
@@ -1332,7 +1354,7 @@ void InitializeProblemBase(
     problem->bram_guard_bytes = planner_params.bram_guard_bytes;
 }
 
-void ResolveProblemMethodAndCards(
+void ResolveProblemMethodAndPolicies(
     const Request& req,
     const ExecutionPlan& plan,
     KeySwitchProblem* problem) {
@@ -1350,19 +1372,6 @@ void ResolveProblemMethodAndCards(
         ResolveKeyPlacement(req.ks_profile.key_placement, problem->method);
     problem->collective_strategy =
         ResolveCollective(req.ks_profile.collective, problem->method);
-
-    if (IsCinnamonMethod(problem->method)) {
-        const uint32_t total_digits = std::max<uint32_t>(1, req.ks_profile.num_digits);
-        const uint32_t scale_out_cards = EffectiveScaleOutCards(req, plan);
-        problem->active_cards = std::max<uint32_t>(
-            1,
-            std::min<uint32_t>(total_digits, scale_out_cards));
-        problem->cards = problem->active_cards;
-        return;
-    }
-
-    problem->active_cards = 1;
-    problem->cards = 1;
 }
 
 void NormalizeProblemDimensions(
@@ -1378,6 +1387,30 @@ void NormalizeProblemDimensions(
     problem->polys = std::max<uint32_t>(1, req.ks_profile.num_polys);
     problem->poly_modulus_degree = std::max<uint32_t>(1, req.ks_profile.poly_modulus_degree);
 
+}
+
+bool ResolveProblemCardLayout(
+    const Request& req,
+    const ExecutionPlan& plan,
+    KeySwitchProblem* problem) {
+
+    if (!UsesDigitShardedMultiBoardMethod(problem->method)) {
+        problem->active_cards = 1;
+        problem->cards = 1;
+        problem->digit_shards.clear();
+        return true;
+    }
+
+    const uint32_t scale_out_cards = EffectiveScaleOutCards(req, plan);
+    problem->active_cards = std::max<uint32_t>(
+        1,
+        std::min<uint32_t>(problem->digits, scale_out_cards));
+    problem->cards = problem->active_cards;
+    problem->digit_shards = BuildDigitShards(problem->digits, problem->active_cards);
+    return HasValidDigitShards(
+        problem->digit_shards,
+        problem->digits,
+        problem->active_cards);
 }
 
 void NormalizeProblemBytes(
@@ -1481,8 +1514,12 @@ KeySwitchProblem KeySwitchExecutionModel::BuildProblem(
         return problem;
     }
 
-    ResolveProblemMethodAndCards(req, plan, &problem);
+    ResolveProblemMethodAndPolicies(req, plan, &problem);
     NormalizeProblemDimensions(req, &problem);
+    if (!ResolveProblemCardLayout(req, plan, &problem)) {
+        problem.valid = false;
+        return problem;
+    }
     NormalizeProblemBytes(req, &problem);
     DeriveProblemGranularityBytes(&problem);
 
@@ -2203,35 +2240,6 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
         return UnsupportedConfig(cinnamon_method);
     }
 
-    const uint32_t total_digits = std::max<uint32_t>(1, req.ks_profile.num_digits);
-    const uint32_t scale_out_cards = EffectiveScaleOutCards(req, plan);
-    const uint32_t active_cards = std::max<uint32_t>(
-        1,
-        std::min<uint32_t>(total_digits, scale_out_cards));
-    if (active_cards <= 1) {
-        // Explicit policy: auto-degrade to single-board when only one card is available.
-        Request single_req = req;
-        single_req.ks_profile.partition = PartitionStrategy::None;
-        single_req.ks_profile.collective = CollectiveStrategy::None;
-        single_req.ks_profile.key_placement = KeyPlacement::StreamFromHBM;
-        single_req.ks_profile.scale_out_cards = 1;
-        single_req.ks_profile.enable_inter_card_merge = false;
-        single_req.ks_profile.allow_cross_card_reduce = false;
-        KeySwitchExecution degraded = BuildSharedSingleBoardPhysical(
-            single_req,
-            plan,
-            state,
-            KeySwitchMethod::OutputCentric);
-        if (!degraded.fallback_used) {
-            degraded.method_degraded = true;
-            degraded.degraded_reason = KeySwitchFallbackReason::DegradedToSingleBoard;
-            degraded.fallback_reason = KeySwitchFallbackReason::None;
-        }
-        degraded.requested_method = req.ks_profile.method;
-        degraded.effective_method = KeySwitchMethod::OutputCentric;
-        return degraded;
-    }
-
     const MultiBoardMode multi_board_mode =
         (forced_mode != MultiBoardMode::Auto)
         ? forced_mode
@@ -2267,9 +2275,6 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
     }
 
     ExecutionPlan scale_plan = plan;
-    if (scale_plan.assigned_cards.size() > active_cards) {
-        scale_plan.assigned_cards.resize(active_cards);
-    }
 
     Request scale_req = req;
     scale_req.ks_profile.method = cinnamon_method;
@@ -2277,7 +2282,41 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
     scale_req.ks_profile.key_placement = key_placement;
     scale_req.ks_profile.collective = collective;
     scale_req.ks_profile.multi_board_mode = multi_board_mode;
-    scale_req.ks_profile.scale_out_cards = active_cards;
+    scale_req.ks_profile.scale_out_cards = req.ks_profile.scale_out_cards;
+
+    KeySwitchProblem problem = BuildProblem(scale_req, scale_plan, state);
+    if (!problem.valid) {
+        return UnsupportedConfig(cinnamon_method);
+    }
+    const uint32_t total_digits = problem.digits;
+    const uint32_t active_cards = problem.active_cards;
+    if (active_cards <= 1) {
+        // Explicit policy: auto-degrade to single-board when only one card is available.
+        Request single_req = req;
+        single_req.ks_profile.partition = PartitionStrategy::None;
+        single_req.ks_profile.collective = CollectiveStrategy::None;
+        single_req.ks_profile.key_placement = KeyPlacement::StreamFromHBM;
+        single_req.ks_profile.scale_out_cards = 1;
+        single_req.ks_profile.enable_inter_card_merge = false;
+        single_req.ks_profile.allow_cross_card_reduce = false;
+        KeySwitchExecution degraded = BuildSharedSingleBoardPhysical(
+            single_req,
+            plan,
+            state,
+            KeySwitchMethod::OutputCentric);
+        if (!degraded.fallback_used) {
+            degraded.method_degraded = true;
+            degraded.degraded_reason = KeySwitchFallbackReason::DegradedToSingleBoard;
+            degraded.fallback_reason = KeySwitchFallbackReason::None;
+        }
+        degraded.requested_method = req.ks_profile.method;
+        degraded.effective_method = KeySwitchMethod::OutputCentric;
+        return degraded;
+    }
+
+    if (scale_plan.assigned_cards.size() > active_cards) {
+        scale_plan.assigned_cards.resize(active_cards);
+    }
 
     KeySwitchExecution execution;
     execution.valid = true;
@@ -2292,7 +2331,7 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
     execution.key_placement = key_placement;
     execution.collective_strategy = collective;
     execution.active_cards = active_cards;
-    execution.problem = BuildProblem(scale_req, scale_plan, state);
+    execution.problem = std::move(problem);
     execution.problem.method = cinnamon_method;
     execution.problem.multi_board_mode = multi_board_mode;
     execution.problem.partition_strategy = partition;
@@ -2304,8 +2343,8 @@ KeySwitchExecution KeySwitchExecutionModel::BuildCinnamon(
     execution.key_resident_hit = true;
     execution.key_persistent_bram = true;
 
-    const std::vector<DigitShard> shards = BuildDigitShards(total_digits, active_cards);
-    if (shards.empty()) {
+    const std::vector<DigitShard>& shards = execution.problem.digit_shards;
+    if (shards.empty() || shards.size() != active_cards) {
         execution.fallback_used = true;
         execution.fallback_reason = KeySwitchFallbackReason::TilePlanInvalid;
         execution.valid = false;

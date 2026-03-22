@@ -10,11 +10,6 @@ uint32_t CeilDivU32(uint32_t a, uint32_t b) {
     return (b == 0) ? 0 : ((a + b - 1) / b);
 }
 
-uint32_t SafeBconvParallelism(const HardwareConfig& config) {
-    // Xiangchen: 目前不考虑bconv单元之间的资源竞争，直接返回总的bconv单元数作为并行度上限。
-    return 0;
-}
-
 } // namespace
 
 HardwareModel::HardwareModel()
@@ -198,7 +193,7 @@ uint64_t HardwareModel::EstimateBconvCycles(
         /*per_wave_cycles=*/1,
         /*drain_cycles=*/0,
         /*wave_passes=*/1.0,
-        /*num_limbs=*/SafeBconvParallelism(config_)
+        /*num_limbs=*/0
     );
     return cycles;
 }
@@ -259,7 +254,7 @@ HardwareUnitConfig HardwareModel::EweSubConfig() const {
 
 HardwareUnitConfig HardwareModel::BconvConfig() const {
     HardwareUnitConfig unit;
-    unit.unit_count = SafeBconvParallelism(config_);
+    unit.unit_count = 0;
     unit.latency_cycles = std::max<uint32_t>(1, config_.bconv_mac_delay_cycles);
     unit.pipeline_depth = std::max<uint32_t>(1, config_.bconv_pipeline_depth);
     unit.full_pipeline = config_.bconv_full_pipeline;

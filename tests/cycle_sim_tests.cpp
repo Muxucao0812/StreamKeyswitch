@@ -1,4 +1,6 @@
 #include "backend/cycle_backend/cycle_backend.h"
+#include "backend/cycle_backend/cycle_backend_cinnamon_ib.h"
+#include "backend/cycle_backend/cycle_backend_cinnamon_oa.h"
 #include "backend/cycle_backend/cycle_backend_ola.h"
 #include "backend/cycle_backend/cycle_backend_poseidon.h"
 #include "backend/cycle_backend/cycle_backend_primitives.h"
@@ -1387,6 +1389,53 @@ void TestCinnamonRejectsInvalidConfig(testfw::TestContext& ctx) {
     EXPECT_TRUE(ctx, result.fallback_reason == KeySwitchFallbackReason::UnsupportedConfig);
 }
 
+void TestCinnamonProgramBuildersRequireProblemDigitShards(testfw::TestContext& ctx) {
+    const SystemState state = MakeState(/*num_cards=*/3);
+    const ExecutionPlan plan = MakePlan(/*request_id=*/251, /*num_cards=*/3);
+    const HardwareModel hardware;
+    KeySwitchExecutionModel model;
+
+    Request oa_req = MakePoseidonRequest(
+        /*request_id=*/251,
+        /*user_id=*/30,
+        /*ciphertexts=*/2,
+        /*digits=*/10,
+        /*limbs=*/6,
+        /*polys=*/2,
+        /*poly_degree=*/1024,
+        /*input_bytes=*/24576,
+        /*output_bytes=*/24576,
+        /*key_bytes=*/12288);
+    oa_req.ks_profile.method = KeySwitchMethod::CinnamonOA;
+    oa_req.ks_profile.partition = PartitionStrategy::ByDigit;
+    oa_req.ks_profile.collective = CollectiveStrategy::GatherToRoot;
+    oa_req.ks_profile.key_placement = KeyPlacement::ShardedByPartition;
+    oa_req.ks_profile.multi_board_mode = MultiBoardMode::OutputAggregation;
+    oa_req.ks_profile.scale_out_cards = 3;
+    oa_req.ks_profile.enable_inter_card_merge = true;
+    oa_req.ks_profile.allow_cross_card_reduce = true;
+    oa_req.ks_profile.allow_local_moddown = true;
+
+    KeySwitchProblem oa_problem = model.BuildProblem(oa_req, plan, state);
+    EXPECT_TRUE(ctx, oa_problem.valid);
+    EXPECT_EQ(ctx, oa_problem.digit_shards.size(), static_cast<std::size_t>(3));
+    EXPECT_TRUE(ctx, !BuildCinnamonOutputAggregationProgram(oa_problem, hardware).empty());
+    oa_problem.digit_shards.pop_back();
+    EXPECT_TRUE(ctx, BuildCinnamonOutputAggregationProgram(oa_problem, hardware).empty());
+
+    Request ib_req = oa_req;
+    ib_req.request_id = 252;
+    ib_req.ks_profile.method = KeySwitchMethod::CinnamonIB;
+    ib_req.ks_profile.multi_board_mode = MultiBoardMode::InputBroadcast;
+
+    KeySwitchProblem ib_problem = model.BuildProblem(ib_req, plan, state);
+    EXPECT_TRUE(ctx, ib_problem.valid);
+    EXPECT_EQ(ctx, ib_problem.digit_shards.size(), static_cast<std::size_t>(3));
+    EXPECT_TRUE(ctx, !BuildCinnamonInputBroadcastProgram(ib_problem, hardware).empty());
+    ib_problem.digit_shards.clear();
+    EXPECT_TRUE(ctx, BuildCinnamonInputBroadcastProgram(ib_problem, hardware).empty());
+}
+
 void TestBuiltInScaleSingleBoardNoLongerFallsBack(testfw::TestContext& ctx) {
     const HEParams he = HEParams::BuiltInDefault();
     Request req = MakePoseidonRequest(
@@ -1783,6 +1832,7 @@ int main() {
     TestCinnamonByDigitInputBroadcast(ctx);
     TestCinnamonSingleCardDegradesToOutputCentric(ctx);
     TestCinnamonRejectsInvalidConfig(ctx);
+    TestCinnamonProgramBuildersRequireProblemDigitShards(ctx);
     TestBuiltInScaleSingleBoardNoLongerFallsBack(ctx);
     TestProblemSizeMonotonicity(ctx);
     TestHardwareScalingMonotonicity(ctx);

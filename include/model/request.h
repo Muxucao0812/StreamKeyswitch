@@ -5,24 +5,13 @@
 
 enum class KeySwitchMethod : uint8_t {
     Auto,
-    // Single card, classic staged keyswitch datapath.
-    SingleBoardClassic,
-    // Reserved, not implemented in KeySwitchExecutionModel::Build().
-    SingleBoardFused,
-    // Multi-card scale-out by RNS limb partition.
-    ScaleOutLimb,
-    // Reserved, not implemented in KeySwitchExecutionModel::Build().
-    ScaleOutDigit,
-    // Reserved, not implemented in KeySwitchExecutionModel::Build().
-    ScaleOutCiphertext,
-
+ 
     // Single Board
     Poseidon,
     OLA,
     FAB,
     FAST,
     HERA,
-    // Single Board (stream-oriented)
     DigitCentric,
     OutputCentric,
     MaxParallel,
@@ -64,7 +53,6 @@ enum class MultiBoardMode : uint8_t {
 
 inline bool IsCinnamonMethod(KeySwitchMethod method) {
     switch (method) {
-    case KeySwitchMethod::Cinnamon:
     case KeySwitchMethod::CinnamonIB:
     case KeySwitchMethod::CinnamonOA:
         return true;

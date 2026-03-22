@@ -193,8 +193,13 @@ HEParams BuildHEParams(const ExperimentConfig& config) {
 
 void ApplyMultiCardConfig(
     std::vector<Request>* requests,
-    bool enable_multi_card) {
+    bool enable_multi_card
+) {
     if (enable_multi_card) {
+        for (auto& req: *requests){
+            req.ks_profile.preferred_cards = req.ks_profile.num_digits;
+            req.ks_profile.max_cards = req.ks_profile.num_digits;
+        }
         return;
     }
     for (auto& req : *requests) {
