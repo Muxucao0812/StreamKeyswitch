@@ -137,9 +137,7 @@ CycleProgram BuildOutputCentricProgram(
     std::cout << "Step 5: For each digit, load the 2 * digit_limbs eval key to BRAM" << std::endl;
     for (uint32_t i = 0; i < digit_num; i++){
         for (uint32_t m = 0; m < p; m++){
-            builder.bram.AcquireOnIssue(
-                static_cast<uint64_t>(digit_limbs) * problem.ct_limb_bytes
-            );
+         
             emit_op(
                 /*name*/"load_eval_key_digit_" + std::to_string(i) + "_part_" + std::to_string(m),
                 /*kind*/CycleInstructionKind::LoadHBM,
@@ -150,6 +148,9 @@ CycleProgram BuildOutputCentricProgram(
                 /*output_limbs*/0,
                 /*work_items*/static_cast<uint64_t>(digit_limbs)
              );
+            builder.bram.AcquireOnIssue(
+                static_cast<uint64_t>(digit_limbs) * problem.ct_limb_bytes
+            );
             if (!builder.Ok()) {
                 return CycleProgram{};
             }
@@ -204,6 +205,13 @@ CycleProgram BuildOutputCentricProgram(
                 }
             }
         }
+    }
+
+    // Remove the digit_num * digit_limbs
+    for (uint32_t i = 0; i < digit_num; i++){
+        builder.bram.ReleaseOnIssue(
+            static_cast<uint64_t>(digit_limbs) * problem.ct_limb_bytes
+        );
     }
 
     // Send the accumulated results with digit_limbs limbs for each digit back to HBM
@@ -366,6 +374,12 @@ CycleProgram BuildOutputCentricProgram(
         }
     }
 
+    for (uint32_t i = 0; i < digit_num; i++){
+        builder.bram.ReleaseOnIssue(
+            static_cast<uint64_t>(digit_limbs) * problem.ct_limb_bytes
+        );
+    }
+
     // Send the accumulated results with digit_limbs limbs for each digit back to HBM
     std::cout << "Step 12: Send the accumulated results with digit_limbs limbs for each digit back to HBM" << std::endl;
     for (uint32_t i = 0; i < p; i++){
@@ -490,6 +504,13 @@ CycleProgram BuildOutputCentricProgram(
                 }
             }
         }
+    }
+
+
+    for (uint32_t i = 0; i < digit_num; i++){
+        builder.bram.ReleaseOnIssue(
+            static_cast<uint64_t>(digit_limbs) * problem.ct_limb_bytes
+        );
     }
 
     // Send the accumulated result with digit_limbs limbs for each digit back to HBM
@@ -621,7 +642,14 @@ CycleProgram BuildOutputCentricProgram(
         }
     }
 
-    if (digit_num != (lk-l)){
+
+    for (uint32_t i = 0; i < digit_num; i++){
+        builder.bram.ReleaseOnIssue(
+            static_cast<uint64_t>(digit_limbs) * problem.ct_limb_bytes
+        );
+    }
+
+    if (digit_limbs != (lk-l)){
         std::cerr << "Output-Centric method currently only supports digit_num == lk-l, but got digit_num " << digit_num << " and lk-l " << (lk-l) << std::endl;
         return CycleProgram{};
     }
