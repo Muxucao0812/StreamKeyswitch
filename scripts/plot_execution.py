@@ -20,6 +20,7 @@ PRIMITIVE_ORDER = [
     'EweMul',
     'EweAdd',
     'EweSub',
+    'InterCardComm',
     'Other',
 ]
 
@@ -33,6 +34,7 @@ PRIMITIVE_COLORS = {
     'EweMul': '#8E24AA',
     'EweAdd': '#00ACC1',
     'EweSub': '#7CB342',
+    'InterCardComm': '#5E35B1',
     'Other': '#757575',
 }
 
@@ -58,7 +60,7 @@ def aggregate_breakdown_items(breakdown, small_pct_threshold=3.0):
     other_cycles = 0
     for label, cycles in items:
         pct = 100.0 * cycles / total_cycles
-        if pct < small_pct_threshold:
+        if label == 'Other' or pct < small_pct_threshold:
             other_cycles += cycles
         else:
             major.append((label, cycles))
@@ -204,13 +206,14 @@ def parse_emitted_group_trace(output):
     kind_map = {
         '0': 'LoadHBM',
         '1': 'StoreHBM',
-        '2': 'Decompose',
-        '3': 'NTT',
-        '4': 'INTT',
-        '5': 'EweMul',
-        '6': 'EweAdd',
-        '7': 'EweSub',
-        '8': 'BConv',
+        '2': 'NTT',
+        '3': 'INTT',
+        '4': 'EweMul',
+        '5': 'EweAdd',
+        '6': 'EweSub',
+        '7': 'BConv',
+        '8': 'InterCardSend',
+        '9': 'InterCardRecv',
     }
 
     rows = []
@@ -280,6 +283,8 @@ def parse_emitted_group_trace(output):
 
 
 def normalize_primitive_kind(kind):
+    if kind in ('InterCardSend', 'InterCardRecv', 'InterCardReduce'):
+        return 'InterCardComm'
     if kind in PRIMITIVE_COLORS:
         return kind
     return 'Other'
@@ -287,6 +292,10 @@ def normalize_primitive_kind(kind):
 
 def infer_primitive_from_name(name):
     lower_name = name.lower()
+    if 'intercard' in lower_name or (
+        ('send' in lower_name or 'recv' in lower_name) and 'card' in lower_name
+    ):
+        return 'InterCardComm'
     if 'store' in lower_name or 'spill' in lower_name:
         return 'StoreHBM'
     if 'load' in lower_name or 'reload' in lower_name:

@@ -31,65 +31,65 @@ Emitted group 0: load_input_digit_0, kind=0, bytes=2097152, work_items=8, micro_
 Emitted group 1: load_input_digit_1, kind=0, bytes=2097152, work_items=8, micro_ops=16, est_cycles/op=100, total_est_cycles=1329, bram_live=4194304
 Emitted group 2: load_input_digit_2, kind=0, bytes=2097152, work_items=8, micro_ops=16, est_cycles/op=100, total_est_cycles=1329, bram_live=6291456
 Step 2: INTT for all limbs
-Emitted group 3: intt_all_limbs_digit_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
-Emitted group 4: intt_all_limbs_digit_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
-Emitted group 5: intt_all_limbs_digit_2, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 3: intt_all_limbs_digit_0, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 4: intt_all_limbs_digit_1, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 5: intt_all_limbs_digit_2, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
 Step 3: BConv for each limb
-Emitted group 6: bconv_2k_limbs_digit_0, kind=8, bytes=2097152, work_items=31, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=6291456
-Emitted group 7: bconv_2k_limbs_digit_1, kind=8, bytes=2097152, work_items=31, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=12320768
-Emitted group 8: bconv_2k_limbs_digit_2, kind=8, bytes=2097152, work_items=31, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=18350080
-Emitted group 9: ntt_2k_limbs_digit_0, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=24379392
-Emitted group 10: ntt_2k_limbs_digit_1, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=24379392
-Emitted group 11: ntt_2k_limbs_digit_2, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=24379392
+Emitted group 6: bconv_2k_limbs_digit_0, kind=7, bytes=2097152, work_items=31, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=6291456
+Emitted group 7: bconv_2k_limbs_digit_1, kind=7, bytes=2097152, work_items=31, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=12320768
+Emitted group 8: bconv_2k_limbs_digit_2, kind=7, bytes=2097152, work_items=31, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=18350080
+Emitted group 9: ntt_2k_limbs_digit_0, kind=2, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=24379392
+Emitted group 10: ntt_2k_limbs_digit_1, kind=2, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=24379392
+Emitted group 11: ntt_2k_limbs_digit_2, kind=2, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=24379392
 Step 4: spill digit_num - 1 digits to HBM, keep one digit in BRAM for reuse in inner product
 Emitted group 12: spill_digit_0, kind=1, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=24379392
 Emitted group 13: spill_digit_1, kind=1, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
 Emitted group 14: load_eval_key_digit_0_part_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
 Emitted group 15: load_eval_key_digit_0_part_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
-Emitted group 16: bconv_inner_product_digit_0_part_0, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
-Emitted group 17: bconv_inner_product_digit_0_part_1, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 16: bconv_inner_product_digit_0_part_0, kind=7, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 17: bconv_inner_product_digit_0_part_1, kind=7, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
 Emitted group 18: store_result_digit_0, kind=1, bytes=16252928, work_items=62, micro_ops=62, est_cycles/op=182, total_est_cycles=10177, bram_live=16252928
 Emitted group 19: load_spilled_digit_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=0
 Emitted group 20: load_eval_key_digit_1_part_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
 Emitted group 21: load_eval_key_digit_1_part_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
-Emitted group 22: bconv_inner_product_digit_1_part_0, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
-Emitted group 23: bconv_inner_product_digit_1_part_1, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 22: bconv_inner_product_digit_1_part_0, kind=7, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 23: bconv_inner_product_digit_1_part_1, kind=7, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
 Emitted group 24: store_result_digit_1, kind=1, bytes=16252928, work_items=62, micro_ops=62, est_cycles/op=182, total_est_cycles=10177, bram_live=16252928
 Emitted group 25: load_spilled_digit_2, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=0
 Emitted group 26: load_eval_key_digit_2_part_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
 Emitted group 27: load_eval_key_digit_2_part_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
-Emitted group 28: bconv_inner_product_digit_2_part_0, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
-Emitted group 29: bconv_inner_product_digit_2_part_1, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 28: bconv_inner_product_digit_2_part_0, kind=7, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 29: bconv_inner_product_digit_2_part_1, kind=7, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
 Emitted group 30: store_result_digit_2, kind=1, bytes=16252928, work_items=62, micro_ops=62, est_cycles/op=182, total_est_cycles=10177, bram_live=16252928
 Step 5: accumulate the partial results for each digit in HBM, and store back to BRAM for final INTT
 Emitted group 31: load_partial_result_digit_0_part_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=0
 Emitted group 32: load_partial_result_digit_1_part_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
-Emitted group 33: accumulate_partial_result_digit_1_part_0, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=16252928
+Emitted group 33: accumulate_partial_result_digit_1_part_0, kind=7, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=16252928
 Emitted group 34: load_partial_result_digit_2_part_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
-Emitted group 35: accumulate_partial_result_digit_2_part_0, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=16252928
+Emitted group 35: accumulate_partial_result_digit_2_part_0, kind=7, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=16252928
 Emitted group 36: load_partial_result_digit_0_part_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
 Emitted group 37: load_partial_result_digit_1_part_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
-Emitted group 38: accumulate_partial_result_digit_1_part_1, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 38: accumulate_partial_result_digit_1_part_1, kind=7, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
 Emitted group 39: load_partial_result_digit_2_part_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
-Emitted group 40: accumulate_partial_result_digit_2_part_1, kind=8, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
+Emitted group 40: accumulate_partial_result_digit_2_part_1, kind=7, bytes=8126464, work_items=31, micro_ops=961, est_cycles/op=276, total_est_cycles=246036, bram_live=24379392
 Step 6: store the 2*l limbs of the final result back to HBM
 Emitted group 41: store_final_result_part_0, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=16252928
 Emitted group 42: store_final_result_part_1, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=10223616
 Step 7: INTT for 2*(lk-l) limbs
-Emitted group 43: intt_final_result_part_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
-Emitted group 44: intt_final_result_part_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
+Emitted group 43: intt_final_result_part_0, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
+Emitted group 44: intt_final_result_part_1, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
 Step 8: BConv for 2*(lk-l) limbs
-Emitted group 45: bconv_final_result_part_0, kind=8, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=4194304
-Emitted group 46: bconv_final_result_part_1, kind=8, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=8126464
+Emitted group 45: bconv_final_result_part_0, kind=7, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=4194304
+Emitted group 46: bconv_final_result_part_1, kind=7, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=8126464
 Step 9: NTT for 2*l limbs
-Emitted group 47: ntt_final_result_part_0, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=12058624
-Emitted group 48: ntt_final_result_part_1, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=12058624
+Emitted group 47: ntt_final_result_part_0, kind=2, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=12058624
+Emitted group 48: ntt_final_result_part_1, kind=2, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=12058624
 Step 10: Load 2*l limbs to BRAM, sub, and store back to HBM
 Emitted group 49: load_final_result_part_0, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=12058624
-Emitted group 50: sub_final_result_part_0, kind=8, bytes=6029312, work_items=23, micro_ops=529, est_cycles/op=276, total_est_cycles=135444, bram_live=18087936
+Emitted group 50: sub_final_result_part_0, kind=7, bytes=6029312, work_items=23, micro_ops=529, est_cycles/op=276, total_est_cycles=135444, bram_live=18087936
 Emitted group 51: store_final_result_part_0, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=12058624
 Emitted group 52: load_final_result_part_1, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=6029312
-Emitted group 53: sub_final_result_part_1, kind=8, bytes=6029312, work_items=23, micro_ops=529, est_cycles/op=276, total_est_cycles=135444, bram_live=12058624
+Emitted group 53: sub_final_result_part_1, kind=7, bytes=6029312, work_items=23, micro_ops=529, est_cycles/op=276, total_est_cycles=135444, bram_live=12058624
 Emitted group 54: store_final_result_part_1, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=6029312
 
 ========== Detailed Execution Statistics ==========
@@ -366,7 +366,7 @@ Card 0: utilization=1.0000, reload_count=1, served_requests=1
 Total throughput(req/ns): 0.0000
 Total reload count: 1
 Jain fairness index: 1.0000
-Simulation window(ns): [23, 3354210], duration=3354187
+Simulation window(ns): [64, 3354251], duration=3354187
 PoolConfigSource=built-in default
 TreeConfigSource=built-in default
 HEParamsSource=built-in default

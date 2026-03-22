@@ -12,22 +12,22 @@ public:
     explicit BramAccounting(uint64_t budget_bytes)
         : tracker_(budget_bytes) {}
 
-    void AcquireOnIssue(uint64_t bytes) {
+    bool AcquireOnIssue(uint64_t bytes) {
         AddIssue(ToSigned(bytes));
+        return Ok();
     }
 
-    void AcquireOnComplete(uint64_t bytes) {
-        AddComplete(ToSigned(bytes));
-    }
 
-    void ReleaseOnIssue(uint64_t bytes) {
+
+    bool ReleaseOnIssue(uint64_t bytes) {
         AddIssue(-ToSigned(bytes));
+        return Ok();
     }
 
-    void ReleaseOnComplete(uint64_t bytes) {
-        AddComplete(-ToSigned(bytes));
-    }
 
+    bool Ok() const {
+        return !Underflowed() && !Overflowed();
+    }
     bool CanAcquire(uint64_t bytes) const {
         const uint64_t live = Live();
         return (live + bytes) <= tracker_.Budget();
@@ -40,6 +40,7 @@ public:
     bool Overflowed() const {
         return tracker_.Overflowed() || (Live() > tracker_.Budget());
     }
+    bool Underflowed() const { return underflowed_; }
     uint64_t Peak() const { return std::max<uint64_t>(tracker_.Peak(), Live()); }
     uint64_t Live() const {
         return ApplyUnsignedDelta(
@@ -101,10 +102,28 @@ private:
         *target += delta;
     }
 
-    void AddIssue(int64_t delta) { SaturatingAdd(&pending_issue_delta_, delta); }
-    void AddComplete(int64_t delta) { SaturatingAdd(&pending_complete_delta_, delta); }
+    void AddIssue(int64_t delta) {
+        RecordDelta(delta);
+        SaturatingAdd(&pending_issue_delta_, delta);
+    }
+    void AddComplete(int64_t delta) {
+        RecordDelta(delta);
+        SaturatingAdd(&pending_complete_delta_, delta);
+    }
+
+    void RecordDelta(int64_t delta) {
+        if (delta >= 0) {
+            return;
+        }
+
+        const uint64_t released = static_cast<uint64_t>(-delta);
+        if (released > Live()) {
+            underflowed_ = true;
+        }
+    }
 
     BramTracker tracker_;
     int64_t pending_issue_delta_ = 0;
     int64_t pending_complete_delta_ = 0;
+    bool underflowed_ = false;
 };

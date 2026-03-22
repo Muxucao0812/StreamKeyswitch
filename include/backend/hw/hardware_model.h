@@ -23,7 +23,7 @@ struct HardwareConfig {
     uint32_t cluster_count = 1;
 
     double gamma_pattern = 1.0;
-    double pcie_write_bytes_per_ns = 12.0;
+    double pcie_write_bytes_per_ns = 15.75;
     double hbm_bytes_per_ns = 480.0;
     Time host_to_hbm_setup_ns = 80;
     Time dma_setup_ns = 60;
@@ -78,7 +78,7 @@ struct HardwareConfig {
     uint32_t interconnect_pipeline_depth = 2;
     bool interconnect_full_pipeline = true;
     uint32_t interconnect_latency_cycles = 8;
-    double interconnect_bytes_per_ns = 8.0;
+    double interconnect_bytes_per_ns = 15.75;
     Time interconnect_setup_ns = 100;
 
     double energy_hbm_byte_nj = 0.0012;

@@ -28,51 +28,51 @@ DumpRuntimePlan: true
 Emitted group 0: load_input, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
 Emitted group 1: load_input, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=4194304
 Emitted group 2: load_input, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=6291456
-Emitted group 3: ola_intt_digits_stub, kind=4, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
-Emitted group 4: ola_intt_digits_stub, kind=4, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
-Emitted group 5: ola_intt_digits_stub, kind=4, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 3: ola_intt_digits_stub, kind=3, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 4: ola_intt_digits_stub, kind=3, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 5: ola_intt_digits_stub, kind=3, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
 Emitted group 6: ola_spill_digit_stub, kind=1, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=4194304
 Emitted group 7: ola_spill_digit_stub, kind=1, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
-Emitted group 8: ola_bconv_digits_stub, kind=8, bytes=8126464, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=8126464
+Emitted group 8: ola_bconv_digits_stub, kind=7, bytes=8126464, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=8126464
 Emitted group 9: ola_spill_digit_stub, kind=1, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=0
 Emitted group 10: ola_reload_digit_stub, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
-Emitted group 11: ola_bconv_digits_stub, kind=8, bytes=8126464, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=8126464
+Emitted group 11: ola_bconv_digits_stub, kind=7, bytes=8126464, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=8126464
 Emitted group 12: ola_spill_digit_stub, kind=1, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=0
 Emitted group 13: ola_reload_digit_stub, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
-Emitted group 14: ola_bconv_digits_stub, kind=8, bytes=8126464, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=8126464
-Emitted group 15: ola_ntt_digits_stub, kind=3, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=8126464
+Emitted group 14: ola_bconv_digits_stub, kind=7, bytes=8126464, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=8126464
+Emitted group 15: ola_ntt_digits_stub, kind=2, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=8126464
 Emitted group 16: ola_reload_digit_stub, kind=0, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
-Emitted group 17: ola_ntt_digits_stub, kind=3, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=16252928
+Emitted group 17: ola_ntt_digits_stub, kind=2, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=16252928
 Emitted group 18: ola_reload_digit_stub, kind=0, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=24379392
-Emitted group 19: ola_ntt_digits_stub, kind=3, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=24379392
+Emitted group 19: ola_ntt_digits_stub, kind=2, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=24379392
 Emitted group 20: ola_innerprod_load_key_stub, kind=0, bytes=8388662, work_items=0, micro_ops=62, est_cycles/op=103, total_est_cycles=5261, bram_live=27865907
-Emitted group 21: ola_innerprod_mul_stub, kind=5, bytes=16515126, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=27865907
+Emitted group 21: ola_innerprod_mul_stub, kind=4, bytes=16515126, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=27865907
 Emitted group 22: ola_innerprod_load_key_stub, kind=0, bytes=8388662, work_items=0, micro_ops=62, est_cycles/op=103, total_est_cycles=5261, bram_live=29609164
-Emitted group 23: ola_innerprod_mul_stub, kind=5, bytes=16515126, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=29609165
-Emitted group 24: ola_innerprod_accumulate_stub, kind=6, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=258, total_est_cycles=15874, bram_live=27865907
+Emitted group 23: ola_innerprod_mul_stub, kind=4, bytes=16515126, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=29609165
+Emitted group 24: ola_innerprod_accumulate_stub, kind=5, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=258, total_est_cycles=15874, bram_live=27865907
 Emitted group 25: ola_innerprod_load_key_stub, kind=0, bytes=8388662, work_items=0, micro_ops=62, est_cycles/op=103, total_est_cycles=5261, bram_live=29609164
-Emitted group 26: ola_innerprod_mul_stub, kind=5, bytes=16515126, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=29609165
-Emitted group 27: ola_innerprod_accumulate_stub, kind=6, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=258, total_est_cycles=15874, bram_live=27865907
-Emitted group 28: ola_intt_digits_stub, kind=4, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=27865907
-Emitted group 29: ola_intt_digits_stub, kind=4, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=27865907
-Emitted group 30: ola_intt_digits_stub, kind=4, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=27865907
+Emitted group 26: ola_innerprod_mul_stub, kind=4, bytes=16515126, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=29609165
+Emitted group 27: ola_innerprod_accumulate_stub, kind=5, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=258, total_est_cycles=15874, bram_live=27865907
+Emitted group 28: ola_intt_digits_stub, kind=3, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=27865907
+Emitted group 29: ola_intt_digits_stub, kind=3, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=27865907
+Emitted group 30: ola_intt_digits_stub, kind=3, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=27865907
 Emitted group 31: ola_spill_poly_stub, kind=1, bytes=6029312, work_items=0, micro_ops=1, est_cycles/op=3787, total_est_cycles=3787, bram_live=21836595
 Emitted group 32: ola_spill_poly_stub, kind=1, bytes=6029312, work_items=0, micro_ops=1, est_cycles/op=3787, total_est_cycles=3787, bram_live=15807283
-Emitted group 33: ola_modup_stub, kind=8, bytes=16252928, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=15807283
-Emitted group 34: ola_modup_stub, kind=8, bytes=16252928, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=15807283
-Emitted group 35: ola_ntt_digits_stub, kind=3, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=15807283
-Emitted group 36: ola_ntt_digits_stub, kind=3, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=15807283
+Emitted group 33: ola_modup_stub, kind=7, bytes=16252928, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=15807283
+Emitted group 34: ola_modup_stub, kind=7, bytes=16252928, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=15807283
+Emitted group 35: ola_ntt_digits_stub, kind=2, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=15807283
+Emitted group 36: ola_ntt_digits_stub, kind=2, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=15807283
 Emitted group 37: load_input, kind=0, bytes=6029312, work_items=0, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=21836595
-Emitted group 38: ola_reduce_cross_digit_stub, kind=6, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=258, total_est_cycles=15874, bram_live=21836595
+Emitted group 38: ola_reduce_cross_digit_stub, kind=5, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=258, total_est_cycles=15874, bram_live=21836595
 Emitted group 39: load_input, kind=0, bytes=6029312, work_items=0, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=27865907
-Emitted group 40: ola_reduce_cross_digit_stub, kind=6, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=258, total_est_cycles=15874, bram_live=27865907
+Emitted group 40: ola_reduce_cross_digit_stub, kind=5, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=258, total_est_cycles=15874, bram_live=27865907
 
 ========== Detailed Execution Statistics ==========
 
 --- Summary ---
 Total cycles:           361789
 Total latency (ns):     1205964
-Peak BRAM live (bytes): 31352422
+Peak BRAM live (bytes): 29609165
 HBM read (bytes):       63963298
 HBM write (bytes):      32505856
 Dependency stalls:      58629 cycles
@@ -260,7 +260,7 @@ Card 0: utilization=1.0000, reload_count=1, served_requests=1
 Total throughput(req/ns): 0.0000
 Total reload count: 1
 Jain fairness index: 1.0000
-Simulation window(ns): [23, 1205987], duration=1205964
+Simulation window(ns): [64, 1206028], duration=1205964
 PoolConfigSource=built-in default
 TreeConfigSource=built-in default
 HEParamsSource=built-in default

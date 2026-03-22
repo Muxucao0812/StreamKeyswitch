@@ -60,9 +60,7 @@ uint32_t CyclePrimitiveEmitter::EmitInterCardRecv(const CyclePrimitiveDesc& desc
     return Emit(CycleInstructionKind::InterCardRecv, desc);
 }
 
-uint32_t CyclePrimitiveEmitter::EmitInterCardReduce(const CyclePrimitiveDesc& desc) {
-    return Emit(CycleInstructionKind::InterCardReduce, desc);
-}
+
 
 bool CyclePrimitiveEmitter::ValidateMemoryAccounting(const char* label) const {
     uint64_t replay_live = 0;
@@ -117,24 +115,10 @@ uint32_t CyclePrimitiveEmitter::Emit(
 
     const uint32_t micro_ops = MicroOps(kind, desc.input_limbs, desc.output_limbs);
     
-    const uint64_t bytes_per_op =
-        (micro_ops > 0) ? (desc.bytes / micro_ops) : desc.bytes;
-    const uint64_t work_per_op =
-        (micro_ops > 0) ? (desc.work_items / micro_ops) : desc.work_items;
-    const uint64_t per_op_cycles = std::max<uint64_t>(
-        1,
-        EstimateCycles(
-            kind,
-            desc.transfer_path,
-            bytes_per_op,
-            /*input_limbs=*/1,
-            /*output_limbs=*/1));
-    const uint64_t total_cycles = EstimateCycles(
-        kind,
-        desc.transfer_path,
-        desc.bytes,
-        desc.input_limbs,
-        desc.output_limbs);
+    const uint64_t bytes_per_op = (micro_ops > 0) ? (desc.bytes / micro_ops) : desc.bytes;
+    const uint64_t work_per_op = (micro_ops > 0) ? (desc.work_items / micro_ops) : desc.work_items;
+    const uint64_t per_op_cycles = EstimateCycles(kind, desc.transfer_path, bytes_per_op, 1, 1);
+    const uint64_t total_cycles = EstimateCycles(kind, desc.transfer_path, desc.bytes, desc.input_limbs, desc.output_limbs);
 
     CycleInstructionGroup group;
     group.id = static_cast<uint32_t>(program_.groups.size());
@@ -208,7 +192,6 @@ uint64_t CyclePrimitiveEmitter::EstimateCycles(
         return hardware_.EstimateEweSubCycles(problem_, input_limbs);
     case CycleInstructionKind::InterCardSend:
     case CycleInstructionKind::InterCardRecv:
-    case CycleInstructionKind::InterCardReduce:
         return hardware_.EstimateInterconnectTransferCycles(bytes);
     default:
         return 1;
@@ -218,22 +201,26 @@ uint64_t CyclePrimitiveEmitter::EstimateCycles(
 uint32_t CyclePrimitiveEmitter::MicroOps(
     CycleInstructionKind kind,
     uint32_t input_limbs,
-    uint32_t output_limbs) {
+    uint32_t output_limbs
+) {
 
     switch (kind) {
-    case CycleInstructionKind::NTT:
-    case CycleInstructionKind::INTT:
-    case CycleInstructionKind::EweMul:
-    case CycleInstructionKind::EweAdd:
-    case CycleInstructionKind::EweSub:
-    case CycleInstructionKind::LoadHBM:
-        return std::max<uint32_t>(1, input_limbs);
-    case CycleInstructionKind::StoreHBM:
-        return std::max<uint32_t>(1, output_limbs);
-    case CycleInstructionKind::BConv:
-        return std::max<uint32_t>(
-            1,
-            input_limbs * std::max<uint32_t>(1, output_limbs));
+        case CycleInstructionKind::NTT:
+        case CycleInstructionKind::INTT:
+        case CycleInstructionKind::EweMul:
+        case CycleInstructionKind::EweAdd:
+        case CycleInstructionKind::EweSub:
+        case CycleInstructionKind::LoadHBM:
+            return std::max<uint32_t>(1, input_limbs);
+        case CycleInstructionKind::StoreHBM:
+            return std::max<uint32_t>(1, output_limbs);
+        case CycleInstructionKind::BConv:
+            return std::max<uint32_t>(1, input_limbs * std::max<uint32_t>(1, output_limbs));
+        case CycleInstructionKind::InterCardSend:
+            return std::max<uint32_t>(1, output_limbs);
+        case CycleInstructionKind::InterCardRecv:
+            return std::max<uint32_t>(1, input_limbs);
+    
     default:
         return 1;
     }
@@ -262,7 +249,7 @@ CycleProgramBuilder::CycleProgramBuilder(
     , program(primitive.Program()) {}
 
 bool CycleProgramBuilder::Ok() const {
-    return build_ok && !bram.Overflowed();
+    return build_ok && bram.Ok();
 }
 
 bool CycleProgramBuilder::ValidateMemoryAccounting(const char* label) {
@@ -316,9 +303,6 @@ uint32_t CycleProgramBuilder::EmitPrimitive(
         break;
     case CycleInstructionKind::InterCardRecv:
         group_id = primitive.EmitInterCardRecv(desc);
-        break;
-    case CycleInstructionKind::InterCardReduce:
-        group_id = primitive.EmitInterCardReduce(desc);
         break;
     default:
         build_ok = false;

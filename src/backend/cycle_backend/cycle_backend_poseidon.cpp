@@ -48,9 +48,7 @@ CycleProgram BuildPoseidonProgram(
     bool accum_in_bram = false;
 
     for (uint32_t digit_idx = 0; digit_idx < problem.digits; ++digit_idx) {
-        const uint64_t input_bram_bytes =
-            static_cast<uint64_t>(ct_now) * digit_limb_now * problem.ct_limb_bytes;
-        builder.bram.AcquireOnIssue(input_bram_bytes);
+        const uint64_t input_bram_bytes = static_cast<uint64_t>(ct_now) * digit_limb_now * problem.ct_limb_bytes;
         emit_op(
             "load_input",
             CycleInstructionKind::LoadHBM,
@@ -59,6 +57,7 @@ CycleProgram BuildPoseidonProgram(
             input_bram_bytes,
             digit_limb_now,
             0);
+        builder.bram.AcquireOnIssue(input_bram_bytes);
         if (!builder.Ok()) {
             return CycleProgram{};
         }
@@ -79,7 +78,7 @@ CycleProgram BuildPoseidonProgram(
             static_cast<uint64_t>(ct_now) * problem.num_k * problem.ct_limb_bytes;
         const uint64_t modup_output_bytes = input_bram_bytes + k_limbs_bytes;
 
-        builder.bram.AcquireOnComplete(k_limbs_bytes);
+        builder.bram.AcquireOnIssue(k_limbs_bytes);
         emit_op(
             "modup_bconv",
             CycleInstructionKind::BConv,
@@ -108,7 +107,7 @@ CycleProgram BuildPoseidonProgram(
         const uint64_t one_limb_key = problem.key_digit_limb_bytes;
         const bool should_spill = !builder.bram.CanAcquire(modup_output_bytes + one_limb_key);
         if (should_spill) {
-            builder.bram.ReleaseOnComplete(modup_output_bytes);
+            builder.bram.ReleaseOnIssue(modup_output_bytes);
             emit_op(
                 "modup_spill",
                 CycleInstructionKind::StoreHBM,
@@ -156,7 +155,7 @@ CycleProgram BuildPoseidonProgram(
         const uint64_t accum_bytes =
             static_cast<uint64_t>(ct_now) * p_lk * problem.ct_limb_bytes;
         builder.bram.AcquireOnIssue(accum_bytes);
-        builder.bram.ReleaseOnComplete(total_key_bytes + modup_output_bytes);
+        builder.bram.ReleaseOnIssue(total_key_bytes + modup_output_bytes);
         emit_op(
             "innerprod_mul_all",
             CycleInstructionKind::EweMul,
@@ -171,7 +170,7 @@ CycleProgram BuildPoseidonProgram(
 
         const bool is_last_digit = (digit_idx + 1 == problem.digits);
         if (!is_last_digit) {
-            builder.bram.ReleaseOnComplete(accum_bytes);
+            builder.bram.ReleaseOnIssue(accum_bytes);
             emit_op(
                 "innerprod_spill_partial",
                 CycleInstructionKind::StoreHBM,
@@ -225,7 +224,7 @@ CycleProgram BuildPoseidonProgram(
             return CycleProgram{};
         }
 
-        builder.bram.ReleaseOnComplete(accum_bytes);
+        builder.bram.ReleaseOnIssue(accum_bytes);
         emit_op(
             "reduce_cross_digit_add",
             CycleInstructionKind::EweAdd,
@@ -294,7 +293,7 @@ CycleProgram BuildPoseidonProgram(
     }
 
     builder.bram.AcquireOnIssue(two_l_bytes);
-    builder.bram.ReleaseOnComplete(two_k_bytes);
+    builder.bram.ReleaseOnIssue(two_k_bytes);
     emit_op(
         "moddown_bconv",
         CycleInstructionKind::BConv,
@@ -320,7 +319,7 @@ CycleProgram BuildPoseidonProgram(
     }
 
     builder.bram.AcquireOnIssue(one_limb);
-    builder.bram.ReleaseOnComplete(one_limb);
+    builder.bram.ReleaseOnIssue(one_limb);
     emit_op(
         "moddown_reload_2l",
         CycleInstructionKind::LoadHBM,
@@ -345,7 +344,7 @@ CycleProgram BuildPoseidonProgram(
         return CycleProgram{};
     }
 
-    builder.bram.ReleaseOnComplete(two_l_bytes);
+    builder.bram.ReleaseOnIssue(two_l_bytes);
     emit_op(
         "moddown_store_output",
         CycleInstructionKind::StoreHBM,

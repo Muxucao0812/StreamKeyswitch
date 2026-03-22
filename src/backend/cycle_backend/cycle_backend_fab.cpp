@@ -86,7 +86,7 @@ CycleProgram BuildFABProgram(
                 );
             }
             for (uint32_t digit_idx = 0; digit_idx < digit_num - 1; ++digit_idx) {
-                builder.bram.ReleaseOnComplete(static_cast<uint64_t> (problem.ct_limb_bytes ));
+                builder.bram.ReleaseOnIssue(static_cast<uint64_t> (problem.ct_limb_bytes ));
                 emit_op(
                     /*name*/"reduce_and_spill",
                     /*kind*/CycleInstructionKind::EweAdd,
@@ -97,7 +97,7 @@ CycleProgram BuildFABProgram(
                     /*output_limbs*/0 // one limb output for the reduced result
                 );
             }
-            builder.bram.ReleaseOnComplete(static_cast<uint64_t> (problem.ct_limb_bytes ));
+            builder.bram.ReleaseOnIssue(static_cast<uint64_t> (problem.ct_limb_bytes ));
             emit_op(
                 /*name*/"Spill_InnerProduct_Result",
                 /*kind*/CycleInstructionKind::StoreHBM,
@@ -164,10 +164,10 @@ CycleProgram BuildFABProgram(
                 );
             }
             // release one digital lk-l limbs in BRAM after processing each poly to save BRAM space, and spill the intermediate result to HBM
-            builder.bram.ReleaseOnComplete(static_cast<uint64_t>(problem.ct_limb_bytes) * (lk - l));
+            builder.bram.ReleaseOnIssue(static_cast<uint64_t>(problem.ct_limb_bytes) * (lk - l));
         }
         if (digit_idx > 0){
-            builder.bram.ReleaseOnComplete(static_cast<uint64_t>(problem.ct_limb_bytes) * (lk - l) * 2);
+            builder.bram.ReleaseOnIssue(static_cast<uint64_t>(problem.ct_limb_bytes) * (lk - l) * 2);
             emit_op(
                 /*name*/"reduce_and_spill",
                 /*kind*/CycleInstructionKind::EweAdd,

@@ -65,7 +65,7 @@ CycleProgram BuildCinnamonInputBroadcastProgram(
     for (uint32_t card_idx = 1; card_idx < active_cards; card_idx++) {
         emit_op(
             /*name*/"recv_input_card_" + std::to_string(card_idx+1),
-            /*kind*/CycleInstructionKind::InterCardRecv,
+            /*kind*/CycleInstructionKind::InterCardSend,
             /*transfer_path*/CycleTransferPath::HBMToHBM,
             /*type*/CycleOpType::InterCardComm,
              /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
@@ -78,6 +78,7 @@ CycleProgram BuildCinnamonInputBroadcastProgram(
     builder.bram.AcquireOnIssue(
         static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
     );
+
 
     for (uint32_t i = 0; i < digit_num; i++){
         // INTT for all limbs

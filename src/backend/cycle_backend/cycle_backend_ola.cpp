@@ -80,7 +80,7 @@ CycleProgram BuildOLAProgram(
             return false;
         }
 
-        builder.bram.ReleaseOnComplete(bytes);
+        builder.bram.ReleaseOnIssue(bytes);
         digit_in_bram[digit_idx] = false;
 
         emit_op(
@@ -108,7 +108,7 @@ CycleProgram BuildOLAProgram(
             }
 
             const uint64_t bytes = digit_bytes[idx];
-            builder.bram.ReleaseOnComplete(bytes);
+            builder.bram.ReleaseOnIssue(bytes);
             digit_in_bram[idx] = false;
 
             emit_op(
@@ -260,7 +260,7 @@ CycleProgram BuildOLAProgram(
             return CycleProgram{};
         }
         if (bconv_extra_bytes > 0) {
-            builder.bram.AcquireOnComplete(bconv_extra_bytes);
+            builder.bram.AcquireOnIssue(bconv_extra_bytes);
         }
         digit_bytes[digit_idx] = bconv_output_bytes;
 
@@ -376,7 +376,7 @@ CycleProgram BuildOLAProgram(
         }
 
         builder.bram.AcquireOnIssue(partial_window_bytes);
-        builder.bram.ReleaseOnComplete(key_window_bytes);
+        builder.bram.ReleaseOnIssue(key_window_bytes);
 
         emit_op(
             "ola_innerprod_mul_stub",
@@ -396,7 +396,7 @@ CycleProgram BuildOLAProgram(
             continue;
         }
 
-        builder.bram.ReleaseOnComplete(partial_window_bytes);
+        builder.bram.ReleaseOnIssue(partial_window_bytes);
         emit_op(
             "ola_innerprod_accumulate_stub",
             CycleInstructionKind::EweAdd,
@@ -438,7 +438,7 @@ CycleProgram BuildOLAProgram(
 
         const uint64_t bytes =
             static_cast<uint64_t>(ct_now) * problem.limbs * problem.ct_limb_bytes;
-        builder.bram.ReleaseOnComplete(bytes);
+        builder.bram.ReleaseOnIssue(bytes);
         emit_op(
             "ola_spill_poly_stub",
             CycleInstructionKind::StoreHBM,

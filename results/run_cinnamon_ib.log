@@ -26,71 +26,70 @@ DumpLogicalGraph: true
 DumpRuntimePlan: true
 =========================
 Building Cinnamon Input Broadcast program with,active_cards 3,ct 1, p 2, digit_num 3, digit_limbs 8, l 23, lk 31
-Emitted group 0: recv_input_card_2, kind=26, bytes=6029312, work_items=23, micro_ops=1, est_cycles/op=226130, total_est_cycles=226130, bram_live=0
-Emitted group 1: recv_input_card_3, kind=26, bytes=6029312, work_items=23, micro_ops=1, est_cycles/op=226130, total_est_cycles=226130, bram_live=0
-Emitted group 2: intt_digit_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6029312
-Emitted group 3: bconv_digit_0, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=6029312
-Emitted group 4: ntt_digit_0, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
-Emitted group 5: intt_digit_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
-Emitted group 6: bconv_digit_1, kind=8, bytes=2097152, work_items=8, micro_ops=128, est_cycles/op=276, total_est_cycles=32788, bram_live=8126464
-Emitted group 7: ntt_digit_1, kind=3, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=4108, total_est_cycles=65548, bram_live=10223616
-Emitted group 8: intt_digit_2, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=10223616
-Emitted group 9: bconv_digit_2, kind=8, bytes=2097152, work_items=8, micro_ops=128, est_cycles/op=276, total_est_cycles=32788, bram_live=10223616
-Emitted group 10: ntt_digit_2, kind=3, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=4108, total_est_cycles=65548, bram_live=12320768
+Emitted group 0: recv_input_card_2, kind=8, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=5024, total_est_cycles=114875, bram_live=0
+Emitted group 1: recv_input_card_3, kind=8, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=5024, total_est_cycles=114875, bram_live=0
+Emitted group 2: intt_digit_0, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6029312
+Emitted group 3: bconv_digit_0, kind=7, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=6029312
+Emitted group 4: ntt_digit_0, kind=2, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
+Emitted group 5: intt_digit_1, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
+Emitted group 6: bconv_digit_1, kind=7, bytes=2097152, work_items=8, micro_ops=128, est_cycles/op=276, total_est_cycles=32788, bram_live=8126464
+Emitted group 7: ntt_digit_1, kind=2, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=4108, total_est_cycles=65548, bram_live=10223616
+Emitted group 8: intt_digit_2, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=10223616
+Emitted group 9: bconv_digit_2, kind=7, bytes=2097152, work_items=8, micro_ops=128, est_cycles/op=276, total_est_cycles=32788, bram_live=10223616
+Emitted group 10: ntt_digit_2, kind=2, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=4108, total_est_cycles=65548, bram_live=12320768
 Emitted group 11: load_key_0_0, kind=0, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=182, total_est_cycles=2640, bram_live=12320768
-Emitted group 12: mul_digit_0_0, kind=5, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=260, total_est_cycles=4100, bram_live=16515072
+Emitted group 12: mul_digit_0_0, kind=4, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=260, total_est_cycles=4100, bram_live=16515072
 Emitted group 13: load_key_0_1, kind=0, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=182, total_est_cycles=2640, bram_live=16515072
-Emitted group 14: mul_digit_1_0, kind=5, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=260, total_est_cycles=4100, bram_live=20709376
-Emitted group 15: add_digit_1_0, kind=6, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=258, total_est_cycles=4098, bram_live=20709376
+Emitted group 14: mul_digit_1_0, kind=4, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=260, total_est_cycles=4100, bram_live=20709376
+Emitted group 15: add_digit_1_0, kind=5, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=258, total_est_cycles=4098, bram_live=20709376
 Emitted group 16: load_key_0_2, kind=0, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=182, total_est_cycles=2640, bram_live=16515072
-Emitted group 17: mul_digit_2_0, kind=5, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=260, total_est_cycles=4100, bram_live=20709376
-Emitted group 18: add_digit_2_0, kind=6, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=258, total_est_cycles=4098, bram_live=20709376
+Emitted group 17: mul_digit_2_0, kind=4, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=260, total_est_cycles=4100, bram_live=20709376
+Emitted group 18: add_digit_2_0, kind=5, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=258, total_est_cycles=4098, bram_live=20709376
 Emitted group 19: load_key_1_0, kind=0, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=182, total_est_cycles=2640, bram_live=16515072
-Emitted group 20: mul_digit_0_1, kind=5, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=260, total_est_cycles=4100, bram_live=20709376
+Emitted group 20: mul_digit_0_1, kind=4, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=260, total_est_cycles=4100, bram_live=20709376
 Emitted group 21: load_key_1_1, kind=0, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=182, total_est_cycles=2640, bram_live=20709376
-Emitted group 22: mul_digit_1_1, kind=5, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=260, total_est_cycles=4100, bram_live=24903680
-Emitted group 23: add_digit_1_1, kind=6, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=258, total_est_cycles=4098, bram_live=24903680
+Emitted group 22: mul_digit_1_1, kind=4, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=260, total_est_cycles=4100, bram_live=24903680
+Emitted group 23: add_digit_1_1, kind=5, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=258, total_est_cycles=4098, bram_live=24903680
 Emitted group 24: load_key_1_2, kind=0, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=182, total_est_cycles=2640, bram_live=20709376
-Emitted group 25: mul_digit_2_1, kind=5, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=260, total_est_cycles=4100, bram_live=24903680
-Emitted group 26: add_digit_2_1, kind=6, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=258, total_est_cycles=4098, bram_live=24903680
-Emitted group 27: final_ntt_0, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
-Emitted group 28: final_ntt_1, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
-Emitted group 29: final_bconv_0, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=8126464
-Emitted group 30: final_ntt_digit_0, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
-Emitted group 31: final_bconv_1, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=8126464
-Emitted group 32: final_ntt_digit_1, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
-Emitted group 33: subtract_input_0, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=8126464
-Emitted group 34: subtract_input_1, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=8126464
-Emitted group 35: send_result_card_2, kind=25, bytes=2097152, work_items=8, micro_ops=1, est_cycles/op=78674, total_est_cycles=78674, bram_live=8126464
-Emitted group 36: send_result_card_3, kind=25, bytes=2097152, work_items=8, micro_ops=1, est_cycles/op=78674, total_est_cycles=78674, bram_live=10223616
+Emitted group 25: mul_digit_2_1, kind=4, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=260, total_est_cycles=4100, bram_live=24903680
+Emitted group 26: add_digit_2_1, kind=5, bytes=4194304, work_items=16, micro_ops=16, est_cycles/op=258, total_est_cycles=4098, bram_live=24903680
+Emitted group 27: final_ntt_0, kind=2, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
+Emitted group 28: final_ntt_1, kind=2, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
+Emitted group 29: final_bconv_0, kind=7, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=8126464
+Emitted group 30: final_ntt_digit_0, kind=2, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
+Emitted group 31: final_bconv_1, kind=7, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=8126464
+Emitted group 32: final_ntt_digit_1, kind=2, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
+Emitted group 33: subtract_input_0, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=8126464
+Emitted group 34: subtract_input_1, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=8126464
+Emitted group 35: send_result_card_2, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=5024, total_est_cycles=39976, bram_live=8126464
+Emitted group 36: send_result_card_3, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=5024, total_est_cycles=39976, bram_live=10223616
 
 ========== Detailed Execution Statistics ==========
 
 --- Summary ---
-Total cycles:           754979
-Total latency (ns):     2516597
+Total cycles:           306141
+Total latency (ns):     1020470
 Peak BRAM live (bytes): 24903680
-HBM read (bytes):       25165824
-HBM write (bytes):      0
-Dependency stalls:      656268 cycles
-Resource stalls:        98711 cycles
+HBM read (bytes):       41418752
+HBM write (bytes):      16252928
+Dependency stalls:      66756 cycles
+Resource stalls:        239385 cycles
 Instruction groups:     37
-Total instructions:     820
+Total instructions:     878
 
 --- Cycle Breakdown by Instruction Kind ---
-  LoadHBM: cycles=4386 (0.580943%)  count=96  bytes=25165824
-  NTT: cycles=73965 (9.79696%)  count=72  bytes=18874368
-  INTT: cycles=24657 (3.26592%)  count=24  bytes=6291456
-  EweMul: cycles=6258 (0.828897%)  count=96  bytes=25165824
-  EweAdd: cycles=4140 (0.54836%)  count=64  bytes=16777216
-  EweSub: cycles=1038 (0.137487%)  count=16  bytes=4194304
-  BConv: cycles=30927 (4.09641%)  count=448  bytes=10485760
-  InterCardSend: cycles=157348 (20.8414%)  count=2  bytes=4194304
-  InterCardRecv: cycles=452260 (59.9037%)  count=2  bytes=12058624
+  LoadHBM: cycles=4386 (1.43267%)  count=96  bytes=25165824
+  NTT: cycles=73965 (24.1604%)  count=72  bytes=18874368
+  INTT: cycles=24657 (8.05413%)  count=24  bytes=6291456
+  EweMul: cycles=6258 (2.04416%)  count=96  bytes=25165824
+  EweAdd: cycles=4140 (1.35232%)  count=64  bytes=16777216
+  EweSub: cycles=1038 (0.339059%)  count=16  bytes=4194304
+  BConv: cycles=30927 (10.1022%)  count=448  bytes=10485760
+  InterCardSend: cycles=160770 (52.515%)  count=62  bytes=16252928
 
 --- EstimateCycle (1-Limb Input) by Operation ---
-  recv_input_card_2: kind=InterCardRecv  one_limb_cycles=226130  groups=1  instrs=1
-  recv_input_card_3: kind=InterCardRecv  one_limb_cycles=226130  groups=1  instrs=1
+  recv_input_card_2: kind=InterCardSend  one_limb_cycles=5024  groups=1  instrs=23
+  recv_input_card_3: kind=InterCardSend  one_limb_cycles=5024  groups=1  instrs=23
   intt_digit_0: kind=INTT  one_limb_cycles=4108  groups=1  instrs=8
   bconv_digit_0: kind=BConv  one_limb_cycles=276  groups=1  instrs=64
   ntt_digit_0: kind=NTT  one_limb_cycles=4108  groups=1  instrs=8
@@ -124,130 +123,130 @@ Total instructions:     820
   final_ntt_digit_1: kind=NTT  one_limb_cycles=4108  groups=1  instrs=8
   subtract_input_0: kind=EweSub  one_limb_cycles=258  groups=1  instrs=8
   subtract_input_1: kind=EweSub  one_limb_cycles=258  groups=1  instrs=8
-  send_result_card_2: kind=InterCardSend  one_limb_cycles=78674  groups=1  instrs=1
-  send_result_card_3: kind=InterCardSend  one_limb_cycles=78674  groups=1  instrs=1
+  send_result_card_2: kind=InterCardSend  one_limb_cycles=5024  groups=1  instrs=8
+  send_result_card_3: kind=InterCardSend  one_limb_cycles=5024  groups=1  instrs=8
 
 --- Group Timeline ---
   ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
-   0  recv_input_card_2              0    226130     226130            0            0  6029312
-   1  recv_input_card_3         226130    452260     226130            0            0  6029312
-   2  intt_digit_0              452260    460479       8219            0      6029312  2097152
-   3  bconv_digit_0             460479    464898       4419      6029312      6029312  2097152
-   4  ntt_digit_0               464898    473117       8219      6029312      8126464  2097152
-   5  intt_digit_1              473117    481336       8219      8126464      8126464  2097152
-   6  bconv_digit_1             481336    490171       8835      8126464      8126464  2097152
-   7  ntt_digit_1               490171    506606      16435      8126464     10223616  4194304
-   8  intt_digit_2              506606    514825       8219     10223616     10223616  2097152
-   9  bconv_digit_2             514825    523660       8835     10223616     10223616  2097152
-  10  ntt_digit_2               523660    540095      16435     10223616     12320768  4194304
-  11  load_key_0_0              540095    540826        731     12320768     12320768  4194304
-  12  mul_digit_0_0             540826    541869       1043     12320768     16515072  4194304
-  13  load_key_0_1              541869    542600        731     16515072     16515072  4194304
-  14  mul_digit_1_0             542600    543643       1043     16515072     20709376  4194304
-  15  add_digit_1_0             543643    544678       1035     20709376     20709376  4194304
-  16  load_key_0_2              544678    545409        731     20709376     16515072  4194304
-  17  mul_digit_2_0             545409    546452       1043     16515072     20709376  4194304
-  18  add_digit_2_0             546452    547487       1035     20709376     20709376  4194304
-  19  load_key_1_0              547487    548218        731     20709376     16515072  4194304
-  20  mul_digit_0_1             548218    549261       1043     16515072     20709376  4194304
-  21  load_key_1_1              549261    549992        731     20709376     20709376  4194304
-  22  mul_digit_1_1             549992    551035       1043     20709376     24903680  4194304
-  23  add_digit_1_1             551035    552070       1035     24903680     24903680  4194304
-  24  load_key_1_2              552070    552801        731     24903680     20709376  4194304
-  25  mul_digit_2_1             552801    553844       1043     20709376     24903680  4194304
-  26  add_digit_2_1             553844    554879       1035     24903680     24903680  4194304
-  27  final_ntt_0               554879    563098       8219     24903680      8126464  2097152
-  28  final_ntt_1               563098    571317       8219      8126464      8126464  2097152
-  29  final_bconv_0             571317    575736       4419      8126464      8126464  2097152
-  30  final_ntt_digit_0         575736    583955       8219      8126464      8126464  2097152
-  31  final_bconv_1             583955    588374       4419      8126464      8126464  2097152
-  32  final_ntt_digit_1         588374    596593       8219      8126464      8126464  2097152
-  33  subtract_input_0          596593    597112        519      8126464      8126464  2097152
-  34  subtract_input_1          597112    597631        519      8126464      8126464  2097152
-  35  send_result_card_2        597631    676305      78674      8126464      8126464  2097152
-  36  send_result_card_3        676305    754979      78674      8126464     10223616  2097152
+   0  recv_input_card_2              0     60288      60288            0            0  6029312
+   1  recv_input_card_3          60288    120576      60288            0            0  6029312
+   2  intt_digit_0              120576    128795       8219            0      6029312  2097152
+   3  bconv_digit_0             128795    133214       4419      6029312      6029312  2097152
+   4  ntt_digit_0               133214    141433       8219      6029312      8126464  2097152
+   5  intt_digit_1              141433    149652       8219      8126464      8126464  2097152
+   6  bconv_digit_1             149652    158487       8835      8126464      8126464  2097152
+   7  ntt_digit_1               158487    174922      16435      8126464     10223616  4194304
+   8  intt_digit_2              174922    183141       8219     10223616     10223616  2097152
+   9  bconv_digit_2             183141    191976       8835     10223616     10223616  2097152
+  10  ntt_digit_2               191976    208411      16435     10223616     12320768  4194304
+  11  load_key_0_0              208411    209142        731     12320768     12320768  4194304
+  12  mul_digit_0_0             209142    210185       1043     12320768     16515072  4194304
+  13  load_key_0_1              210185    210916        731     16515072     16515072  4194304
+  14  mul_digit_1_0             210916    211959       1043     16515072     20709376  4194304
+  15  add_digit_1_0             211959    212994       1035     20709376     20709376  4194304
+  16  load_key_0_2              212994    213725        731     20709376     16515072  4194304
+  17  mul_digit_2_0             213725    214768       1043     16515072     20709376  4194304
+  18  add_digit_2_0             214768    215803       1035     20709376     20709376  4194304
+  19  load_key_1_0              215803    216534        731     20709376     16515072  4194304
+  20  mul_digit_0_1             216534    217577       1043     16515072     20709376  4194304
+  21  load_key_1_1              217577    218308        731     20709376     20709376  4194304
+  22  mul_digit_1_1             218308    219351       1043     20709376     24903680  4194304
+  23  add_digit_1_1             219351    220386       1035     24903680     24903680  4194304
+  24  load_key_1_2              220386    221117        731     24903680     20709376  4194304
+  25  mul_digit_2_1             221117    222160       1043     20709376     24903680  4194304
+  26  add_digit_2_1             222160    223195       1035     24903680     24903680  4194304
+  27  final_ntt_0               223195    231414       8219     24903680      8126464  2097152
+  28  final_ntt_1               231414    239633       8219      8126464      8126464  2097152
+  29  final_bconv_0             239633    244052       4419      8126464      8126464  2097152
+  30  final_ntt_digit_0         244052    252271       8219      8126464      8126464  2097152
+  31  final_bconv_1             252271    256690       4419      8126464      8126464  2097152
+  32  final_ntt_digit_1         256690    264909       8219      8126464      8126464  2097152
+  33  subtract_input_0          264909    265428        519      8126464      8126464  2097152
+  34  subtract_input_1          265428    265947        519      8126464      8126464  2097152
+  35  send_result_card_2        265947    286044      20097      8126464      8126464  2097152
+  36  send_result_card_3        286044    306141      20097      8126464     10223616  2097152
 
 --- BRAM Timeline (cycle, live_bytes) ---
 # cycle,bram_bytes
 0,0
 0,0
-226130,0
-226130,0
-452260,0
-452260,0
-460479,6029312
-460479,6029312
-464898,6029312
-464898,6029312
-473117,8126464
-473117,8126464
-481336,8126464
-481336,8126464
-490171,8126464
-490171,8126464
-506606,10223616
-506606,10223616
-514825,10223616
-514825,10223616
-523660,10223616
-523660,10223616
-540095,12320768
-540095,12320768
-540826,12320768
-540826,12320768
-541869,16515072
-541869,16515072
-542600,16515072
-542600,16515072
-543643,20709376
-543643,20709376
-544678,20709376
-544678,20709376
-545409,16515072
-545409,16515072
-546452,20709376
-546452,20709376
-547487,20709376
-547487,20709376
-548218,16515072
-548218,16515072
-549261,20709376
-549261,20709376
-549992,20709376
-549992,20709376
-551035,24903680
-551035,24903680
-552070,24903680
-552070,24903680
-552801,20709376
-552801,20709376
-553844,24903680
-553844,24903680
-554879,24903680
-554879,24903680
-563098,8126464
-563098,8126464
-571317,8126464
-571317,8126464
-575736,8126464
-575736,8126464
-583955,8126464
-583955,8126464
-588374,8126464
-588374,8126464
-596593,8126464
-596593,8126464
-597112,8126464
-597112,8126464
-597631,8126464
-597631,8126464
-676305,8126464
-676305,8126464
-754979,10223616
+60288,0
+60288,0
+120576,0
+120576,0
+128795,6029312
+128795,6029312
+133214,6029312
+133214,6029312
+141433,8126464
+141433,8126464
+149652,8126464
+149652,8126464
+158487,8126464
+158487,8126464
+174922,10223616
+174922,10223616
+183141,10223616
+183141,10223616
+191976,10223616
+191976,10223616
+208411,12320768
+208411,12320768
+209142,12320768
+209142,12320768
+210185,16515072
+210185,16515072
+210916,16515072
+210916,16515072
+211959,20709376
+211959,20709376
+212994,20709376
+212994,20709376
+213725,16515072
+213725,16515072
+214768,20709376
+214768,20709376
+215803,20709376
+215803,20709376
+216534,16515072
+216534,16515072
+217577,20709376
+217577,20709376
+218308,20709376
+218308,20709376
+219351,24903680
+219351,24903680
+220386,24903680
+220386,24903680
+221117,20709376
+221117,20709376
+222160,24903680
+222160,24903680
+223195,24903680
+223195,24903680
+231414,8126464
+231414,8126464
+239633,8126464
+239633,8126464
+244052,8126464
+244052,8126464
+252271,8126464
+252271,8126464
+256690,8126464
+256690,8126464
+264909,8126464
+264909,8126464
+265428,8126464
+265428,8126464
+265947,8126464
+265947,8126464
+286044,8126464
+286044,8126464
+306141,10223616
 
 --- Transfer vs Compute ---
-Transfer: 613994 cycles (81.326%)
-Compute:  140985 cycles (18.674%)
+Transfer: 165156 cycles (53.9477%)
+Compute:  140985 cycles (46.0523%)
 ====================================================
 
 Scheduler=fifo
@@ -258,14 +257,14 @@ Seed=123
 NumCards=3
 === Request Metrics ===
 Completed requests: 1
-Mean latency(ns): 2516597.0000
-P95 latency(ns): 2516597
-P99 latency(ns): 2516597
-Max latency(ns): 2516597
+Mean latency(ns): 1020470.0000
+P95 latency(ns): 1020470
+P99 latency(ns): 1020470
+Max latency(ns): 1020470
 Mean queue time(ns): 0.0000
-Mean service time(ns): 2516597.0000
+Mean service time(ns): 1020470.0000
 === User Metrics ===
-User 0: completed=1, mean_latency(ns)=2516597.0000, throughput(req/ns)=0.0000, reload_count=3
+User 0: completed=1, mean_latency(ns)=1020470.0000, throughput(req/ns)=0.0000, reload_count=3
 === Card Metrics ===
 Card 0: utilization=1.0000, reload_count=1, served_requests=1
 Card 1: utilization=1.0000, reload_count=1, served_requests=1
@@ -274,7 +273,7 @@ Card 2: utilization=1.0000, reload_count=1, served_requests=1
 Total throughput(req/ns): 0.0000
 Total reload count: 3
 Jain fairness index: 1.0000
-Simulation window(ns): [23, 2516620], duration=2516597
+Simulation window(ns): [64, 1020534], duration=1020470
 PoolConfigSource=built-in default
 TreeConfigSource=built-in default
 HEParamsSource=built-in default

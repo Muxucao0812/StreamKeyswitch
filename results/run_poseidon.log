@@ -25,25 +25,25 @@ CSVOutput: results/metrics_poseidon.csv
 DumpLogicalGraph: true
 DumpRuntimePlan: true
 =========================
-Emitted group 0: load_input, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
-Emitted group 1: modup_intt, kind=4, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=2097152
-Emitted group 2: modup_bconv, kind=8, bytes=4194304, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
-Emitted group 3: modup_ntt, kind=3, bytes=4194304, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=4194304
+Emitted group 0: load_input, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=0
+Emitted group 1: modup_intt, kind=3, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=2097152
+Emitted group 2: modup_bconv, kind=7, bytes=4194304, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
+Emitted group 3: modup_ntt, kind=2, bytes=4194304, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=4194304
 Emitted group 4: innerprod_load_key_all, kind=0, bytes=8388662, work_items=0, micro_ops=62, est_cycles/op=103, total_est_cycles=5261, bram_live=12582966
-Emitted group 5: innerprod_mul_all, kind=5, bytes=12582966, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=16252928
+Emitted group 5: innerprod_mul_all, kind=4, bytes=12582966, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=16252928
 Emitted group 6: innerprod_spill_partial, kind=1, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=182, total_est_cycles=10177, bram_live=0
-Emitted group 7: load_input, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
-Emitted group 8: modup_intt, kind=4, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=2097152
-Emitted group 9: modup_bconv, kind=8, bytes=4194304, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
-Emitted group 10: modup_ntt, kind=3, bytes=4194304, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=4194304
+Emitted group 7: load_input, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=0
+Emitted group 8: modup_intt, kind=3, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=2097152
+Emitted group 9: modup_bconv, kind=7, bytes=4194304, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
+Emitted group 10: modup_ntt, kind=2, bytes=4194304, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=4194304
 Emitted group 11: innerprod_load_key_all, kind=0, bytes=8388662, work_items=0, micro_ops=62, est_cycles/op=103, total_est_cycles=5261, bram_live=12582966
-Emitted group 12: innerprod_mul_all, kind=5, bytes=12582966, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=16252928
+Emitted group 12: innerprod_mul_all, kind=4, bytes=12582966, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=16252928
 Emitted group 13: innerprod_spill_partial, kind=1, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=182, total_est_cycles=10177, bram_live=0
-Emitted group 14: load_input, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
-Emitted group 15: modup_intt, kind=4, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=2097152
-Emitted group 16: modup_bconv, kind=8, bytes=4194304, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
-Emitted group 17: modup_ntt, kind=3, bytes=4194304, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=4194304
+Emitted group 14: load_input, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=0
+Emitted group 15: modup_intt, kind=3, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=2097152
+Emitted group 16: modup_bconv, kind=7, bytes=4194304, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
+Emitted group 17: modup_ntt, kind=2, bytes=4194304, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=4194304
 Emitted group 18: innerprod_load_key_all, kind=0, bytes=8388662, work_items=0, micro_ops=62, est_cycles/op=103, total_est_cycles=5261, bram_live=12582966
-Emitted group 19: innerprod_mul_all, kind=5, bytes=12582966, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=16252928
+Emitted group 19: innerprod_mul_all, kind=4, bytes=12582966, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=16252928
 Emitted group 20: reduce_reload_partial_rhs, kind=0, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=182, total_est_cycles=10177, bram_live=32505856
  The program is not generated

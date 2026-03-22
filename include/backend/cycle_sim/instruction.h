@@ -10,36 +10,14 @@
 enum class CycleInstructionKind : uint8_t {
     LoadHBM = 0,
     StoreHBM,
-    Decompose,
     NTT,
     INTT,
     EweMul,
     EweAdd,
     EweSub,
     BConv,
-
-    NTTLoad,
-    NTTButterflyLocal,
-    NTTTranspose1,
-    NTTButterflyGlobal,
-    NTTTranspose2,
-    NTTStore,
-
-    INTTLoad,
-    INTTButterflyLocal,
-    INTTTranspose1,
-    INTTButterflyGlobal,
-    INTTTranspose2,
-    INTTStore,
-
-    BConvLoad,
-    BConvMAC,
-    BConvReduce,
-    BConvStore,
-
     InterCardSend,
     InterCardRecv,
-    InterCardReduce
 };
 
 enum class CycleTransferPath : uint8_t {
@@ -122,75 +100,22 @@ inline ResourceClass ResourceClassOf(CycleInstructionKind kind) {
     switch (kind) {
     case CycleInstructionKind::LoadHBM:
     case CycleInstructionKind::StoreHBM:
-    case CycleInstructionKind::NTTLoad:
-    case CycleInstructionKind::NTTStore:
-    case CycleInstructionKind::INTTLoad:
-    case CycleInstructionKind::INTTStore:
-    case CycleInstructionKind::BConvLoad:
-    case CycleInstructionKind::BConvStore:
         return ResourceClass::HBM;
-
-    case CycleInstructionKind::NTTTranspose1:
-    case CycleInstructionKind::NTTTranspose2:
-    case CycleInstructionKind::INTTTranspose1:
-    case CycleInstructionKind::INTTTranspose2:
-        return ResourceClass::SPU;
-
     case CycleInstructionKind::NTT:
     case CycleInstructionKind::INTT:
-    case CycleInstructionKind::NTTButterflyLocal:
-    case CycleInstructionKind::NTTButterflyGlobal:
-    case CycleInstructionKind::INTTButterflyLocal:
-    case CycleInstructionKind::INTTButterflyGlobal:
     case CycleInstructionKind::EweMul:
     case CycleInstructionKind::EweAdd:
     case CycleInstructionKind::EweSub:
     case CycleInstructionKind::BConv:
-    case CycleInstructionKind::BConvMAC:
-    case CycleInstructionKind::BConvReduce:
-    case CycleInstructionKind::Decompose:
         return ResourceClass::ComputeArray;
 
     case CycleInstructionKind::InterCardSend:
     case CycleInstructionKind::InterCardRecv:
-    case CycleInstructionKind::InterCardReduce:
         return ResourceClass::Interconnect;
     }
     return ResourceClass::ComputeArray;
 }
 
-inline CycleInstructionKind BaseKind(CycleInstructionKind kind) {
-    switch (kind) {
-    case CycleInstructionKind::NTTLoad:
-    case CycleInstructionKind::INTTLoad:
-    case CycleInstructionKind::BConvLoad:
-        return CycleInstructionKind::LoadHBM;
-    case CycleInstructionKind::NTTStore:
-    case CycleInstructionKind::INTTStore:
-    case CycleInstructionKind::BConvStore:
-        return CycleInstructionKind::StoreHBM;
-    case CycleInstructionKind::NTTButterflyLocal:
-    case CycleInstructionKind::NTTButterflyGlobal:
-    case CycleInstructionKind::NTTTranspose1:
-    case CycleInstructionKind::NTTTranspose2:
-        return CycleInstructionKind::NTT;
-    case CycleInstructionKind::INTTButterflyLocal:
-    case CycleInstructionKind::INTTButterflyGlobal:
-    case CycleInstructionKind::INTTTranspose1:
-    case CycleInstructionKind::INTTTranspose2:
-        return CycleInstructionKind::INTT;
-    case CycleInstructionKind::BConvMAC:
-        return CycleInstructionKind::BConv;
-    case CycleInstructionKind::BConvReduce:
-        return CycleInstructionKind::EweAdd;
-    case CycleInstructionKind::InterCardSend:
-    case CycleInstructionKind::InterCardRecv:
-    case CycleInstructionKind::InterCardReduce:
-        return kind;
-    default:
-        return kind;
-    }
-}
 
 inline const char* ToString(CycleInstructionKind kind) {
     switch (kind) {
@@ -198,8 +123,6 @@ inline const char* ToString(CycleInstructionKind kind) {
         return "LoadHBM";
     case CycleInstructionKind::StoreHBM:
         return "StoreHBM";
-    case CycleInstructionKind::Decompose:
-        return "Decompose";
     case CycleInstructionKind::NTT:
         return "NTT";
     case CycleInstructionKind::INTT:
@@ -212,44 +135,10 @@ inline const char* ToString(CycleInstructionKind kind) {
         return "EweSub";
     case CycleInstructionKind::BConv:
         return "BConv";
-    case CycleInstructionKind::NTTLoad:
-        return "NTTLoad";
-    case CycleInstructionKind::NTTButterflyLocal:
-        return "NTTButterflyLocal";
-    case CycleInstructionKind::NTTTranspose1:
-        return "NTTTranspose1";
-    case CycleInstructionKind::NTTButterflyGlobal:
-        return "NTTButterflyGlobal";
-    case CycleInstructionKind::NTTTranspose2:
-        return "NTTTranspose2";
-    case CycleInstructionKind::NTTStore:
-        return "NTTStore";
-    case CycleInstructionKind::INTTLoad:
-        return "INTTLoad";
-    case CycleInstructionKind::INTTButterflyLocal:
-        return "INTTButterflyLocal";
-    case CycleInstructionKind::INTTTranspose1:
-        return "INTTTranspose1";
-    case CycleInstructionKind::INTTButterflyGlobal:
-        return "INTTButterflyGlobal";
-    case CycleInstructionKind::INTTTranspose2:
-        return "INTTTranspose2";
-    case CycleInstructionKind::INTTStore:
-        return "INTTStore";
-    case CycleInstructionKind::BConvLoad:
-        return "BConvLoad";
-    case CycleInstructionKind::BConvMAC:
-        return "BConvMAC";
-    case CycleInstructionKind::BConvReduce:
-        return "BConvReduce";
-    case CycleInstructionKind::BConvStore:
-        return "BConvStore";
     case CycleInstructionKind::InterCardSend:
         return "InterCardSend";
     case CycleInstructionKind::InterCardRecv:
         return "InterCardRecv";
-    case CycleInstructionKind::InterCardReduce:
-        return "InterCardReduce";
     }
 
     return "Unknown";

@@ -173,12 +173,9 @@ std::size_t StageIndex(StageType stage_type) {
 }
 
 StageType StageTypeOf(
-    CycleOpType type,
-    CycleInstructionKind kind) {
+    CycleOpType type
+) {
 
-    if (kind == CycleInstructionKind::Decompose) {
-        return StageType::Decompose;
-    }
 
     switch (type) {
     case CycleOpType::KeyLoad:
@@ -231,10 +228,6 @@ void AddCycleComputeTime(
     const CycleGroupTiming& timing,
     Time value) {
 
-    if (timing.kind == CycleInstructionKind::Decompose) {
-        SaturatingAdd(&breakdown->transform_time, value);
-        return;
-    }
 
     switch (timing.type) {
     case CycleOpType::NTT:
@@ -278,53 +271,11 @@ void AddCommunicationStats(
         SaturatingAdd(&breakdown->inter_card_recv_time, value);
         SaturatingAdd(&breakdown->inter_card_recv_bytes, timing.bytes);
         return;
-    case CycleInstructionKind::InterCardReduce:
-        SaturatingAdd(&breakdown->inter_card_reduce_time, value);
-        SaturatingAdd(&breakdown->inter_card_reduce_bytes, timing.bytes);
-        return;
     default:
         return;
     }
 }
 
-ExecutionResult MakeFallbackResult(
-    const Request& req,
-    KeySwitchMethod effective_method,
-    KeySwitchFallbackReason reason) {
-
-    ExecutionResult result{};
-    result.requested_method = req.ks_profile.method;
-    result.effective_method = effective_method;
-
-    result.fallback_used = (reason != KeySwitchFallbackReason::None);
-    result.fallback_reason = reason;
-
-    result.method_degraded = false;
-    result.degraded_reason = KeySwitchFallbackReason::None;
-    result.tiled_execution = false;
-
-    result.primitive_breakdown_primary = true;
-    result.stage_breakdown_compat_only = true;
-
-    result.tile_count = 1;
-    result.key_host_to_hbm_bytes = req.ks_profile.key_bytes;
-    result.key_hbm_to_bram_bytes = 0;
-    result.ct_hbm_to_bram_bytes = req.ks_profile.input_bytes;
-    result.out_bram_to_hbm_bytes = req.ks_profile.output_bytes;
-    result.hbm_read_bytes =
-        result.key_host_to_hbm_bytes
-        + result.key_hbm_to_bram_bytes
-        + result.ct_hbm_to_bram_bytes;
-    result.hbm_write_bytes = result.out_bram_to_hbm_bytes;
-    result.working_set_bytes = req.ks_profile.input_bytes + req.ks_profile.key_bytes;
-    result.peak_hbm_bytes = result.working_set_bytes;
-    result.peak_total_bytes = result.peak_hbm_bytes;
-    result.primitive_peak_memory_bytes = result.peak_total_bytes;
-    result.peak_memory_bytes = result.peak_total_bytes;
-
-    NormalizeStatusFlags(&result);
-    return result;
-}
 
 ExecutionBreakdown StageBreakdownFromCycles(
     const HardwareModel& hw_model,
@@ -639,7 +590,7 @@ CycleProgram CycleBackend::BuildProgram(
     const ExecutionPlan& plan,
     const SystemState& state,
     KeySwitchMethod method,
-    KeySwitchExecution* execution
+    KeySwitchExecution* execution 
 ) const {
 
  
@@ -708,7 +659,7 @@ ExecutionResult CycleBackend::CollectResult(
     for (const CycleGroupTiming& timing : sim_stats.group_timings) {
         const uint64_t duration_cycles = timing.DurationCycles();
         SaturatingAdd(
-            &stage_cycles[StageIndex(StageTypeOf(timing.type, timing.kind))],
+            &stage_cycles[StageIndex(StageTypeOf(timing.type))],
             duration_cycles);
         AddTransferTime(
             &transfer_cycles,

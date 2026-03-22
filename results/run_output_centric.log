@@ -30,14 +30,14 @@ Step 1: load the two input digits to BRAM, total bytes: 2097152
 Emitted group 0: load_digit_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
 Emitted group 1: load_digit_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=4194304
 Step 2: INTT for the two digits
-Emitted group 2: intt_digit_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
-Emitted group 3: intt_digit_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
+Emitted group 2: intt_digit_0, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
+Emitted group 3: intt_digit_1, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
 Step 3: BConv for two digit to generate the last digit limbs
-Emitted group 4: bconv_digit_0, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
-Emitted group 5: bconv_digit_1, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=6291456
+Emitted group 4: bconv_digit_0, kind=7, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
+Emitted group 5: bconv_digit_1, kind=7, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=6291456
 Step 4: For two digits, NTT for new generated limbs
-Emitted group 6: ntt_digit_0, kind=3, bytes=2097152, work_items=2097152, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8388608
-Emitted group 7: ntt_digit_1, kind=3, bytes=2097152, work_items=2097152, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8388608
+Emitted group 6: ntt_digit_0, kind=2, bytes=2097152, work_items=2097152, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8388608
+Emitted group 7: ntt_digit_1, kind=2, bytes=2097152, work_items=2097152, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8388608
 Step 5: For each digit, load the 2 * digit_limbs eval key to BRAM
 Emitted group 8: load_eval_key_digit_0_part_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=8388608
 Emitted group 9: load_eval_key_digit_0_part_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=10485760
@@ -46,27 +46,27 @@ Emitted group 11: load_eval_key_digit_1_part_1, kind=0, bytes=2097152, work_item
 Emitted group 12: load_eval_key_digit_2_part_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=16777216
 Emitted group 13: load_eval_key_digit_2_part_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=18874368
 Step 6: For each digit, Multiply and accumulate the partial results for each digit with digit_limbs limbs
-Emitted group 14: mul_acc_digit_0_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=20971520
-Emitted group 15: mul_acc_digit_1_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=20971520
-Emitted group 16: acc_digit_1_part_0, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=20971520
-Emitted group 17: mul_acc_digit_2_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=18874368
-Emitted group 18: acc_digit_2_part_0, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=18874368
-Emitted group 19: mul_acc_digit_0_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
-Emitted group 20: mul_acc_digit_1_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
-Emitted group 21: acc_digit_1_part_1, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=16777216
-Emitted group 22: mul_acc_digit_2_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=14680064
-Emitted group 23: acc_digit_2_part_1, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=14680064
+Emitted group 14: mul_acc_digit_0_part_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=20971520
+Emitted group 15: mul_acc_digit_1_part_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=20971520
+Emitted group 16: acc_digit_1_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=20971520
+Emitted group 17: mul_acc_digit_2_part_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=18874368
+Emitted group 18: acc_digit_2_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=18874368
+Emitted group 19: mul_acc_digit_0_part_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
+Emitted group 20: mul_acc_digit_1_part_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
+Emitted group 21: acc_digit_1_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=16777216
+Emitted group 22: mul_acc_digit_2_part_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=14680064
+Emitted group 23: acc_digit_2_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=14680064
 Step 7: Send the accumulated results with digit_limbs limbs for each digit back to HBM
 Emitted group 24: store_acc_result_digit_part_0, kind=1, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=6291456
 Emitted group 25: store_acc_result_digit_part_1, kind=1, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=4194304
 Step 8: Load the last digit with digit_limbs limbs to BRAM, and INTT
 Emitted group 26: load_last_digit, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
-Emitted group 27: intt_last_digit, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
+Emitted group 27: intt_last_digit, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
 Step 9: BConv for the two digits and NTT
-Emitted group 28: bconv_last_digit_0, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
-Emitted group 29: ntt_last_digit_0, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
-Emitted group 30: bconv_last_digit_1, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=6291456
-Emitted group 31: ntt_last_digit_1, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8388608
+Emitted group 28: bconv_last_digit_0, kind=7, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
+Emitted group 29: ntt_last_digit_0, kind=2, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 30: bconv_last_digit_1, kind=7, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=6291456
+Emitted group 31: ntt_last_digit_1, kind=2, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8388608
 Step 10: For each digit, load the corresponding eval key
 Emitted group 32: load_eval_key_for_last_digit_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=10485760
 Emitted group 33: load_eval_key_for_last_digit_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=12582912
@@ -75,24 +75,24 @@ Emitted group 35: load_eval_key_for_last_digit_1, kind=0, bytes=2097152, work_it
 Emitted group 36: load_eval_key_for_last_digit_2, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=18874368
 Emitted group 37: load_eval_key_for_last_digit_2, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=20971520
 Step 11: For each digit, Multiply and accumulate the partial results for each digit with digit_limbs limbs, and store the accumulated result back to HBM
-Emitted group 38: mul_acc_last_digit_0_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=20971520
-Emitted group 39: mul_acc_last_digit_1_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=20971520
-Emitted group 40: acc_last_digit_1_part_0, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=20971520
-Emitted group 41: mul_acc_last_digit_2_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=18874368
-Emitted group 42: acc_last_digit_2_part_0, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=18874368
-Emitted group 43: mul_acc_last_digit_0_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
-Emitted group 44: mul_acc_last_digit_1_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
-Emitted group 45: acc_last_digit_1_part_1, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=16777216
-Emitted group 46: mul_acc_last_digit_2_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=14680064
-Emitted group 47: acc_last_digit_2_part_1, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=14680064
+Emitted group 38: mul_acc_last_digit_0_part_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=20971520
+Emitted group 39: mul_acc_last_digit_1_part_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=20971520
+Emitted group 40: acc_last_digit_1_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=20971520
+Emitted group 41: mul_acc_last_digit_2_part_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=18874368
+Emitted group 42: acc_last_digit_2_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=18874368
+Emitted group 43: mul_acc_last_digit_0_part_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
+Emitted group 44: mul_acc_last_digit_1_part_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
+Emitted group 45: acc_last_digit_1_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=16777216
+Emitted group 46: mul_acc_last_digit_2_part_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=14680064
+Emitted group 47: acc_last_digit_2_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=14680064
 Step 12: Send the accumulated results with digit_limbs limbs for each digit back to HBM
 Emitted group 48: store_acc_result_last_digit_part_0, kind=1, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=6291456
 Emitted group 49: store_acc_result_last_digit_part_1, kind=1, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=4194304
 Step 13: Repeat BConv, NTT, Mul-Acc for the last digit with digit_limbs limbs for l/digit_limbs times, and store the final result with l limbs back to HBM
-Emitted group 50: bconv_last_digit_0_full, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=2097152
-Emitted group 51: ntt_last_digit_0_full, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
-Emitted group 52: bconv_last_digit_1_full, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
-Emitted group 53: ntt_last_digit_1_full, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 50: bconv_last_digit_0_full, kind=7, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=2097152
+Emitted group 51: ntt_last_digit_0_full, kind=2, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
+Emitted group 52: bconv_last_digit_1_full, kind=7, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
+Emitted group 53: ntt_last_digit_1_full, kind=2, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
 For each digit, load the corresponding eval key for the full digit limbs, and do mul-acc for l/digit_limbs times
 Emitted group 54: load_eval_key_for_full_last_digit_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=8388608
 Emitted group 55: load_eval_key_for_full_last_digit_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=10485760
@@ -100,26 +100,26 @@ Emitted group 56: load_eval_key_for_full_last_digit_1, kind=0, bytes=2097152, wo
 Emitted group 57: load_eval_key_for_full_last_digit_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=14680064
 Emitted group 58: load_eval_key_for_full_last_digit_2, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=16777216
 Emitted group 59: load_eval_key_for_full_last_digit_2, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=18874368
-Emitted group 60: mul_acc_full_last_digit_0_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=18874368
-Emitted group 61: mul_acc_full_last_digit_1_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=18874368
-Emitted group 62: acc_full_last_digit_1_part_0, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=18874368
-Emitted group 63: mul_acc_full_last_digit_2_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
-Emitted group 64: acc_full_last_digit_2_part_0, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=16777216
-Emitted group 65: mul_acc_full_last_digit_0_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=14680064
-Emitted group 66: mul_acc_full_last_digit_1_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=14680064
-Emitted group 67: acc_full_last_digit_1_part_1, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=14680064
-Emitted group 68: mul_acc_full_last_digit_2_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=12582912
-Emitted group 69: acc_full_last_digit_2_part_1, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=12582912
+Emitted group 60: mul_acc_full_last_digit_0_part_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=18874368
+Emitted group 61: mul_acc_full_last_digit_1_part_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=18874368
+Emitted group 62: acc_full_last_digit_1_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=18874368
+Emitted group 63: mul_acc_full_last_digit_2_part_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
+Emitted group 64: acc_full_last_digit_2_part_0, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=16777216
+Emitted group 65: mul_acc_full_last_digit_0_part_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=14680064
+Emitted group 66: mul_acc_full_last_digit_1_part_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=14680064
+Emitted group 67: acc_full_last_digit_1_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=14680064
+Emitted group 68: mul_acc_full_last_digit_2_part_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=12582912
+Emitted group 69: acc_full_last_digit_2_part_1, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=12582912
 Send the accumulated result with digit_limbs limbs for each digit back to HBM
 Emitted group 70: store_acc_result_full_last_digit_part_0, kind=1, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=4194304
 Emitted group 71: store_acc_result_full_last_digit_part_1, kind=1, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
 Bconv for the last digit with digit_limbs limbs for l/digit_limbs times
-Emitted group 72: bconv_full_last_digit_0, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=0
-Emitted group 73: ntt_full_last_digit_0, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=2097152
-Emitted group 74: bconv_full_last_digit_1, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=2097152
-Emitted group 75: ntt_full_last_digit_1, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
-Emitted group 76: bconv_full_last_digit_2, kind=8, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
-Emitted group 77: ntt_full_last_digit_2, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 72: bconv_full_last_digit_0, kind=7, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=0
+Emitted group 73: ntt_full_last_digit_0, kind=2, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=2097152
+Emitted group 74: bconv_full_last_digit_1, kind=7, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=2097152
+Emitted group 75: ntt_full_last_digit_1, kind=2, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
+Emitted group 76: bconv_full_last_digit_2, kind=7, bytes=2097152, work_items=8, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=4194304
+Emitted group 77: ntt_full_last_digit_2, kind=2, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
 For each digit, load the corresponding eval key for the full digit limbs, and do mul-acc for l/digit_limbs times, and store the final result back to HBM
 Emitted group 78: load_eval_key_for_full_last_digit_0_part_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=8388608
 Emitted group 79: load_eval_key_for_full_last_digit_0_part_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=10485760
@@ -128,27 +128,27 @@ Emitted group 81: load_eval_key_for_full_last_digit_1_part_1, kind=0, bytes=2097
 Emitted group 82: load_eval_key_for_full_last_digit_2_part_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=16777216
 Emitted group 83: load_eval_key_for_full_last_digit_2_part_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=18874368
 For each digit, do mul-acc for l/digit_limbs times, and store the final result back to HBM
-Emitted group 84: mul_acc_full_last_digit_0_part_0_final, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=18874368
-Emitted group 85: mul_acc_full_last_digit_1_part_0_final, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=18874368
-Emitted group 86: acc_full_last_digit_1_part_0_final, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=18874368
-Emitted group 87: mul_acc_full_last_digit_2_part_0_final, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
-Emitted group 88: acc_full_last_digit_2_part_0_final, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=16777216
-Emitted group 89: mul_acc_full_last_digit_0_part_1_final, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=14680064
-Emitted group 90: mul_acc_full_last_digit_1_part_1_final, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=14680064
-Emitted group 91: acc_full_last_digit_1_part_1_final, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=14680064
-Emitted group 92: mul_acc_full_last_digit_2_part_1_final, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=12582912
-Emitted group 93: acc_full_last_digit_2_part_1_final, kind=6, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=12582912
-Emitted group 94: moddigit_0, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
-Emitted group 95: bconv_moddigit_0, kind=8, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=4194304
-Emitted group 96: ntt_moddigit_0, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=8126464
-Emitted group 97: moddigit_1, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
-Emitted group 98: bconv_moddigit_1, kind=8, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=8126464
-Emitted group 99: ntt_moddigit_1, kind=3, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=12058624
+Emitted group 84: mul_acc_full_last_digit_0_part_0_final, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=18874368
+Emitted group 85: mul_acc_full_last_digit_1_part_0_final, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=18874368
+Emitted group 86: acc_full_last_digit_1_part_0_final, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=18874368
+Emitted group 87: mul_acc_full_last_digit_2_part_0_final, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=16777216
+Emitted group 88: acc_full_last_digit_2_part_0_final, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=16777216
+Emitted group 89: mul_acc_full_last_digit_0_part_1_final, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=14680064
+Emitted group 90: mul_acc_full_last_digit_1_part_1_final, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=14680064
+Emitted group 91: acc_full_last_digit_1_part_1_final, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=14680064
+Emitted group 92: mul_acc_full_last_digit_2_part_1_final, kind=4, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=260, total_est_cycles=2052, bram_live=12582912
+Emitted group 93: acc_full_last_digit_2_part_1_final, kind=5, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=258, total_est_cycles=2050, bram_live=12582912
+Emitted group 94: moddigit_0, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=4194304
+Emitted group 95: bconv_moddigit_0, kind=7, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=4194304
+Emitted group 96: ntt_moddigit_0, kind=2, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=8126464
+Emitted group 97: moddigit_1, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
+Emitted group 98: bconv_moddigit_1, kind=7, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=8126464
+Emitted group 99: ntt_moddigit_1, kind=2, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=12058624
 Emitted group 100: load_moddigit_0, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=18087936
-Emitted group 101: sub_moddigit_0, kind=7, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=258, total_est_cycles=5890, bram_live=18087936
+Emitted group 101: sub_moddigit_0, kind=6, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=258, total_est_cycles=5890, bram_live=18087936
 Emitted group 102: store_moddigit_0, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=12058624
 Emitted group 103: load_moddigit_1, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=12058624
-Emitted group 104: sub_moddigit_1, kind=7, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=258, total_est_cycles=5890, bram_live=12058624
+Emitted group 104: sub_moddigit_1, kind=6, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=258, total_est_cycles=5890, bram_live=12058624
 Emitted group 105: store_moddigit_1, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=6029312
 
 ========== Detailed Execution Statistics ==========
@@ -628,7 +628,7 @@ Card 0: utilization=1.0000, reload_count=1, served_requests=1
 Total throughput(req/ns): 0.0000
 Total reload count: 1
 Jain fairness index: 1.0000
-Simulation window(ns): [23, 899950], duration=899927
+Simulation window(ns): [64, 899991], duration=899927
 PoolConfigSource=built-in default
 TreeConfigSource=built-in default
 HEParamsSource=built-in default

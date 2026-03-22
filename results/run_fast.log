@@ -28,2012 +28,471 @@ DumpRuntimePlan: true
 Step 1: load ct to BRAM, total bytes: 12058624
 Emitted group 0: load_input, kind=0, bytes=12058624, work_items=0, micro_ops=46, est_cycles/op=182, total_est_cycles=7555, bram_live=6029312
 Step 2: INTT for all limbs
-Emitted group 1: intt_all_limbs, kind=4, bytes=0, work_items=0, micro_ops=46, est_cycles/op=4108, total_est_cycles=188428, bram_live=6029312
+Emitted group 1: intt_all_limbs, kind=3, bytes=0, work_items=0, micro_ops=46, est_cycles/op=4108, total_est_cycles=188428, bram_live=6029312
 Step 3: BConv NTT Innerprod
-Emitted group 2: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 3: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 4: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 5: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 6: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 7: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 8: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 9: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 10: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 11: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 12: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 13: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 14: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 15: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 2: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 3: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 4: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 5: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 6: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 7: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 8: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 9: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 10: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 11: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 12: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 13: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 14: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 15: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 16: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 17: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 18: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 19: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 20: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 21: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 22: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 23: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 24: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 25: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 26: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 27: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 28: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 29: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 30: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 17: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 18: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 19: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 20: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 21: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 22: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 23: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 24: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 25: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 26: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 27: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 28: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 29: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 30: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 31: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 32: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 33: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 34: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 35: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 36: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 37: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 38: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 39: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 40: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 41: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 42: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 43: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 44: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 45: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 32: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 33: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 34: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 35: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 36: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 37: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 38: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 39: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 40: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 41: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 42: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 43: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 44: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 45: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 46: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 47: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 48: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 49: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 50: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 51: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 52: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 53: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 54: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 55: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 56: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 57: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 58: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 59: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 60: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 47: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 48: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 49: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 50: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 51: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 52: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 53: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 54: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 55: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 56: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 57: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 58: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 59: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 60: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 61: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 62: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 63: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 64: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 65: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 66: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 67: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 68: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 69: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 70: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 71: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 72: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 73: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 74: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 75: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 62: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 63: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 64: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 65: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 66: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 67: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 68: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 69: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 70: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 71: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 72: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 73: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 74: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 75: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 76: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 77: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 78: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 79: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 80: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 81: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 82: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 83: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 84: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 85: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 86: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 87: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 88: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 89: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 90: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 77: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 78: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 79: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 80: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 81: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 82: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 83: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 84: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 85: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 86: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 87: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 88: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 89: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 90: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 91: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 92: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 93: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 94: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 95: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 96: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 97: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 98: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 99: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 100: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 101: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 102: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 103: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 104: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 105: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 92: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 93: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 94: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 95: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 96: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 97: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 98: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 99: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 100: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 101: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 102: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 103: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 104: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 105: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 106: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 107: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 108: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 109: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 110: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 111: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 112: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 113: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 114: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 115: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 116: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 117: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 118: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 119: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 120: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 107: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 108: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 109: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 110: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 111: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 112: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 113: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 114: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 115: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 116: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 117: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 118: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 119: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 120: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 121: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 122: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 123: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 124: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 125: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 126: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 127: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 128: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 129: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 130: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 131: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 132: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 133: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 134: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 135: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 122: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 123: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 124: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 125: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 126: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 127: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 128: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 129: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 130: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 131: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 132: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 133: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 134: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 135: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 136: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 137: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 138: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 139: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 140: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 141: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 142: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 143: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 144: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 145: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 146: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 147: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 148: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 149: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 150: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 137: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 138: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 139: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 140: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 141: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 142: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 143: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 144: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 145: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 146: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 147: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 148: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 149: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 150: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 151: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 152: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 153: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 154: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 155: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 156: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 157: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 158: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 159: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 160: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 161: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 162: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 163: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 164: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 165: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 152: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 153: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 154: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 155: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 156: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 157: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 158: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 159: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 160: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 161: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 162: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 163: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 164: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 165: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 166: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 167: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 168: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 169: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 170: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 171: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 172: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 173: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 174: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 175: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 176: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 177: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 178: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 179: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 180: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 167: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 168: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 169: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 170: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 171: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 172: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 173: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 174: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 175: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 176: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 177: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 178: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 179: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 180: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 181: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 182: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 183: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 184: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 185: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 186: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 187: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 188: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 189: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 190: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 191: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 192: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 193: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 194: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 195: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 182: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 183: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 184: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 185: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 186: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 187: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 188: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 189: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 190: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 191: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 192: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 193: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 194: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 195: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 196: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 197: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 198: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 199: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 200: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 201: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 202: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 203: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 204: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 205: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 206: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 207: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 208: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 209: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 210: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 197: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 198: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 199: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 200: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 201: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 202: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 203: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 204: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 205: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 206: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 207: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 208: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 209: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 210: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 211: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 212: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 213: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 214: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 215: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 216: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 217: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 218: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 219: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 220: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 221: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 222: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 223: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 224: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 225: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 212: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 213: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 214: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 215: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 216: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 217: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 218: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 219: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 220: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 221: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 222: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 223: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 224: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 225: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 226: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 227: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 228: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 229: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 230: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 231: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 232: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 233: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 234: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 235: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 236: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 237: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 238: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 239: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 240: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 227: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 228: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 229: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 230: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 231: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 232: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 233: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 234: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 235: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 236: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 237: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 238: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 239: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 240: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 241: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 242: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 243: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 244: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 245: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 246: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 247: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 248: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 249: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 250: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 251: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 252: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 253: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 254: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 255: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 242: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 243: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 244: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 245: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 246: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 247: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 248: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 249: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 250: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 251: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 252: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 253: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 254: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 255: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 256: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 257: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 258: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 259: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 260: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 261: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 262: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 263: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 264: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 265: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 266: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 267: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 268: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 269: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 270: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 257: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 258: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 259: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 260: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 261: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 262: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 263: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 264: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 265: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 266: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 267: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 268: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 269: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 270: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 271: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 272: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 273: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 274: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 275: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 276: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 277: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 278: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 279: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 280: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 281: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 282: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 283: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 284: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 285: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 272: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 273: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 274: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 275: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 276: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 277: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 278: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 279: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 280: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 281: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 282: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 283: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 284: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 285: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 286: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 287: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 288: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 289: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 290: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 291: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 292: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 293: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 294: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 295: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 296: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 297: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 298: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 299: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 300: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 287: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 288: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 289: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 290: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 291: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 292: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 293: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 294: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 295: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 296: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 297: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 298: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 299: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 300: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 301: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 302: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 303: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 304: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 305: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 306: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 307: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 308: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 309: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 310: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 311: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 312: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 313: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 314: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 315: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 302: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 303: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 304: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 305: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 306: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 307: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 308: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 309: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 310: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 311: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 312: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 313: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 314: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 315: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 316: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 317: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 318: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 319: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 320: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 321: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 322: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 323: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 324: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 325: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 326: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 327: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 328: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 329: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 330: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 317: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 318: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 319: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 320: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 321: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 322: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 323: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 324: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 325: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 326: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 327: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 328: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 329: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 330: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 331: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 332: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 333: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 334: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 335: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 336: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 337: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 338: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 339: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 340: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 341: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 342: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 343: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 344: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 345: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 332: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 333: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 334: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 335: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 336: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 337: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 338: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 339: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 340: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 341: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 342: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 343: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 344: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 345: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 346: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 347: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 348: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 349: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 350: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 351: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 352: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 353: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 354: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 355: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 356: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 357: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 358: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 359: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 360: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 347: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 348: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 349: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 350: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 351: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 352: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 353: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 354: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 355: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 356: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 357: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 358: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 359: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 360: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 361: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 362: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 363: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 364: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 365: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 366: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 367: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 368: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 369: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 370: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 371: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 372: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 373: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 374: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 375: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 362: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 363: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 364: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 365: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 366: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 367: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 368: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 369: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 370: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 371: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 372: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 373: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 374: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 375: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 376: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 377: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 378: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 379: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 380: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 381: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 382: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 383: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 384: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 385: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 386: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 387: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 388: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 389: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 390: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 377: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 378: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 379: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 380: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 381: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 382: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 383: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 384: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 385: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 386: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 387: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 388: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 389: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 390: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 391: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 392: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 393: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 394: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 395: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 396: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 397: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 398: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 399: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 400: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 401: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 402: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 403: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 404: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 405: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 392: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 393: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 394: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 395: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 396: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 397: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 398: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 399: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 400: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 401: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 402: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 403: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 404: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 405: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 406: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 407: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 408: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 409: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 410: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 411: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 412: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 413: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 414: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 415: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 416: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 417: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 418: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 419: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 420: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 407: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 408: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 409: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 410: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 411: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 412: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 413: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 414: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 415: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 416: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 417: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 418: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 419: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 420: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 421: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 422: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 423: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 424: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 425: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 426: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 427: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 428: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 429: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 430: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 431: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 432: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 433: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 434: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 435: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 422: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 423: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 424: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 425: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 426: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 427: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 428: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 429: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 430: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 431: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 432: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 433: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 434: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 435: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 436: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 437: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 438: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 439: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 440: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 441: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 442: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 443: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 444: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 445: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 446: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 447: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 448: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 449: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 450: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 437: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 438: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 439: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 440: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 441: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 442: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 443: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 444: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 445: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 446: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 447: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 448: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 449: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 450: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 451: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Emitted group 452: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
-Emitted group 453: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
-Emitted group 454: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
-Emitted group 455: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
-Emitted group 456: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 457: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 458: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 459: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 460: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
-Emitted group 461: bconv, kind=8, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
-Emitted group 462: NTT, kind=3, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
-Emitted group 463: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
-Emitted group 464: mul_evalkey, kind=5, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
-Emitted group 465: accumulate, kind=6, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 452: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6291456
+Emitted group 453: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6291456
+Emitted group 454: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6553600
+Emitted group 455: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=6815744
+Emitted group 456: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 457: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 458: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 459: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 460: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
+Emitted group 461: bconv, kind=7, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=276, total_est_cycles=2068, bram_live=6815744
+Emitted group 462: NTT, kind=2, bytes=0, work_items=1, micro_ops=1, est_cycles/op=4108, total_est_cycles=4108, bram_live=6815744
+Emitted group 463: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7077888
+Emitted group 464: mul_evalkey, kind=4, bytes=0, work_items=2, micro_ops=2, est_cycles/op=260, total_est_cycles=516, bram_live=7340032
+Emitted group 465: accumulate, kind=5, bytes=1048576, work_items=2, micro_ops=4, est_cycles/op=258, total_est_cycles=1026, bram_live=7077888
 Emitted group 466: store_intermediate, kind=1, bytes=524288, work_items=0, micro_ops=2, est_cycles/op=182, total_est_cycles=346, bram_live=6029312
-Step 4.1: load intermediate result to BRAM
-Emitted group 467: load_intermediate, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=0
-Step 4.1: INTT for intermediate result
-Emitted group 468: intt_intermediate, kind=4, bytes=0, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=0
-Step 4.1: bconv for intermediate result
-Emitted group 469: bconv_intermediate, kind=8, bytes=0, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=0
-Step 4.1: Load ct from HBM to BRAM
-Emitted group 470: load_ct_for_sub, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=9961472
-Step 4.1: subtract
-Emitted group 471: subtract_intermediate, kind=7, bytes=0, work_items=23, micro_ops=23, est_cycles/op=258, total_est_cycles=5890, bram_live=9961472
-Step 4.1: store subtracted result back to HBM
-Emitted group 472: store_subtracted_intermediate, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=3932160
-Step 4.2: load intermediate result to BRAM
-Emitted group 473: load_intermediate, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=0
-Step 4.2: INTT for intermediate result
-Emitted group 474: intt_intermediate, kind=4, bytes=0, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=0
-Step 4.2: bconv for intermediate result
-Emitted group 475: bconv_intermediate, kind=8, bytes=0, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=0
-Step 4.2: Load ct from HBM to BRAM
-Emitted group 476: load_ct_for_sub, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=9961472
-Step 4.2: subtract
-Emitted group 477: subtract_intermediate, kind=7, bytes=0, work_items=23, micro_ops=23, est_cycles/op=258, total_est_cycles=5890, bram_live=9961472
-Step 4.2: store subtracted result back to HBM
-Emitted group 478: store_subtracted_intermediate, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=3932160
-
-========== Detailed Execution Statistics ==========
-
---- Summary ---
-Total cycles:           605588
-Total latency (ns):     2018627
-Peak BRAM live (bytes): 9961472
-HBM read (bytes):       28311552
-HBM write (bytes):      28311552
-Dependency stalls:      492376 cycles
-Resource stalls:        113212 cycles
-Instruction groups:     479
-Total instructions:     2149
-
---- Cycle Breakdown by Instruction Kind ---
-  LoadHBM: cycles=5107 (0.843313%)  count=108  bytes=28311552
-  StoreHBM: cycles=7861 (1.29808%)  count=108  bytes=28311552
-  NTT: cycles=382044 (63.0865%)  count=93  bytes=0
-  INTT: cycles=65735 (10.8547%)  count=62  bytes=0
-  EweMul: cycles=48546 (8.01634%)  count=372  bytes=0
-  EweAdd: cycles=16182 (2.67211%)  count=248  bytes=65011712
-  EweSub: cycles=3100 (0.511899%)  count=46  bytes=0
-  BConv: cycles=77013 (12.7171%)  count=1112  bytes=195035136
-
---- EstimateCycle (1-Limb Input) by Operation ---
-  load_input: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=46
-  intt_all_limbs: kind=INTT  one_limb_cycles=4108  groups=1  instrs=46
-  bconv: kind=BConv  one_limb_cycles=276  groups=93  instrs=744
-  NTT: kind=NTT  one_limb_cycles=4108  groups=93  instrs=93
-  mul_evalkey: kind=EweMul  one_limb_cycles=260  groups=186  instrs=372
-  accumulate: kind=EweAdd  one_limb_cycles=258  groups=62  instrs=248
-  store_intermediate: kind=StoreHBM  one_limb_cycles=182  groups=31  instrs=62
-  load_intermediate: kind=LoadHBM  one_limb_cycles=182  groups=2  instrs=16
-  intt_intermediate: kind=INTT  one_limb_cycles=4108  groups=2  instrs=16
-  bconv_intermediate: kind=BConv  one_limb_cycles=276  groups=2  instrs=368
-  load_ct_for_sub: kind=LoadHBM  one_limb_cycles=182  groups=2  instrs=46
-  subtract_intermediate: kind=EweSub  one_limb_cycles=258  groups=2  instrs=46
-  store_subtracted_intermediate: kind=StoreHBM  one_limb_cycles=182  groups=2  instrs=46
-
---- Group Timeline ---
-  ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
-   0  load_input                     0      2185       2185            0      6029312  12058624
-   1  intt_all_limbs              2185     51482      49297      6029312      6029312  0
-   2  bconv                      51482     52037        555      6029312      6291456  2097152
-   3  NTT                        52037     56145       4108      6291456      6291456  0
-   4  mul_evalkey                56145     56406        261      6291456      6553600  0
-   5  mul_evalkey                56406     56667        261      6553600      6815744  0
-   6  bconv                      56667     57222        555      6815744      6815744  2097152
-   7  NTT                        57222     61330       4108      6815744      6815744  0
-   8  mul_evalkey                61330     61591        261      6815744      7077888  0
-   9  mul_evalkey                61591     61852        261      7077888      7340032  0
-  10  accumulate                 61852     62113        261      7340032      7077888  1048576
-  11  bconv                      62113     62668        555      7077888      6815744  2097152
-  12  NTT                        62668     66776       4108      6815744      6815744  0
-  13  mul_evalkey                66776     67037        261      6815744      7077888  0
-  14  mul_evalkey                67037     67298        261      7077888      7340032  0
-  15  accumulate                 67298     67559        261      7340032      7077888  1048576
-  16  store_intermediate         67559     67742        183      7077888      6029312  524288
-  17  bconv                      67742     68297        555      6029312      6291456  2097152
-  18  NTT                        68297     72405       4108      6291456      6291456  0
-  19  mul_evalkey                72405     72666        261      6291456      6553600  0
-  20  mul_evalkey                72666     72927        261      6553600      6815744  0
-  21  bconv                      72927     73482        555      6815744      6815744  2097152
-  22  NTT                        73482     77590       4108      6815744      6815744  0
-  23  mul_evalkey                77590     77851        261      6815744      7077888  0
-  24  mul_evalkey                77851     78112        261      7077888      7340032  0
-  25  accumulate                 78112     78373        261      7340032      7077888  1048576
-  26  bconv                      78373     78928        555      7077888      6815744  2097152
-  27  NTT                        78928     83036       4108      6815744      6815744  0
-  28  mul_evalkey                83036     83297        261      6815744      7077888  0
-  29  mul_evalkey                83297     83558        261      7077888      7340032  0
-  30  accumulate                 83558     83819        261      7340032      7077888  1048576
-  31  store_intermediate         83819     84002        183      7077888      6029312  524288
-  32  bconv                      84002     84557        555      6029312      6291456  2097152
-  33  NTT                        84557     88665       4108      6291456      6291456  0
-  34  mul_evalkey                88665     88926        261      6291456      6553600  0
-  35  mul_evalkey                88926     89187        261      6553600      6815744  0
-  36  bconv                      89187     89742        555      6815744      6815744  2097152
-  37  NTT                        89742     93850       4108      6815744      6815744  0
-  38  mul_evalkey                93850     94111        261      6815744      7077888  0
-  39  mul_evalkey                94111     94372        261      7077888      7340032  0
-  40  accumulate                 94372     94633        261      7340032      7077888  1048576
-  41  bconv                      94633     95188        555      7077888      6815744  2097152
-  42  NTT                        95188     99296       4108      6815744      6815744  0
-  43  mul_evalkey                99296     99557        261      6815744      7077888  0
-  44  mul_evalkey                99557     99818        261      7077888      7340032  0
-  45  accumulate                 99818    100079        261      7340032      7077888  1048576
-  46  store_intermediate        100079    100262        183      7077888      6029312  524288
-  47  bconv                     100262    100817        555      6029312      6291456  2097152
-  48  NTT                       100817    104925       4108      6291456      6291456  0
-  49  mul_evalkey               104925    105186        261      6291456      6553600  0
-  50  mul_evalkey               105186    105447        261      6553600      6815744  0
-  51  bconv                     105447    106002        555      6815744      6815744  2097152
-  52  NTT                       106002    110110       4108      6815744      6815744  0
-  53  mul_evalkey               110110    110371        261      6815744      7077888  0
-  54  mul_evalkey               110371    110632        261      7077888      7340032  0
-  55  accumulate                110632    110893        261      7340032      7077888  1048576
-  56  bconv                     110893    111448        555      7077888      6815744  2097152
-  57  NTT                       111448    115556       4108      6815744      6815744  0
-  58  mul_evalkey               115556    115817        261      6815744      7077888  0
-  59  mul_evalkey               115817    116078        261      7077888      7340032  0
-  60  accumulate                116078    116339        261      7340032      7077888  1048576
-  61  store_intermediate        116339    116522        183      7077888      6029312  524288
-  62  bconv                     116522    117077        555      6029312      6291456  2097152
-  63  NTT                       117077    121185       4108      6291456      6291456  0
-  64  mul_evalkey               121185    121446        261      6291456      6553600  0
-  65  mul_evalkey               121446    121707        261      6553600      6815744  0
-  66  bconv                     121707    122262        555      6815744      6815744  2097152
-  67  NTT                       122262    126370       4108      6815744      6815744  0
-  68  mul_evalkey               126370    126631        261      6815744      7077888  0
-  69  mul_evalkey               126631    126892        261      7077888      7340032  0
-  70  accumulate                126892    127153        261      7340032      7077888  1048576
-  71  bconv                     127153    127708        555      7077888      6815744  2097152
-  72  NTT                       127708    131816       4108      6815744      6815744  0
-  73  mul_evalkey               131816    132077        261      6815744      7077888  0
-  74  mul_evalkey               132077    132338        261      7077888      7340032  0
-  75  accumulate                132338    132599        261      7340032      7077888  1048576
-  76  store_intermediate        132599    132782        183      7077888      6029312  524288
-  77  bconv                     132782    133337        555      6029312      6291456  2097152
-  78  NTT                       133337    137445       4108      6291456      6291456  0
-  79  mul_evalkey               137445    137706        261      6291456      6553600  0
-  80  mul_evalkey               137706    137967        261      6553600      6815744  0
-  81  bconv                     137967    138522        555      6815744      6815744  2097152
-  82  NTT                       138522    142630       4108      6815744      6815744  0
-  83  mul_evalkey               142630    142891        261      6815744      7077888  0
-  84  mul_evalkey               142891    143152        261      7077888      7340032  0
-  85  accumulate                143152    143413        261      7340032      7077888  1048576
-  86  bconv                     143413    143968        555      7077888      6815744  2097152
-  87  NTT                       143968    148076       4108      6815744      6815744  0
-  88  mul_evalkey               148076    148337        261      6815744      7077888  0
-  89  mul_evalkey               148337    148598        261      7077888      7340032  0
-  90  accumulate                148598    148859        261      7340032      7077888  1048576
-  91  store_intermediate        148859    149042        183      7077888      6029312  524288
-  92  bconv                     149042    149597        555      6029312      6291456  2097152
-  93  NTT                       149597    153705       4108      6291456      6291456  0
-  94  mul_evalkey               153705    153966        261      6291456      6553600  0
-  95  mul_evalkey               153966    154227        261      6553600      6815744  0
-  96  bconv                     154227    154782        555      6815744      6815744  2097152
-  97  NTT                       154782    158890       4108      6815744      6815744  0
-  98  mul_evalkey               158890    159151        261      6815744      7077888  0
-  99  mul_evalkey               159151    159412        261      7077888      7340032  0
-  100  accumulate                159412    159673        261      7340032      7077888  1048576
-  101  bconv                     159673    160228        555      7077888      6815744  2097152
-  102  NTT                       160228    164336       4108      6815744      6815744  0
-  103  mul_evalkey               164336    164597        261      6815744      7077888  0
-  104  mul_evalkey               164597    164858        261      7077888      7340032  0
-  105  accumulate                164858    165119        261      7340032      7077888  1048576
-  106  store_intermediate        165119    165302        183      7077888      6029312  524288
-  107  bconv                     165302    165857        555      6029312      6291456  2097152
-  108  NTT                       165857    169965       4108      6291456      6291456  0
-  109  mul_evalkey               169965    170226        261      6291456      6553600  0
-  110  mul_evalkey               170226    170487        261      6553600      6815744  0
-  111  bconv                     170487    171042        555      6815744      6815744  2097152
-  112  NTT                       171042    175150       4108      6815744      6815744  0
-  113  mul_evalkey               175150    175411        261      6815744      7077888  0
-  114  mul_evalkey               175411    175672        261      7077888      7340032  0
-  115  accumulate                175672    175933        261      7340032      7077888  1048576
-  116  bconv                     175933    176488        555      7077888      6815744  2097152
-  117  NTT                       176488    180596       4108      6815744      6815744  0
-  118  mul_evalkey               180596    180857        261      6815744      7077888  0
-  119  mul_evalkey               180857    181118        261      7077888      7340032  0
-  120  accumulate                181118    181379        261      7340032      7077888  1048576
-  121  store_intermediate        181379    181562        183      7077888      6029312  524288
-  122  bconv                     181562    182117        555      6029312      6291456  2097152
-  123  NTT                       182117    186225       4108      6291456      6291456  0
-  124  mul_evalkey               186225    186486        261      6291456      6553600  0
-  125  mul_evalkey               186486    186747        261      6553600      6815744  0
-  126  bconv                     186747    187302        555      6815744      6815744  2097152
-  127  NTT                       187302    191410       4108      6815744      6815744  0
-  128  mul_evalkey               191410    191671        261      6815744      7077888  0
-  129  mul_evalkey               191671    191932        261      7077888      7340032  0
-  130  accumulate                191932    192193        261      7340032      7077888  1048576
-  131  bconv                     192193    192748        555      7077888      6815744  2097152
-  132  NTT                       192748    196856       4108      6815744      6815744  0
-  133  mul_evalkey               196856    197117        261      6815744      7077888  0
-  134  mul_evalkey               197117    197378        261      7077888      7340032  0
-  135  accumulate                197378    197639        261      7340032      7077888  1048576
-  136  store_intermediate        197639    197822        183      7077888      6029312  524288
-  137  bconv                     197822    198377        555      6029312      6291456  2097152
-  138  NTT                       198377    202485       4108      6291456      6291456  0
-  139  mul_evalkey               202485    202746        261      6291456      6553600  0
-  140  mul_evalkey               202746    203007        261      6553600      6815744  0
-  141  bconv                     203007    203562        555      6815744      6815744  2097152
-  142  NTT                       203562    207670       4108      6815744      6815744  0
-  143  mul_evalkey               207670    207931        261      6815744      7077888  0
-  144  mul_evalkey               207931    208192        261      7077888      7340032  0
-  145  accumulate                208192    208453        261      7340032      7077888  1048576
-  146  bconv                     208453    209008        555      7077888      6815744  2097152
-  147  NTT                       209008    213116       4108      6815744      6815744  0
-  148  mul_evalkey               213116    213377        261      6815744      7077888  0
-  149  mul_evalkey               213377    213638        261      7077888      7340032  0
-  150  accumulate                213638    213899        261      7340032      7077888  1048576
-  151  store_intermediate        213899    214082        183      7077888      6029312  524288
-  152  bconv                     214082    214637        555      6029312      6291456  2097152
-  153  NTT                       214637    218745       4108      6291456      6291456  0
-  154  mul_evalkey               218745    219006        261      6291456      6553600  0
-  155  mul_evalkey               219006    219267        261      6553600      6815744  0
-  156  bconv                     219267    219822        555      6815744      6815744  2097152
-  157  NTT                       219822    223930       4108      6815744      6815744  0
-  158  mul_evalkey               223930    224191        261      6815744      7077888  0
-  159  mul_evalkey               224191    224452        261      7077888      7340032  0
-  160  accumulate                224452    224713        261      7340032      7077888  1048576
-  161  bconv                     224713    225268        555      7077888      6815744  2097152
-  162  NTT                       225268    229376       4108      6815744      6815744  0
-  163  mul_evalkey               229376    229637        261      6815744      7077888  0
-  164  mul_evalkey               229637    229898        261      7077888      7340032  0
-  165  accumulate                229898    230159        261      7340032      7077888  1048576
-  166  store_intermediate        230159    230342        183      7077888      6029312  524288
-  167  bconv                     230342    230897        555      6029312      6291456  2097152
-  168  NTT                       230897    235005       4108      6291456      6291456  0
-  169  mul_evalkey               235005    235266        261      6291456      6553600  0
-  170  mul_evalkey               235266    235527        261      6553600      6815744  0
-  171  bconv                     235527    236082        555      6815744      6815744  2097152
-  172  NTT                       236082    240190       4108      6815744      6815744  0
-  173  mul_evalkey               240190    240451        261      6815744      7077888  0
-  174  mul_evalkey               240451    240712        261      7077888      7340032  0
-  175  accumulate                240712    240973        261      7340032      7077888  1048576
-  176  bconv                     240973    241528        555      7077888      6815744  2097152
-  177  NTT                       241528    245636       4108      6815744      6815744  0
-  178  mul_evalkey               245636    245897        261      6815744      7077888  0
-  179  mul_evalkey               245897    246158        261      7077888      7340032  0
-  180  accumulate                246158    246419        261      7340032      7077888  1048576
-  181  store_intermediate        246419    246602        183      7077888      6029312  524288
-  182  bconv                     246602    247157        555      6029312      6291456  2097152
-  183  NTT                       247157    251265       4108      6291456      6291456  0
-  184  mul_evalkey               251265    251526        261      6291456      6553600  0
-  185  mul_evalkey               251526    251787        261      6553600      6815744  0
-  186  bconv                     251787    252342        555      6815744      6815744  2097152
-  187  NTT                       252342    256450       4108      6815744      6815744  0
-  188  mul_evalkey               256450    256711        261      6815744      7077888  0
-  189  mul_evalkey               256711    256972        261      7077888      7340032  0
-  190  accumulate                256972    257233        261      7340032      7077888  1048576
-  191  bconv                     257233    257788        555      7077888      6815744  2097152
-  192  NTT                       257788    261896       4108      6815744      6815744  0
-  193  mul_evalkey               261896    262157        261      6815744      7077888  0
-  194  mul_evalkey               262157    262418        261      7077888      7340032  0
-  195  accumulate                262418    262679        261      7340032      7077888  1048576
-  196  store_intermediate        262679    262862        183      7077888      6029312  524288
-  197  bconv                     262862    263417        555      6029312      6291456  2097152
-  198  NTT                       263417    267525       4108      6291456      6291456  0
-  199  mul_evalkey               267525    267786        261      6291456      6553600  0
-  200  mul_evalkey               267786    268047        261      6553600      6815744  0
-  201  bconv                     268047    268602        555      6815744      6815744  2097152
-  202  NTT                       268602    272710       4108      6815744      6815744  0
-  203  mul_evalkey               272710    272971        261      6815744      7077888  0
-  204  mul_evalkey               272971    273232        261      7077888      7340032  0
-  205  accumulate                273232    273493        261      7340032      7077888  1048576
-  206  bconv                     273493    274048        555      7077888      6815744  2097152
-  207  NTT                       274048    278156       4108      6815744      6815744  0
-  208  mul_evalkey               278156    278417        261      6815744      7077888  0
-  209  mul_evalkey               278417    278678        261      7077888      7340032  0
-  210  accumulate                278678    278939        261      7340032      7077888  1048576
-  211  store_intermediate        278939    279122        183      7077888      6029312  524288
-  212  bconv                     279122    279677        555      6029312      6291456  2097152
-  213  NTT                       279677    283785       4108      6291456      6291456  0
-  214  mul_evalkey               283785    284046        261      6291456      6553600  0
-  215  mul_evalkey               284046    284307        261      6553600      6815744  0
-  216  bconv                     284307    284862        555      6815744      6815744  2097152
-  217  NTT                       284862    288970       4108      6815744      6815744  0
-  218  mul_evalkey               288970    289231        261      6815744      7077888  0
-  219  mul_evalkey               289231    289492        261      7077888      7340032  0
-  220  accumulate                289492    289753        261      7340032      7077888  1048576
-  221  bconv                     289753    290308        555      7077888      6815744  2097152
-  222  NTT                       290308    294416       4108      6815744      6815744  0
-  223  mul_evalkey               294416    294677        261      6815744      7077888  0
-  224  mul_evalkey               294677    294938        261      7077888      7340032  0
-  225  accumulate                294938    295199        261      7340032      7077888  1048576
-  226  store_intermediate        295199    295382        183      7077888      6029312  524288
-  227  bconv                     295382    295937        555      6029312      6291456  2097152
-  228  NTT                       295937    300045       4108      6291456      6291456  0
-  229  mul_evalkey               300045    300306        261      6291456      6553600  0
-  230  mul_evalkey               300306    300567        261      6553600      6815744  0
-  231  bconv                     300567    301122        555      6815744      6815744  2097152
-  232  NTT                       301122    305230       4108      6815744      6815744  0
-  233  mul_evalkey               305230    305491        261      6815744      7077888  0
-  234  mul_evalkey               305491    305752        261      7077888      7340032  0
-  235  accumulate                305752    306013        261      7340032      7077888  1048576
-  236  bconv                     306013    306568        555      7077888      6815744  2097152
-  237  NTT                       306568    310676       4108      6815744      6815744  0
-  238  mul_evalkey               310676    310937        261      6815744      7077888  0
-  239  mul_evalkey               310937    311198        261      7077888      7340032  0
-  240  accumulate                311198    311459        261      7340032      7077888  1048576
-  241  store_intermediate        311459    311642        183      7077888      6029312  524288
-  242  bconv                     311642    312197        555      6029312      6291456  2097152
-  243  NTT                       312197    316305       4108      6291456      6291456  0
-  244  mul_evalkey               316305    316566        261      6291456      6553600  0
-  245  mul_evalkey               316566    316827        261      6553600      6815744  0
-  246  bconv                     316827    317382        555      6815744      6815744  2097152
-  247  NTT                       317382    321490       4108      6815744      6815744  0
-  248  mul_evalkey               321490    321751        261      6815744      7077888  0
-  249  mul_evalkey               321751    322012        261      7077888      7340032  0
-  250  accumulate                322012    322273        261      7340032      7077888  1048576
-  251  bconv                     322273    322828        555      7077888      6815744  2097152
-  252  NTT                       322828    326936       4108      6815744      6815744  0
-  253  mul_evalkey               326936    327197        261      6815744      7077888  0
-  254  mul_evalkey               327197    327458        261      7077888      7340032  0
-  255  accumulate                327458    327719        261      7340032      7077888  1048576
-  256  store_intermediate        327719    327902        183      7077888      6029312  524288
-  257  bconv                     327902    328457        555      6029312      6291456  2097152
-  258  NTT                       328457    332565       4108      6291456      6291456  0
-  259  mul_evalkey               332565    332826        261      6291456      6553600  0
-  260  mul_evalkey               332826    333087        261      6553600      6815744  0
-  261  bconv                     333087    333642        555      6815744      6815744  2097152
-  262  NTT                       333642    337750       4108      6815744      6815744  0
-  263  mul_evalkey               337750    338011        261      6815744      7077888  0
-  264  mul_evalkey               338011    338272        261      7077888      7340032  0
-  265  accumulate                338272    338533        261      7340032      7077888  1048576
-  266  bconv                     338533    339088        555      7077888      6815744  2097152
-  267  NTT                       339088    343196       4108      6815744      6815744  0
-  268  mul_evalkey               343196    343457        261      6815744      7077888  0
-  269  mul_evalkey               343457    343718        261      7077888      7340032  0
-  270  accumulate                343718    343979        261      7340032      7077888  1048576
-  271  store_intermediate        343979    344162        183      7077888      6029312  524288
-  272  bconv                     344162    344717        555      6029312      6291456  2097152
-  273  NTT                       344717    348825       4108      6291456      6291456  0
-  274  mul_evalkey               348825    349086        261      6291456      6553600  0
-  275  mul_evalkey               349086    349347        261      6553600      6815744  0
-  276  bconv                     349347    349902        555      6815744      6815744  2097152
-  277  NTT                       349902    354010       4108      6815744      6815744  0
-  278  mul_evalkey               354010    354271        261      6815744      7077888  0
-  279  mul_evalkey               354271    354532        261      7077888      7340032  0
-  280  accumulate                354532    354793        261      7340032      7077888  1048576
-  281  bconv                     354793    355348        555      7077888      6815744  2097152
-  282  NTT                       355348    359456       4108      6815744      6815744  0
-  283  mul_evalkey               359456    359717        261      6815744      7077888  0
-  284  mul_evalkey               359717    359978        261      7077888      7340032  0
-  285  accumulate                359978    360239        261      7340032      7077888  1048576
-  286  store_intermediate        360239    360422        183      7077888      6029312  524288
-  287  bconv                     360422    360977        555      6029312      6291456  2097152
-  288  NTT                       360977    365085       4108      6291456      6291456  0
-  289  mul_evalkey               365085    365346        261      6291456      6553600  0
-  290  mul_evalkey               365346    365607        261      6553600      6815744  0
-  291  bconv                     365607    366162        555      6815744      6815744  2097152
-  292  NTT                       366162    370270       4108      6815744      6815744  0
-  293  mul_evalkey               370270    370531        261      6815744      7077888  0
-  294  mul_evalkey               370531    370792        261      7077888      7340032  0
-  295  accumulate                370792    371053        261      7340032      7077888  1048576
-  296  bconv                     371053    371608        555      7077888      6815744  2097152
-  297  NTT                       371608    375716       4108      6815744      6815744  0
-  298  mul_evalkey               375716    375977        261      6815744      7077888  0
-  299  mul_evalkey               375977    376238        261      7077888      7340032  0
-  300  accumulate                376238    376499        261      7340032      7077888  1048576
-  301  store_intermediate        376499    376682        183      7077888      6029312  524288
-  302  bconv                     376682    377237        555      6029312      6291456  2097152
-  303  NTT                       377237    381345       4108      6291456      6291456  0
-  304  mul_evalkey               381345    381606        261      6291456      6553600  0
-  305  mul_evalkey               381606    381867        261      6553600      6815744  0
-  306  bconv                     381867    382422        555      6815744      6815744  2097152
-  307  NTT                       382422    386530       4108      6815744      6815744  0
-  308  mul_evalkey               386530    386791        261      6815744      7077888  0
-  309  mul_evalkey               386791    387052        261      7077888      7340032  0
-  310  accumulate                387052    387313        261      7340032      7077888  1048576
-  311  bconv                     387313    387868        555      7077888      6815744  2097152
-  312  NTT                       387868    391976       4108      6815744      6815744  0
-  313  mul_evalkey               391976    392237        261      6815744      7077888  0
-  314  mul_evalkey               392237    392498        261      7077888      7340032  0
-  315  accumulate                392498    392759        261      7340032      7077888  1048576
-  316  store_intermediate        392759    392942        183      7077888      6029312  524288
-  317  bconv                     392942    393497        555      6029312      6291456  2097152
-  318  NTT                       393497    397605       4108      6291456      6291456  0
-  319  mul_evalkey               397605    397866        261      6291456      6553600  0
-  320  mul_evalkey               397866    398127        261      6553600      6815744  0
-  321  bconv                     398127    398682        555      6815744      6815744  2097152
-  322  NTT                       398682    402790       4108      6815744      6815744  0
-  323  mul_evalkey               402790    403051        261      6815744      7077888  0
-  324  mul_evalkey               403051    403312        261      7077888      7340032  0
-  325  accumulate                403312    403573        261      7340032      7077888  1048576
-  326  bconv                     403573    404128        555      7077888      6815744  2097152
-  327  NTT                       404128    408236       4108      6815744      6815744  0
-  328  mul_evalkey               408236    408497        261      6815744      7077888  0
-  329  mul_evalkey               408497    408758        261      7077888      7340032  0
-  330  accumulate                408758    409019        261      7340032      7077888  1048576
-  331  store_intermediate        409019    409202        183      7077888      6029312  524288
-  332  bconv                     409202    409757        555      6029312      6291456  2097152
-  333  NTT                       409757    413865       4108      6291456      6291456  0
-  334  mul_evalkey               413865    414126        261      6291456      6553600  0
-  335  mul_evalkey               414126    414387        261      6553600      6815744  0
-  336  bconv                     414387    414942        555      6815744      6815744  2097152
-  337  NTT                       414942    419050       4108      6815744      6815744  0
-  338  mul_evalkey               419050    419311        261      6815744      7077888  0
-  339  mul_evalkey               419311    419572        261      7077888      7340032  0
-  340  accumulate                419572    419833        261      7340032      7077888  1048576
-  341  bconv                     419833    420388        555      7077888      6815744  2097152
-  342  NTT                       420388    424496       4108      6815744      6815744  0
-  343  mul_evalkey               424496    424757        261      6815744      7077888  0
-  344  mul_evalkey               424757    425018        261      7077888      7340032  0
-  345  accumulate                425018    425279        261      7340032      7077888  1048576
-  346  store_intermediate        425279    425462        183      7077888      6029312  524288
-  347  bconv                     425462    426017        555      6029312      6291456  2097152
-  348  NTT                       426017    430125       4108      6291456      6291456  0
-  349  mul_evalkey               430125    430386        261      6291456      6553600  0
-  350  mul_evalkey               430386    430647        261      6553600      6815744  0
-  351  bconv                     430647    431202        555      6815744      6815744  2097152
-  352  NTT                       431202    435310       4108      6815744      6815744  0
-  353  mul_evalkey               435310    435571        261      6815744      7077888  0
-  354  mul_evalkey               435571    435832        261      7077888      7340032  0
-  355  accumulate                435832    436093        261      7340032      7077888  1048576
-  356  bconv                     436093    436648        555      7077888      6815744  2097152
-  357  NTT                       436648    440756       4108      6815744      6815744  0
-  358  mul_evalkey               440756    441017        261      6815744      7077888  0
-  359  mul_evalkey               441017    441278        261      7077888      7340032  0
-  360  accumulate                441278    441539        261      7340032      7077888  1048576
-  361  store_intermediate        441539    441722        183      7077888      6029312  524288
-  362  bconv                     441722    442277        555      6029312      6291456  2097152
-  363  NTT                       442277    446385       4108      6291456      6291456  0
-  364  mul_evalkey               446385    446646        261      6291456      6553600  0
-  365  mul_evalkey               446646    446907        261      6553600      6815744  0
-  366  bconv                     446907    447462        555      6815744      6815744  2097152
-  367  NTT                       447462    451570       4108      6815744      6815744  0
-  368  mul_evalkey               451570    451831        261      6815744      7077888  0
-  369  mul_evalkey               451831    452092        261      7077888      7340032  0
-  370  accumulate                452092    452353        261      7340032      7077888  1048576
-  371  bconv                     452353    452908        555      7077888      6815744  2097152
-  372  NTT                       452908    457016       4108      6815744      6815744  0
-  373  mul_evalkey               457016    457277        261      6815744      7077888  0
-  374  mul_evalkey               457277    457538        261      7077888      7340032  0
-  375  accumulate                457538    457799        261      7340032      7077888  1048576
-  376  store_intermediate        457799    457982        183      7077888      6029312  524288
-  377  bconv                     457982    458537        555      6029312      6291456  2097152
-  378  NTT                       458537    462645       4108      6291456      6291456  0
-  379  mul_evalkey               462645    462906        261      6291456      6553600  0
-  380  mul_evalkey               462906    463167        261      6553600      6815744  0
-  381  bconv                     463167    463722        555      6815744      6815744  2097152
-  382  NTT                       463722    467830       4108      6815744      6815744  0
-  383  mul_evalkey               467830    468091        261      6815744      7077888  0
-  384  mul_evalkey               468091    468352        261      7077888      7340032  0
-  385  accumulate                468352    468613        261      7340032      7077888  1048576
-  386  bconv                     468613    469168        555      7077888      6815744  2097152
-  387  NTT                       469168    473276       4108      6815744      6815744  0
-  388  mul_evalkey               473276    473537        261      6815744      7077888  0
-  389  mul_evalkey               473537    473798        261      7077888      7340032  0
-  390  accumulate                473798    474059        261      7340032      7077888  1048576
-  391  store_intermediate        474059    474242        183      7077888      6029312  524288
-  392  bconv                     474242    474797        555      6029312      6291456  2097152
-  393  NTT                       474797    478905       4108      6291456      6291456  0
-  394  mul_evalkey               478905    479166        261      6291456      6553600  0
-  395  mul_evalkey               479166    479427        261      6553600      6815744  0
-  396  bconv                     479427    479982        555      6815744      6815744  2097152
-  397  NTT                       479982    484090       4108      6815744      6815744  0
-  398  mul_evalkey               484090    484351        261      6815744      7077888  0
-  399  mul_evalkey               484351    484612        261      7077888      7340032  0
-  400  accumulate                484612    484873        261      7340032      7077888  1048576
-  401  bconv                     484873    485428        555      7077888      6815744  2097152
-  402  NTT                       485428    489536       4108      6815744      6815744  0
-  403  mul_evalkey               489536    489797        261      6815744      7077888  0
-  404  mul_evalkey               489797    490058        261      7077888      7340032  0
-  405  accumulate                490058    490319        261      7340032      7077888  1048576
-  406  store_intermediate        490319    490502        183      7077888      6029312  524288
-  407  bconv                     490502    491057        555      6029312      6291456  2097152
-  408  NTT                       491057    495165       4108      6291456      6291456  0
-  409  mul_evalkey               495165    495426        261      6291456      6553600  0
-  410  mul_evalkey               495426    495687        261      6553600      6815744  0
-  411  bconv                     495687    496242        555      6815744      6815744  2097152
-  412  NTT                       496242    500350       4108      6815744      6815744  0
-  413  mul_evalkey               500350    500611        261      6815744      7077888  0
-  414  mul_evalkey               500611    500872        261      7077888      7340032  0
-  415  accumulate                500872    501133        261      7340032      7077888  1048576
-  416  bconv                     501133    501688        555      7077888      6815744  2097152
-  417  NTT                       501688    505796       4108      6815744      6815744  0
-  418  mul_evalkey               505796    506057        261      6815744      7077888  0
-  419  mul_evalkey               506057    506318        261      7077888      7340032  0
-  420  accumulate                506318    506579        261      7340032      7077888  1048576
-  421  store_intermediate        506579    506762        183      7077888      6029312  524288
-  422  bconv                     506762    507317        555      6029312      6291456  2097152
-  423  NTT                       507317    511425       4108      6291456      6291456  0
-  424  mul_evalkey               511425    511686        261      6291456      6553600  0
-  425  mul_evalkey               511686    511947        261      6553600      6815744  0
-  426  bconv                     511947    512502        555      6815744      6815744  2097152
-  427  NTT                       512502    516610       4108      6815744      6815744  0
-  428  mul_evalkey               516610    516871        261      6815744      7077888  0
-  429  mul_evalkey               516871    517132        261      7077888      7340032  0
-  430  accumulate                517132    517393        261      7340032      7077888  1048576
-  431  bconv                     517393    517948        555      7077888      6815744  2097152
-  432  NTT                       517948    522056       4108      6815744      6815744  0
-  433  mul_evalkey               522056    522317        261      6815744      7077888  0
-  434  mul_evalkey               522317    522578        261      7077888      7340032  0
-  435  accumulate                522578    522839        261      7340032      7077888  1048576
-  436  store_intermediate        522839    523022        183      7077888      6029312  524288
-  437  bconv                     523022    523577        555      6029312      6291456  2097152
-  438  NTT                       523577    527685       4108      6291456      6291456  0
-  439  mul_evalkey               527685    527946        261      6291456      6553600  0
-  440  mul_evalkey               527946    528207        261      6553600      6815744  0
-  441  bconv                     528207    528762        555      6815744      6815744  2097152
-  442  NTT                       528762    532870       4108      6815744      6815744  0
-  443  mul_evalkey               532870    533131        261      6815744      7077888  0
-  444  mul_evalkey               533131    533392        261      7077888      7340032  0
-  445  accumulate                533392    533653        261      7340032      7077888  1048576
-  446  bconv                     533653    534208        555      7077888      6815744  2097152
-  447  NTT                       534208    538316       4108      6815744      6815744  0
-  448  mul_evalkey               538316    538577        261      6815744      7077888  0
-  449  mul_evalkey               538577    538838        261      7077888      7340032  0
-  450  accumulate                538838    539099        261      7340032      7077888  1048576
-  451  store_intermediate        539099    539282        183      7077888      6029312  524288
-  452  bconv                     539282    539837        555      6029312      6291456  2097152
-  453  NTT                       539837    543945       4108      6291456      6291456  0
-  454  mul_evalkey               543945    544206        261      6291456      6553600  0
-  455  mul_evalkey               544206    544467        261      6553600      6815744  0
-  456  bconv                     544467    545022        555      6815744      6815744  2097152
-  457  NTT                       545022    549130       4108      6815744      6815744  0
-  458  mul_evalkey               549130    549391        261      6815744      7077888  0
-  459  mul_evalkey               549391    549652        261      7077888      7340032  0
-  460  accumulate                549652    549913        261      7340032      7077888  1048576
-  461  bconv                     549913    550468        555      7077888      6815744  2097152
-  462  NTT                       550468    554576       4108      6815744      6815744  0
-  463  mul_evalkey               554576    554837        261      6815744      7077888  0
-  464  mul_evalkey               554837    555098        261      7077888      7340032  0
-  465  accumulate                555098    555359        261      7340032      7077888  1048576
-  466  store_intermediate        555359    555542        183      7077888      6029312  524288
-  467  load_intermediate         555542    555909        367      6029312            0  2097152
-  468  intt_intermediate         555909    564128       8219            0            0  0
-  469  bconv_intermediate        564128    576827      12699            0            0  0
-  470  load_ct_for_sub           576827    577921       1094            0      9961472  6029312
-  471  subtract_intermediate     577921    579471       1550      9961472      9961472  0
-  472  store_subtracted_intermediate  579471    580565       1094      9961472      3932160  6029312
-  473  load_intermediate         580565    580932        367      3932160            0  2097152
-  474  intt_intermediate         580932    589151       8219            0            0  0
-  475  bconv_intermediate        589151    601850      12699            0            0  0
-  476  load_ct_for_sub           601850    602944       1094            0      9961472  6029312
-  477  subtract_intermediate     602944    604494       1550      9961472      9961472  0
-  478  store_subtracted_intermediate  604494    605588       1094      9961472      3932160  6029312
-
---- BRAM Timeline (cycle, live_bytes) ---
-# cycle,bram_bytes
-0,0
-0,0
-2185,6029312
-2185,6029312
-51482,6029312
-51482,6029312
-52037,6291456
-52037,6291456
-56145,6291456
-56145,6291456
-56406,6553600
-56406,6553600
-56667,6815744
-56667,6815744
-57222,6815744
-57222,6815744
-61330,6815744
-61330,6815744
-61591,7077888
-61591,7077888
-61852,7340032
-61852,7340032
-62113,7077888
-62113,7077888
-62668,6815744
-62668,6815744
-66776,6815744
-66776,6815744
-67037,7077888
-67037,7077888
-67298,7340032
-67298,7340032
-67559,7077888
-67559,7077888
-67742,6029312
-67742,6029312
-68297,6291456
-68297,6291456
-72405,6291456
-72405,6291456
-72666,6553600
-72666,6553600
-72927,6815744
-72927,6815744
-73482,6815744
-73482,6815744
-77590,6815744
-77590,6815744
-77851,7077888
-77851,7077888
-78112,7340032
-78112,7340032
-78373,7077888
-78373,7077888
-78928,6815744
-78928,6815744
-83036,6815744
-83036,6815744
-83297,7077888
-83297,7077888
-83558,7340032
-83558,7340032
-83819,7077888
-83819,7077888
-84002,6029312
-84002,6029312
-84557,6291456
-84557,6291456
-88665,6291456
-88665,6291456
-88926,6553600
-88926,6553600
-89187,6815744
-89187,6815744
-89742,6815744
-89742,6815744
-93850,6815744
-93850,6815744
-94111,7077888
-94111,7077888
-94372,7340032
-94372,7340032
-94633,7077888
-94633,7077888
-95188,6815744
-95188,6815744
-99296,6815744
-99296,6815744
-99557,7077888
-99557,7077888
-99818,7340032
-99818,7340032
-100079,7077888
-100079,7077888
-100262,6029312
-100262,6029312
-100817,6291456
-100817,6291456
-104925,6291456
-104925,6291456
-105186,6553600
-105186,6553600
-105447,6815744
-105447,6815744
-106002,6815744
-106002,6815744
-110110,6815744
-110110,6815744
-110371,7077888
-110371,7077888
-110632,7340032
-110632,7340032
-110893,7077888
-110893,7077888
-111448,6815744
-111448,6815744
-115556,6815744
-115556,6815744
-115817,7077888
-115817,7077888
-116078,7340032
-116078,7340032
-116339,7077888
-116339,7077888
-116522,6029312
-116522,6029312
-117077,6291456
-117077,6291456
-121185,6291456
-121185,6291456
-121446,6553600
-121446,6553600
-121707,6815744
-121707,6815744
-122262,6815744
-122262,6815744
-126370,6815744
-126370,6815744
-126631,7077888
-126631,7077888
-126892,7340032
-126892,7340032
-127153,7077888
-127153,7077888
-127708,6815744
-127708,6815744
-131816,6815744
-131816,6815744
-132077,7077888
-132077,7077888
-132338,7340032
-132338,7340032
-132599,7077888
-132599,7077888
-132782,6029312
-132782,6029312
-133337,6291456
-133337,6291456
-137445,6291456
-137445,6291456
-137706,6553600
-137706,6553600
-137967,6815744
-137967,6815744
-138522,6815744
-138522,6815744
-142630,6815744
-142630,6815744
-142891,7077888
-142891,7077888
-143152,7340032
-143152,7340032
-143413,7077888
-143413,7077888
-143968,6815744
-143968,6815744
-148076,6815744
-148076,6815744
-148337,7077888
-148337,7077888
-148598,7340032
-148598,7340032
-148859,7077888
-148859,7077888
-149042,6029312
-149042,6029312
-149597,6291456
-149597,6291456
-153705,6291456
-153705,6291456
-153966,6553600
-153966,6553600
-154227,6815744
-154227,6815744
-154782,6815744
-154782,6815744
-158890,6815744
-158890,6815744
-159151,7077888
-159151,7077888
-159412,7340032
-159412,7340032
-159673,7077888
-159673,7077888
-160228,6815744
-160228,6815744
-164336,6815744
-164336,6815744
-164597,7077888
-164597,7077888
-164858,7340032
-164858,7340032
-165119,7077888
-165119,7077888
-165302,6029312
-165302,6029312
-165857,6291456
-165857,6291456
-169965,6291456
-169965,6291456
-170226,6553600
-170226,6553600
-170487,6815744
-170487,6815744
-171042,6815744
-171042,6815744
-175150,6815744
-175150,6815744
-175411,7077888
-175411,7077888
-175672,7340032
-175672,7340032
-175933,7077888
-175933,7077888
-176488,6815744
-176488,6815744
-180596,6815744
-180596,6815744
-180857,7077888
-180857,7077888
-181118,7340032
-181118,7340032
-181379,7077888
-181379,7077888
-181562,6029312
-181562,6029312
-182117,6291456
-182117,6291456
-186225,6291456
-186225,6291456
-186486,6553600
-186486,6553600
-186747,6815744
-186747,6815744
-187302,6815744
-187302,6815744
-191410,6815744
-191410,6815744
-191671,7077888
-191671,7077888
-191932,7340032
-191932,7340032
-192193,7077888
-192193,7077888
-192748,6815744
-192748,6815744
-196856,6815744
-196856,6815744
-197117,7077888
-197117,7077888
-197378,7340032
-197378,7340032
-197639,7077888
-197639,7077888
-197822,6029312
-197822,6029312
-198377,6291456
-198377,6291456
-202485,6291456
-202485,6291456
-202746,6553600
-202746,6553600
-203007,6815744
-203007,6815744
-203562,6815744
-203562,6815744
-207670,6815744
-207670,6815744
-207931,7077888
-207931,7077888
-208192,7340032
-208192,7340032
-208453,7077888
-208453,7077888
-209008,6815744
-209008,6815744
-213116,6815744
-213116,6815744
-213377,7077888
-213377,7077888
-213638,7340032
-213638,7340032
-213899,7077888
-213899,7077888
-214082,6029312
-214082,6029312
-214637,6291456
-214637,6291456
-218745,6291456
-218745,6291456
-219006,6553600
-219006,6553600
-219267,6815744
-219267,6815744
-219822,6815744
-219822,6815744
-223930,6815744
-223930,6815744
-224191,7077888
-224191,7077888
-224452,7340032
-224452,7340032
-224713,7077888
-224713,7077888
-225268,6815744
-225268,6815744
-229376,6815744
-229376,6815744
-229637,7077888
-229637,7077888
-229898,7340032
-229898,7340032
-230159,7077888
-230159,7077888
-230342,6029312
-230342,6029312
-230897,6291456
-230897,6291456
-235005,6291456
-235005,6291456
-235266,6553600
-235266,6553600
-235527,6815744
-235527,6815744
-236082,6815744
-236082,6815744
-240190,6815744
-240190,6815744
-240451,7077888
-240451,7077888
-240712,7340032
-240712,7340032
-240973,7077888
-240973,7077888
-241528,6815744
-241528,6815744
-245636,6815744
-245636,6815744
-245897,7077888
-245897,7077888
-246158,7340032
-246158,7340032
-246419,7077888
-246419,7077888
-246602,6029312
-246602,6029312
-247157,6291456
-247157,6291456
-251265,6291456
-251265,6291456
-251526,6553600
-251526,6553600
-251787,6815744
-251787,6815744
-252342,6815744
-252342,6815744
-256450,6815744
-256450,6815744
-256711,7077888
-256711,7077888
-256972,7340032
-256972,7340032
-257233,7077888
-257233,7077888
-257788,6815744
-257788,6815744
-261896,6815744
-261896,6815744
-262157,7077888
-262157,7077888
-262418,7340032
-262418,7340032
-262679,7077888
-262679,7077888
-262862,6029312
-262862,6029312
-263417,6291456
-263417,6291456
-267525,6291456
-267525,6291456
-267786,6553600
-267786,6553600
-268047,6815744
-268047,6815744
-268602,6815744
-268602,6815744
-272710,6815744
-272710,6815744
-272971,7077888
-272971,7077888
-273232,7340032
-273232,7340032
-273493,7077888
-273493,7077888
-274048,6815744
-274048,6815744
-278156,6815744
-278156,6815744
-278417,7077888
-278417,7077888
-278678,7340032
-278678,7340032
-278939,7077888
-278939,7077888
-279122,6029312
-279122,6029312
-279677,6291456
-279677,6291456
-283785,6291456
-283785,6291456
-284046,6553600
-284046,6553600
-284307,6815744
-284307,6815744
-284862,6815744
-284862,6815744
-288970,6815744
-288970,6815744
-289231,7077888
-289231,7077888
-289492,7340032
-289492,7340032
-289753,7077888
-289753,7077888
-290308,6815744
-290308,6815744
-294416,6815744
-294416,6815744
-294677,7077888
-294677,7077888
-294938,7340032
-294938,7340032
-295199,7077888
-295199,7077888
-295382,6029312
-295382,6029312
-295937,6291456
-295937,6291456
-300045,6291456
-300045,6291456
-300306,6553600
-300306,6553600
-300567,6815744
-300567,6815744
-301122,6815744
-301122,6815744
-305230,6815744
-305230,6815744
-305491,7077888
-305491,7077888
-305752,7340032
-305752,7340032
-306013,7077888
-306013,7077888
-306568,6815744
-306568,6815744
-310676,6815744
-310676,6815744
-310937,7077888
-310937,7077888
-311198,7340032
-311198,7340032
-311459,7077888
-311459,7077888
-311642,6029312
-311642,6029312
-312197,6291456
-312197,6291456
-316305,6291456
-316305,6291456
-316566,6553600
-316566,6553600
-316827,6815744
-316827,6815744
-317382,6815744
-317382,6815744
-321490,6815744
-321490,6815744
-321751,7077888
-321751,7077888
-322012,7340032
-322012,7340032
-322273,7077888
-322273,7077888
-322828,6815744
-322828,6815744
-326936,6815744
-326936,6815744
-327197,7077888
-327197,7077888
-327458,7340032
-327458,7340032
-327719,7077888
-327719,7077888
-327902,6029312
-327902,6029312
-328457,6291456
-328457,6291456
-332565,6291456
-332565,6291456
-332826,6553600
-332826,6553600
-333087,6815744
-333087,6815744
-333642,6815744
-333642,6815744
-337750,6815744
-337750,6815744
-338011,7077888
-338011,7077888
-338272,7340032
-338272,7340032
-338533,7077888
-338533,7077888
-339088,6815744
-339088,6815744
-343196,6815744
-343196,6815744
-343457,7077888
-343457,7077888
-343718,7340032
-343718,7340032
-343979,7077888
-343979,7077888
-344162,6029312
-344162,6029312
-344717,6291456
-344717,6291456
-348825,6291456
-348825,6291456
-349086,6553600
-349086,6553600
-349347,6815744
-349347,6815744
-349902,6815744
-349902,6815744
-354010,6815744
-354010,6815744
-354271,7077888
-354271,7077888
-354532,7340032
-354532,7340032
-354793,7077888
-354793,7077888
-355348,6815744
-355348,6815744
-359456,6815744
-359456,6815744
-359717,7077888
-359717,7077888
-359978,7340032
-359978,7340032
-360239,7077888
-360239,7077888
-360422,6029312
-360422,6029312
-360977,6291456
-360977,6291456
-365085,6291456
-365085,6291456
-365346,6553600
-365346,6553600
-365607,6815744
-365607,6815744
-366162,6815744
-366162,6815744
-370270,6815744
-370270,6815744
-370531,7077888
-370531,7077888
-370792,7340032
-370792,7340032
-371053,7077888
-371053,7077888
-371608,6815744
-371608,6815744
-375716,6815744
-375716,6815744
-375977,7077888
-375977,7077888
-376238,7340032
-376238,7340032
-376499,7077888
-376499,7077888
-376682,6029312
-376682,6029312
-377237,6291456
-377237,6291456
-381345,6291456
-381345,6291456
-381606,6553600
-381606,6553600
-381867,6815744
-381867,6815744
-382422,6815744
-382422,6815744
-386530,6815744
-386530,6815744
-386791,7077888
-386791,7077888
-387052,7340032
-387052,7340032
-387313,7077888
-387313,7077888
-387868,6815744
-387868,6815744
-391976,6815744
-391976,6815744
-392237,7077888
-392237,7077888
-392498,7340032
-392498,7340032
-392759,7077888
-392759,7077888
-392942,6029312
-392942,6029312
-393497,6291456
-393497,6291456
-397605,6291456
-397605,6291456
-397866,6553600
-397866,6553600
-398127,6815744
-398127,6815744
-398682,6815744
-398682,6815744
-402790,6815744
-402790,6815744
-403051,7077888
-403051,7077888
-403312,7340032
-403312,7340032
-403573,7077888
-403573,7077888
-404128,6815744
-404128,6815744
-408236,6815744
-408236,6815744
-408497,7077888
-408497,7077888
-408758,7340032
-408758,7340032
-409019,7077888
-409019,7077888
-409202,6029312
-409202,6029312
-409757,6291456
-409757,6291456
-413865,6291456
-413865,6291456
-414126,6553600
-414126,6553600
-414387,6815744
-414387,6815744
-414942,6815744
-414942,6815744
-419050,6815744
-419050,6815744
-419311,7077888
-419311,7077888
-419572,7340032
-419572,7340032
-419833,7077888
-419833,7077888
-420388,6815744
-420388,6815744
-424496,6815744
-424496,6815744
-424757,7077888
-424757,7077888
-425018,7340032
-425018,7340032
-425279,7077888
-425279,7077888
-425462,6029312
-425462,6029312
-426017,6291456
-426017,6291456
-430125,6291456
-430125,6291456
-430386,6553600
-430386,6553600
-430647,6815744
-430647,6815744
-431202,6815744
-431202,6815744
-435310,6815744
-435310,6815744
-435571,7077888
-435571,7077888
-435832,7340032
-435832,7340032
-436093,7077888
-436093,7077888
-436648,6815744
-436648,6815744
-440756,6815744
-440756,6815744
-441017,7077888
-441017,7077888
-441278,7340032
-441278,7340032
-441539,7077888
-441539,7077888
-441722,6029312
-441722,6029312
-442277,6291456
-442277,6291456
-446385,6291456
-446385,6291456
-446646,6553600
-446646,6553600
-446907,6815744
-446907,6815744
-447462,6815744
-447462,6815744
-451570,6815744
-451570,6815744
-451831,7077888
-451831,7077888
-452092,7340032
-452092,7340032
-452353,7077888
-452353,7077888
-452908,6815744
-452908,6815744
-457016,6815744
-457016,6815744
-457277,7077888
-457277,7077888
-457538,7340032
-457538,7340032
-457799,7077888
-457799,7077888
-457982,6029312
-457982,6029312
-458537,6291456
-458537,6291456
-462645,6291456
-462645,6291456
-462906,6553600
-462906,6553600
-463167,6815744
-463167,6815744
-463722,6815744
-463722,6815744
-467830,6815744
-467830,6815744
-468091,7077888
-468091,7077888
-468352,7340032
-468352,7340032
-468613,7077888
-468613,7077888
-469168,6815744
-469168,6815744
-473276,6815744
-473276,6815744
-473537,7077888
-473537,7077888
-473798,7340032
-473798,7340032
-474059,7077888
-474059,7077888
-474242,6029312
-474242,6029312
-474797,6291456
-474797,6291456
-478905,6291456
-478905,6291456
-479166,6553600
-479166,6553600
-479427,6815744
-479427,6815744
-479982,6815744
-479982,6815744
-484090,6815744
-484090,6815744
-484351,7077888
-484351,7077888
-484612,7340032
-484612,7340032
-484873,7077888
-484873,7077888
-485428,6815744
-485428,6815744
-489536,6815744
-489536,6815744
-489797,7077888
-489797,7077888
-490058,7340032
-490058,7340032
-490319,7077888
-490319,7077888
-490502,6029312
-490502,6029312
-491057,6291456
-491057,6291456
-495165,6291456
-495165,6291456
-495426,6553600
-495426,6553600
-495687,6815744
-495687,6815744
-496242,6815744
-496242,6815744
-500350,6815744
-500350,6815744
-500611,7077888
-500611,7077888
-500872,7340032
-500872,7340032
-501133,7077888
-501133,7077888
-501688,6815744
-501688,6815744
-505796,6815744
-505796,6815744
-506057,7077888
-506057,7077888
-506318,7340032
-506318,7340032
-506579,7077888
-506579,7077888
-506762,6029312
-506762,6029312
-507317,6291456
-507317,6291456
-511425,6291456
-511425,6291456
-511686,6553600
-511686,6553600
-511947,6815744
-511947,6815744
-512502,6815744
-512502,6815744
-516610,6815744
-516610,6815744
-516871,7077888
-516871,7077888
-517132,7340032
-517132,7340032
-517393,7077888
-517393,7077888
-517948,6815744
-517948,6815744
-522056,6815744
-522056,6815744
-522317,7077888
-522317,7077888
-522578,7340032
-522578,7340032
-522839,7077888
-522839,7077888
-523022,6029312
-523022,6029312
-523577,6291456
-523577,6291456
-527685,6291456
-527685,6291456
-527946,6553600
-527946,6553600
-528207,6815744
-528207,6815744
-528762,6815744
-528762,6815744
-532870,6815744
-532870,6815744
-533131,7077888
-533131,7077888
-533392,7340032
-533392,7340032
-533653,7077888
-533653,7077888
-534208,6815744
-534208,6815744
-538316,6815744
-538316,6815744
-538577,7077888
-538577,7077888
-538838,7340032
-538838,7340032
-539099,7077888
-539099,7077888
-539282,6029312
-539282,6029312
-539837,6291456
-539837,6291456
-543945,6291456
-543945,6291456
-544206,6553600
-544206,6553600
-544467,6815744
-544467,6815744
-545022,6815744
-545022,6815744
-549130,6815744
-549130,6815744
-549391,7077888
-549391,7077888
-549652,7340032
-549652,7340032
-549913,7077888
-549913,7077888
-550468,6815744
-550468,6815744
-554576,6815744
-554576,6815744
-554837,7077888
-554837,7077888
-555098,7340032
-555098,7340032
-555359,7077888
-555359,7077888
-555542,6029312
-555542,6029312
-555909,0
-555909,0
-564128,0
-564128,0
-576827,0
-576827,0
-577921,9961472
-577921,9961472
-579471,9961472
-579471,9961472
-580565,3932160
-580565,3932160
-580932,0
-580932,0
-589151,0
-589151,0
-601850,0
-601850,0
-602944,9961472
-602944,9961472
-604494,9961472
-604494,9961472
-605588,3932160
-
---- Transfer vs Compute ---
-Transfer: 12968 cycles (2.14139%)
-Compute:  592620 cycles (97.8586%)
-====================================================
-
-Scheduler=fifo
-Backend=cycle_stub
-RuntimeBackend=cycle_stub
-Workload=synthetic
-Seed=123
-NumCards=1
-=== Request Metrics ===
-Completed requests: 1
-Mean latency(ns): 2018627.0000
-P95 latency(ns): 2018627
-P99 latency(ns): 2018627
-Max latency(ns): 2018627
-Mean queue time(ns): 0.0000
-Mean service time(ns): 2018627.0000
-=== User Metrics ===
-User 0: completed=1, mean_latency(ns)=2018627.0000, throughput(req/ns)=0.0000, reload_count=1
-=== Card Metrics ===
-Card 0: utilization=1.0000, reload_count=1, served_requests=1
-=== System Metrics ===
-Total throughput(req/ns): 0.0000
-Total reload count: 1
-Jain fairness index: 1.0000
-Simulation window(ns): [23, 2018650], duration=2018627
-PoolConfigSource=built-in default
-TreeConfigSource=built-in default
-HEParamsSource=built-in default
-=== CycleBackend Method Dispatch Stats ===
-EstimateCalls=1
-CycleFallbackCount=0
-CSVOutput=results/metrics_fast.csv
+ The program is not generated

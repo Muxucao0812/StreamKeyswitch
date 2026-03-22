@@ -292,8 +292,15 @@ uint64_t HardwareModel::EstimateInterconnectTransferCycles(uint64_t bytes) const
     if (bytes == 0) {
         return 0;
     }
+
+    // Inter-card traffic on the current platform is bounded by the effective
+    // PCIe link bandwidth even if the modeled interconnect is configured wider.
+    const double effective_bw = std::min(
+        config_.interconnect_bytes_per_ns,
+        config_.pcie_write_bytes_per_ns);
+
     return TransferSetupCycles(config_.interconnect_setup_ns)
-        + EstimateTransferBodyCycles(bytes, config_.interconnect_bytes_per_ns);
+        + EstimateTransferBodyCycles(bytes, effective_bw);
 }
 
 double HardwareModel::EstimateTransferEnergyByBytes(uint64_t bytes) const {
