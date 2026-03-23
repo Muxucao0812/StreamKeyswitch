@@ -39,7 +39,6 @@ public:
     uint32_t EmitEweSub(const CyclePrimitiveDesc& desc);
     uint32_t EmitInterCardSend(const CyclePrimitiveDesc& desc);
     uint32_t EmitInterCardRecv(const CyclePrimitiveDesc& desc);
-    uint32_t EmitInterCardReduce(const CyclePrimitiveDesc& desc);
 
     bool ValidateMemoryAccounting(const char* label) const;
 
@@ -82,6 +81,8 @@ public:
     bool Ok() const;
     bool ValidateMemoryAccounting(const char* label);
     std::vector<uint32_t> Deps() const;
+    bool AcquireOnIssue(uint64_t bytes);
+    bool ReleaseOnIssue(uint64_t bytes);
 
     uint32_t EmitPrimitive(
         CycleInstructionKind kind,

@@ -61,7 +61,6 @@ uint32_t CyclePrimitiveEmitter::EmitInterCardRecv(const CyclePrimitiveDesc& desc
 }
 
 
-
 bool CyclePrimitiveEmitter::ValidateMemoryAccounting(const char* label) const {
     uint64_t replay_live = 0;
     uint64_t replay_peak = 0;
@@ -267,10 +266,37 @@ std::vector<uint32_t> CycleProgramBuilder::Deps() const {
     return {last_group};
 }
 
+bool CycleProgramBuilder::AcquireOnIssue(uint64_t bytes) {
+    if (!build_ok) {
+        return false;
+    }
+    if (!bram.AcquireOnIssue(bytes)) {
+        build_ok = false;
+        return false;
+    }
+    return true;
+}
+
+bool CycleProgramBuilder::ReleaseOnIssue(uint64_t bytes) {
+    if (!build_ok) {
+        return false;
+    }
+    if (!bram.ReleaseOnIssue(bytes)) {
+        build_ok = false;
+        return false;
+    }
+    return true;
+}
+
 uint32_t CycleProgramBuilder::EmitPrimitive(
     CycleInstructionKind kind,
     const CyclePrimitiveDesc& desc
 ) {
+
+    if (!Ok()) {
+        build_ok = false;
+        return std::numeric_limits<uint32_t>::max();
+    }
 
     uint32_t group_id = std::numeric_limits<uint32_t>::max();
     switch (kind) {

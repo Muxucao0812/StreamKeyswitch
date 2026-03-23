@@ -19,30 +19,21 @@ CycleProgram BuildOLAProgram(
         "ola_keyswitch");
 
     const uint32_t ct_now = problem.ciphertexts;
-    const uint32_t digit_limb_now = problem.digit_limbs;
-    const uint32_t safe_digits = std::max<uint32_t>(1, problem.digits);
+    const uint32_t p = problem.polys;
+    const uint32_t digit_num = problem.digits;
+    const uint32_t digit_limbs = problem.digit_limbs; // number of limbs
+    const uint32_t l = problem.limbs; // number of limbs in one polynomial
+    const uint32_t lk = problem.key_limbs; // number of limbs in the key
+    const uint32_t k = problem.num_k;
 
-    std::vector<uint64_t> digit_bytes(safe_digits, 0);
-    std::vector<bool> digit_in_bram(safe_digits, false);
-    std::vector<bool> digit_ntt_done(safe_digits, false);
-
-    auto fail = [&builder]() {
-        builder.build_ok = false;
-    };
-
-    auto ciphertext_limbs_from_bytes = [&problem](uint64_t bytes) -> uint32_t {
-        const uint64_t per_limb_bytes =
-            static_cast<uint64_t>(std::max<uint32_t>(1, problem.ciphertexts))
-            * std::max<uint64_t>(1, problem.ct_limb_bytes);
-        const uint64_t limbs = (bytes + per_limb_bytes - 1) / per_limb_bytes;
-        if (limbs == 0) {
-            return 1;
-        }
-        if (limbs > static_cast<uint64_t>(std::numeric_limits<uint32_t>::max())) {
-            return std::numeric_limits<uint32_t>::max();
-        }
-        return static_cast<uint32_t>(limbs);
-    };
+    std::cout << "Building OLA program with ct " << ct_now
+              << ", p " << p
+              << ", digit_num " << digit_num
+              << ", digit_limbs " << digit_limbs
+              << ", l " << l
+              << ", lk " << lk
+              << ", k " << k
+              << std::endl;
 
     auto emit_op = [&builder](
                        const std::string& name,
@@ -65,466 +56,328 @@ CycleProgram BuildOLAProgram(
         builder.EmitPrimitive(kind, desc);
     };
 
-    auto spill_digit_if_resident = [&](uint32_t digit_idx) -> bool {
-        if (digit_idx >= digit_in_bram.size()) {
-            fail();
-            return false;
-        }
-        if (!digit_in_bram[digit_idx]) {
-            return true;
-        }
 
-        const uint64_t bytes = digit_bytes[digit_idx];
-        if (bytes == 0) {
-            fail();
-            return false;
-        }
 
-        builder.bram.ReleaseOnIssue(bytes);
-        digit_in_bram[digit_idx] = false;
+
+    // load all digit inputs.
+    for (uint32_t i = 0; i < digit_num; i++){
+        emit_op(
+            /*name*/"Load_digit" + std::to_string(i),
+            /*kind*/CycleInstructionKind::LoadHBM,
+            /*transfer_path*/CycleTransferPath::HBMToSPM,
+            /*type*/CycleOpType::DataLoad,
+            /*bytes*/static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes,
+            /*input_limbs*/digit_limbs,
+            /*output_limbs*/0,
+            /*work_items*/digit_limbs * ct_now
+         );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes
+         );
+    }
+
+    // INTT for all digits.
+    for (uint32_t i = 0; i < digit_num; i++) {
+        emit_op(
+            /*name*/"INTT_digit" + std::to_string(i),
+            /*kind*/CycleInstructionKind::INTT,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::INTT,
+            /*bytes*/static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes,
+            /*input_limbs*/digit_limbs,
+            /*output_limbs*/0,
+            /*work_items*/digit_limbs * ct_now
+        );
+    }
+
+    // Spill all digits to HBM
+    for (uint32_t i = 0; i < digit_num; i++){
+        emit_op(
+            /*name*/"Spill_digit" + std::to_string(i),
+            /*kind*/CycleInstructionKind::StoreHBM,
+            /*transfer_path*/CycleTransferPath::SPMToHBM,
+            /*type*/CycleOpType::Spill,
+            /*bytes*/static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes,
+            /*input_limbs*/0,
+            /*output_limbs*/digit_limbs,
+            /*work_items*/digit_limbs * ct_now
+         );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes
+         );
+    }
+
+    // Load one digit to do bconv, send to HBM
+    for (uint32_t i = 0; i < digit_num; i++){
+        emit_op(
+            /*name*/"Load_digit_for_bconv_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::LoadHBM,
+            /*transfer_path*/CycleTransferPath::HBMToSPM,
+            /*type*/CycleOpType::DataLoad,
+             /*bytes*/static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes,
+            /*input_limbs*/digit_limbs,
+            /*output_limbs*/0,
+            /*work_items*/digit_limbs * ct_now
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes
+         );
+        // Basis conversion
+        emit_op(
+            /*name*/"bconv_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::BConv,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::BConv,
+             /*bytes*/static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes,
+            /*input_limbs*/digit_limbs,
+            /*output_limbs*/lk,
+            /*work_items*/digit_limbs * ct_now
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes
+        );
 
         emit_op(
-            "ola_spill_digit_stub",
-            CycleInstructionKind::StoreHBM,
-            CycleTransferPath::SPMToHBM,
-            CycleOpType::Spill,
-            bytes,
-            0,
-            ciphertext_limbs_from_bytes(bytes));
+            /*name*/"ntt_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::NTT,
+             /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::NTT,
+             /*bytes*/static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes,
+            /*input_limbs*/lk,
+            /*output_limbs*/0,
+            /*work_items*/digit_limbs * ct_now
+        );
+         builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+        );
 
-        return builder.Ok();
-    };
+        emit_op(
+            /*name*/"Spill_bconv_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::StoreHBM,
+            /*transfer_path*/CycleTransferPath::SPMToHBM,
+            /*type*/CycleOpType::Spill,
+             /*bytes*/static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes,
+            /*input_limbs*/0,
+            /*output_limbs*/lk,
+            /*work_items*/lk * ct_now
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+        );
+    }
 
-    auto spill_one_digit = [&](uint32_t avoid_digit_idx) -> bool {
-        for (uint32_t idx = 0; idx < digit_in_bram.size(); ++idx) {
-            if (idx == avoid_digit_idx) {
-                continue;
-            }
-            if (!digit_in_bram[idx]) {
-                continue;
-            }
-            if (digit_bytes[idx] == 0) {
-                continue;
-            }
-
-            const uint64_t bytes = digit_bytes[idx];
-            builder.bram.ReleaseOnIssue(bytes);
-            digit_in_bram[idx] = false;
-
+    // Run NTT for all digits and inner product
+   for (uint32_t i = 0; i < p; i++){
+        for (uint32_t j = 0; j < digit_num; j++){
+            // Load bconv result in HBM to BRAM
             emit_op(
-                "ola_spill_digit_stub",
-                CycleInstructionKind::StoreHBM,
-                CycleTransferPath::SPMToHBM,
-                CycleOpType::Spill,
-                bytes,
-                0,
-                ciphertext_limbs_from_bytes(bytes));
+                /*name*/"Load_bconv_result_digit_" + std::to_string(j) + "_" + std::to_string(i),
+                /*kind*/CycleInstructionKind::LoadHBM,
+                /*transfer_path*/CycleTransferPath::HBMToSPM,
+                /*type*/CycleOpType::DataLoad,
+                /*bytes*/static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes,
+                /*input_limbs*/lk,
+                /*output_limbs*/0,
+                /*work_items*/static_cast<uint64_t>(ct_now) * lk
+            );
+            builder.AcquireOnIssue(
+                static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+            );
 
-            return builder.Ok();
-        }
-        return false;
-    };
+            // Load eval key for this digit from HBM to BRAM
+            emit_op(
+                /*name*/"Load_eval_key_digit_" + std::to_string(j) + "_" + std::to_string(i),
+                /*kind*/CycleInstructionKind::LoadHBM,
+                /*transfer_path*/CycleTransferPath::HBMToSPM,
+                /*type*/CycleOpType::KeyLoad,
+                /*bytes*/static_cast<uint64_t>(lk) * problem.ct_limb_bytes,
+                /*input_limbs*/lk,
+                /*output_limbs*/0,
+                /*work_items*/static_cast<uint64_t>(lk)
+            );
+            builder.AcquireOnIssue(
+                static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+            );
 
-    auto ensure_capacity_for_bytes = [&](uint64_t bytes, uint32_t avoid_digit_idx) -> bool {
-        if (bytes == 0) {
-            return true;
-        }
-        if (bytes > builder.bram.Budget()) {
-            fail();
-            return false;
-        }
-
-        while (!builder.bram.CanAcquire(bytes)) {
-            if (!spill_one_digit(avoid_digit_idx)) {
-                fail();
-                return false;
+            // Inner product for this digit
+            emit_op(
+                /*name*/"Inner_product_digit_" + std::to_string(j) + "_" + std::to_string(i),
+                /*kind*/CycleInstructionKind::EweMul,
+                /*transfer_path*/CycleTransferPath::None,
+                /*type*/CycleOpType::Multiply,
+                /*bytes*/static_cast<uint64_t>(lk) * ct_now * problem.ct_limb_bytes,
+                /*input_limbs*/lk,
+                /*output_limbs*/lk,
+                /*work_items*/static_cast<uint64_t>(lk) * ct_now
+            );
+            builder.ReleaseOnIssue(
+                static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+            );
+            builder.ReleaseOnIssue(
+                static_cast<uint64_t>(lk) * problem.ct_limb_bytes
+            );
+            builder.AcquireOnIssue(
+                static_cast<uint64_t>(lk) * problem.ct_limb_bytes
+            );
+            if (j > 0){
+                // Accumulate with previous digits' result
+                emit_op(
+                    /*name*/"Accumulate_digit_" + std::to_string(j) + "_" + std::to_string(i),
+                    /*kind*/CycleInstructionKind::EweAdd,
+                    /*transfer_path*/CycleTransferPath::None,
+                    /*type*/CycleOpType::Add,
+                    /*bytes*/static_cast<uint64_t>(lk) * ct_now * problem.ct_limb_bytes,
+                    /*input_limbs*/lk,
+                    /*output_limbs*/lk,
+                    /*work_items*/static_cast<uint64_t>(lk) * ct_now
+                );
+                builder.ReleaseOnIssue(
+                    static_cast<uint64_t>(lk) * problem.ct_limb_bytes
+                );
+                builder.ReleaseOnIssue(
+                    static_cast<uint64_t>(lk) * problem.ct_limb_bytes
+                );
+                builder.AcquireOnIssue(
+                    static_cast<uint64_t>(lk) * problem.ct_limb_bytes
+                );
             }
         }
-        return true;
-    };
+        // INTT for this digit
+        emit_op(
+            /*name*/"INTT_poly_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::INTT,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::INTT,
+            /*bytes*/static_cast<uint64_t>(k) * ct_now * problem.ct_limb_bytes,
+            /*input_limbs*/k,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(k) * ct_now
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(k) * problem.ct_limb_bytes
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(k) * problem.ct_limb_bytes
+        );
+        // Send to HBM
+        emit_op(
+            /*name*/"Store_result_poly_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::StoreHBM,
+            /*transfer_path*/CycleTransferPath::SPMToHBM,
+            /*type*/CycleOpType::DataLoad,
+             /*bytes*/static_cast<uint64_t>(ct_now) * (lk-k) * problem.ct_limb_bytes,
+            /*input_limbs*/0,
+            /*output_limbs*/(lk-k),
+            /*work_items*/static_cast<uint64_t>(ct_now) * (lk-k)
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(lk-k) * problem.ct_limb_bytes
+        );
+   }
 
-    auto ensure_digit_resident = [&](uint32_t digit_idx) -> bool {
-        if (digit_idx >= digit_bytes.size()) {
-            fail();
-            return false;
-        }
-        if (digit_in_bram[digit_idx]) {
-            return true;
-        }
+//    Bconv 
+   for (uint32_t i = 0; i < p; i++){
+        emit_op(
+            /*name*/"Bconv_poly_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::BConv,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::BConv,
+            /*bytes*/static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes,
+            /*input_limbs*/k,
+            /*output_limbs*/l,
+            /*work_items*/static_cast<uint64_t>(ct_now) * k
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes
+        );
 
-        const uint64_t bytes = digit_bytes[digit_idx];
-        if (bytes == 0) {
-            fail();
-            return false;
-        }
-        if (!ensure_capacity_for_bytes(bytes, digit_idx)) {
-            return false;
-        }
+        // NTT
+        emit_op(
+            /*name*/"NTT_poly_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::NTT,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::NTT,
+            /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+   }
 
-        builder.bram.AcquireOnIssue(bytes);
-        digit_in_bram[digit_idx] = true;
+//    Load 2*l limbs to BRAM to reduce the latency of final result store and subsequent INTT and basis conversion, and spill back to HBM after NTT and basis conversion
+   for (uint32_t i = 0; i < p; i++){
+        emit_op(
+            /*name*/"Load_final_result_poly_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::LoadHBM,
+            /*transfer_path*/CycleTransferPath::HBMToSPM,
+            /*type*/CycleOpType::DataLoad,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        emit_op(
+            /*name*/"Subtract_eval_key_poly_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::EweSub,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::Sub,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/l,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
 
         emit_op(
-            "ola_reload_digit_stub",
-            CycleInstructionKind::LoadHBM,
-            CycleTransferPath::HBMToSPM,
-            CycleOpType::DataLoad,
-            bytes,
-            ciphertext_limbs_from_bytes(bytes),
-            0);
+            /*name*/"Store_final_result_poly_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::StoreHBM,
+            /*transfer_path*/CycleTransferPath::SPMToHBM,
+            /*type*/CycleOpType::DataLoad,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/0,
+            /*output_limbs*/l,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+   }
 
-        return builder.Ok();
-    };
 
-    auto load_input_tensor = [&](uint32_t digit_idx, uint32_t poly_now, uint32_t limb_now) -> bool {
-        if (digit_idx >= digit_bytes.size()) {
-            fail();
-            return false;
-        }
 
-        const uint64_t input_bytes =
-            static_cast<uint64_t>(ct_now) * poly_now * limb_now * problem.ct_limb_bytes;
-        if (!ensure_capacity_for_bytes(input_bytes, digit_idx)) {
-            return false;
-        }
+  
 
-        builder.bram.AcquireOnIssue(input_bytes);
-        digit_bytes[digit_idx] = input_bytes;
-        digit_in_bram[digit_idx] = true;
-        emit_op(
-            "load_input",
-            CycleInstructionKind::LoadHBM,
-            CycleTransferPath::HBMToSPM,
-            CycleOpType::DataLoad,
-            input_bytes,
-            std::max<uint32_t>(1, limb_now),
-            0);
-        return builder.Ok();
-    };
-
-    bool accum_in_bram = false;
-
-    // Step 1: load all digit inputs.
-    for (uint32_t digit_idx = 0; digit_idx < problem.digits; ++digit_idx) {
-        if (!load_input_tensor(digit_idx, /*poly_now=*/1, digit_limb_now)) {
-            return CycleProgram{};
-        }
+    if(!builder.Ok()) {
+        return CycleProgram{};
     }
-
-    // Step 2: run INTT for all loaded digits.
-    for (uint32_t digit_idx = 0; digit_idx < problem.digits; ++digit_idx) {
-        if (!ensure_digit_resident(digit_idx)) {
-            return CycleProgram{};
-        }
-
-        const uint64_t intt_bytes = digit_bytes[digit_idx];
-        emit_op(
-            "ola_intt_digits_stub",
-            CycleInstructionKind::INTT,
-            CycleTransferPath::None,
-            CycleOpType::INTT,
-            intt_bytes,
-            ciphertext_limbs_from_bytes(intt_bytes),
-            0);
-
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-    }
-
-    // Step 3: spill (digits - 1), keep one digit resident.
-    if (problem.digits > 0) {
-        for (uint32_t digit_idx = 1; digit_idx < problem.digits; ++digit_idx) {
-            if (!spill_digit_if_resident(digit_idx)) {
-                return CycleProgram{};
-            }
-        }
-    }
-
-    // Step 4: BConv for all digits.
-    for (uint32_t digit_idx = 0; digit_idx < problem.digits; ++digit_idx) {
-        if (!ensure_digit_resident(digit_idx)) {
-            return CycleProgram{};
-        }
-
-        const uint64_t bconv_input_bytes = digit_bytes[digit_idx];
-        const uint64_t bconv_output_bytes =
-            static_cast<uint64_t>(ct_now) * problem.key_limbs * problem.ct_limb_bytes;
-        if (bconv_output_bytes < bconv_input_bytes) {
-            fail();
-            return CycleProgram{};
-        }
-
-        const uint64_t bconv_extra_bytes = bconv_output_bytes - bconv_input_bytes;
-        if (!ensure_capacity_for_bytes(bconv_extra_bytes, digit_idx)) {
-            return CycleProgram{};
-        }
-        if (bconv_extra_bytes > 0) {
-            builder.bram.AcquireOnIssue(bconv_extra_bytes);
-        }
-        digit_bytes[digit_idx] = bconv_output_bytes;
-
-        emit_op(
-            "ola_bconv_digits_stub",
-            CycleInstructionKind::BConv,
-            CycleTransferPath::None,
-            CycleOpType::BConv,
-            bconv_output_bytes,
-            problem.digit_limbs,
-            problem.num_k);
-
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-
-        const bool is_last_digit = (digit_idx + 1 == problem.digits);
-        if (!is_last_digit && !spill_digit_if_resident(digit_idx)) {
-            return CycleProgram{};
-        }
-    }
-
-    // Step 5: NTT for all digits.
-    for (uint32_t digit_idx = problem.digits; digit_idx-- > 0;) {
-        if (!ensure_digit_resident(digit_idx)) {
-            return CycleProgram{};
-        }
-
-        const uint64_t ntt_bytes = digit_bytes[digit_idx];
-        digit_ntt_done[digit_idx] = true;
-
-        emit_op(
-            "ola_ntt_digits_stub",
-            CycleInstructionKind::NTT,
-            CycleTransferPath::None,
-            CycleOpType::NTT,
-            ntt_bytes,
-            ciphertext_limbs_from_bytes(ntt_bytes),
-            0);
-
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-    }
-
-    // Step 6: inner-product across digits.
-    for (uint32_t digit_idx = problem.digits; digit_idx-- > 0;) {
-        if (digit_idx >= digit_in_bram.size()) {
-            fail();
-            return CycleProgram{};
-        }
-        if (!digit_ntt_done[digit_idx]) {
-            fail();
-            return CycleProgram{};
-        }
-        if (!ensure_digit_resident(digit_idx)) {
-            return CycleProgram{};
-        }
-
-        const uint32_t p_lk = problem.polys * problem.key_limbs;
-        const uint64_t partial_bytes =
-            static_cast<uint64_t>(ct_now) * p_lk * problem.ct_limb_bytes;
-        const uint64_t total_key_bytes =
-            static_cast<uint64_t>(p_lk) * problem.key_digit_limb_bytes;
-        if (builder.bram.Budget() == 0) {
-            fail();
-            return CycleProgram{};
-        }
-
-        const uint64_t free_before_key =
-            (builder.bram.Live() >= builder.bram.Budget())
-            ? 0
-            : (builder.bram.Budget() - builder.bram.Live());
-        if (free_before_key == 0) {
-            fail();
-            return CycleProgram{};
-        }
-
-        const uint64_t key_window_cap = std::max<uint64_t>(1, builder.bram.Budget() / 4);
-        const uint64_t key_window_target = std::max<uint64_t>(1, free_before_key / 2);
-        const uint64_t key_window_bytes = std::min<uint64_t>(
-            total_key_bytes,
-            std::min<uint64_t>(key_window_cap, key_window_target));
-
-        if (!ensure_capacity_for_bytes(key_window_bytes, digit_idx)) {
-            return CycleProgram{};
-        }
-
-        builder.bram.AcquireOnIssue(key_window_bytes);
-        emit_op(
-            "ola_innerprod_load_key_stub",
-            CycleInstructionKind::LoadHBM,
-            CycleTransferPath::HBMToSPM,
-            CycleOpType::KeyLoad,
-            total_key_bytes,
-            p_lk,
-            0);
-
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-
-        const uint64_t available_after_key =
-            (builder.bram.Live() >= builder.bram.Budget())
-            ? 1
-            : (builder.bram.Budget() - builder.bram.Live());
-        const uint64_t partial_window_bytes = std::min<uint64_t>(
-            partial_bytes,
-            std::max<uint64_t>(1, available_after_key));
-
-        if (!ensure_capacity_for_bytes(partial_window_bytes, digit_idx)) {
-            return CycleProgram{};
-        }
-
-        builder.bram.AcquireOnIssue(partial_window_bytes);
-        builder.bram.ReleaseOnIssue(key_window_bytes);
-
-        emit_op(
-            "ola_innerprod_mul_stub",
-            CycleInstructionKind::EweMul,
-            CycleTransferPath::None,
-            CycleOpType::Multiply,
-            digit_bytes[digit_idx] + total_key_bytes,
-            p_lk,
-            0);
-
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-
-        if (!accum_in_bram) {
-            accum_in_bram = true;
-            continue;
-        }
-
-        builder.bram.ReleaseOnIssue(partial_window_bytes);
-        emit_op(
-            "ola_innerprod_accumulate_stub",
-            CycleInstructionKind::EweAdd,
-            CycleTransferPath::None,
-            CycleOpType::Add,
-            partial_bytes,
-            p_lk,
-            0);
-
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-    }
-
-    // Step 7: run INTT again for all digits.
-    for (uint32_t digit_idx = 0; digit_idx < problem.digits; ++digit_idx) {
-        if (!ensure_digit_resident(digit_idx)) {
-            return CycleProgram{};
-        }
-
-        const uint64_t intt_bytes = digit_bytes[digit_idx];
-        emit_op(
-            "ola_intt_digits_stub",
-            CycleInstructionKind::INTT,
-            CycleTransferPath::None,
-            CycleOpType::INTT,
-            intt_bytes,
-            ciphertext_limbs_from_bytes(intt_bytes),
-            0);
-
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-    }
-
-    // Step 8: spill 2*l limbs to HBM.
-    for (uint32_t poly_idx = 0; poly_idx < problem.polys; ++poly_idx) {
-        (void)poly_idx;
-
-        const uint64_t bytes =
-            static_cast<uint64_t>(ct_now) * problem.limbs * problem.ct_limb_bytes;
-        builder.bram.ReleaseOnIssue(bytes);
-        emit_op(
-            "ola_spill_poly_stub",
-            CycleInstructionKind::StoreHBM,
-            CycleTransferPath::SPMToHBM,
-            CycleOpType::Spill,
-            bytes,
-            problem.limbs,
-            0);
-
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-    }
-
-    // Step 9: BConv 2*k limbs to 2*l limbs.
-    for (uint32_t poly_idx = 0; poly_idx < problem.polys; ++poly_idx) {
-        (void)poly_idx;
-
-        const uint64_t modup_bytes = static_cast<uint64_t>(ct_now)
-            * problem.polys * problem.key_limbs * problem.ct_limb_bytes;
-        emit_op(
-            "ola_modup_stub",
-            CycleInstructionKind::BConv,
-            CycleTransferPath::None,
-            CycleOpType::BConv,
-            modup_bytes,
-            problem.digit_limbs,
-            problem.num_k);
-
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-    }
-
-    // Step 10: NTT on the retained digit buffer.
-    for (uint32_t poly_idx = 0; poly_idx < problem.polys; ++poly_idx) {
-        (void)poly_idx;
-
-        if (!ensure_digit_resident(/*digit_idx=*/0)) {
-            return CycleProgram{};
-        }
-
-        const uint64_t ntt_bytes = digit_bytes[0];
-        digit_ntt_done[0] = true;
-
-        emit_op(
-            "ola_ntt_digits_stub",
-            CycleInstructionKind::NTT,
-            CycleTransferPath::None,
-            CycleOpType::NTT,
-            ntt_bytes,
-            ciphertext_limbs_from_bytes(ntt_bytes),
-            0);
-
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-    }
-
-    // Step 11: reload 2*l limbs and cross-digit add.
-    for (uint32_t poly_idx = 0; poly_idx < problem.polys; ++poly_idx) {
-        (void)poly_idx;
-
-        if (!load_input_tensor(/*digit_idx=*/0, /*poly_now=*/1, problem.limbs)) {
-            return CycleProgram{};
-        }
-
-        const uint64_t accum_bytes = static_cast<uint64_t>(ct_now)
-            * problem.polys * problem.key_limbs * problem.ct_limb_bytes;
-        emit_op(
-            "ola_reduce_cross_digit_stub",
-            CycleInstructionKind::EweAdd,
-            CycleTransferPath::None,
-            CycleOpType::Add,
-            accum_bytes,
-            problem.polys * problem.key_limbs,
-            0);
-
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-
-        accum_in_bram = true;
-    }
-
-    if (!builder.ValidateMemoryAccounting("OLA") || !builder.Ok()) {
+    if (builder.bram.Live()) {
+        std::cerr << "Error: BRAM live bytes is zero at the end of program building." << std::endl;
         return CycleProgram{};
     }
 

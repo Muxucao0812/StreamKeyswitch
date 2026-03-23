@@ -16,13 +16,21 @@ CycleProgram BuildPoseidonProgram(
         "stream_keyswitch");
 
     const uint32_t ct_now = problem.ciphertexts;
-    const uint32_t digit_limb_now = problem.digit_limbs;
+    const uint32_t p = problem.polys;
+    const uint32_t digit_limbs = problem.digit_limbs;
+    const uint32_t digit_num = problem.digits;
+    const uint32_t l = problem.limbs;
+    const uint32_t k = problem.num_k;
     const uint32_t lk = problem.key_limbs;
-    const uint32_t p_lk = problem.polys * problem.key_limbs;
 
-    auto fail = [&builder]() {
-        builder.build_ok = false;
-    };
+    std::cout << "Building Poseidon program with ct " << ct_now
+              << ", p " << p
+              << ", digit_num " << digit_num
+              << ", digit_limbs " << digit_limbs
+              << ", l " << l
+              << ", lk " << lk
+              << std::endl;
+
 
     auto emit_op = [&builder](
                        const std::string& name,
@@ -45,323 +53,324 @@ CycleProgram BuildPoseidonProgram(
         builder.EmitPrimitive(kind, desc);
     };
 
-    bool accum_in_bram = false;
-
-    for (uint32_t digit_idx = 0; digit_idx < problem.digits; ++digit_idx) {
-        const uint64_t input_bram_bytes = static_cast<uint64_t>(ct_now) * digit_limb_now * problem.ct_limb_bytes;
+    for (uint32_t i = 0; i < digit_num; i++){
         emit_op(
-            "load_input",
-            CycleInstructionKind::LoadHBM,
-            CycleTransferPath::HBMToSPM,
-            CycleOpType::DataLoad,
-            input_bram_bytes,
-            digit_limb_now,
-            0);
-        builder.bram.AcquireOnIssue(input_bram_bytes);
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
+            /*name*/"Load_digit" + std::to_string(i),
+            /*kind*/CycleInstructionKind::LoadHBM,
+            /*transfer_path*/CycleTransferPath::HBMToSPM,
+            /*type*/CycleOpType::DataLoad,
+            /*bytes*/static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes,
+            /*input_limbs*/digit_limbs,
+            /*output_limbs*/0,
+            /*work_items*/digit_limbs
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes
+        );
+    }
 
+    for (uint32_t i = 0; i < digit_num; i++) {
         emit_op(
-            "modup_intt",
-            CycleInstructionKind::INTT,
-            CycleTransferPath::None,
-            CycleOpType::INTT,
-            input_bram_bytes,
-            digit_limb_now,
-            0);
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
+            /*name*/"Modup_INTT_digit" + std::to_string(i),
+            /*kind*/CycleInstructionKind::INTT,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::INTT,
+            /*bytes*/static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes,
+            /*input_limbs*/digit_limbs,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * digit_limbs
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes
+        );
+    }
 
-        const uint64_t k_limbs_bytes =
-            static_cast<uint64_t>(ct_now) * problem.num_k * problem.ct_limb_bytes;
-        const uint64_t modup_output_bytes = input_bram_bytes + k_limbs_bytes;
-
-        builder.bram.AcquireOnIssue(k_limbs_bytes);
+    for (uint32_t i = 0; i < digit_num; i++){
         emit_op(
-            "modup_bconv",
-            CycleInstructionKind::BConv,
-            CycleTransferPath::None,
-            CycleOpType::BConv,
-            modup_output_bytes,
-            digit_limb_now,
-            problem.num_k);
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
+            /*name*/"bconv_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::BConv,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::BConv,
+             /*bytes*/static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes,
+            /*input_limbs*/digit_limbs,
+            /*output_limbs*/(lk - digit_limbs),
+            /*work_items*/static_cast<uint64_t>(ct_now) * digit_limbs
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * (lk - digit_limbs) * problem.ct_limb_bytes
+        );
+    }
 
+    // NTT for all digits
+    for (uint32_t i = 0; i < digit_num; i++){
         emit_op(
-            "modup_ntt",
-            CycleInstructionKind::NTT,
-            CycleTransferPath::None,
-            CycleOpType::NTT,
-            modup_output_bytes,
-            lk,
-            0);
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
+            /*name*/"ntt_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::NTT,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::NTT,
+             /*bytes*/static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes,
+            /*input_limbs*/lk,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * lk
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+        );
+     
+    }
 
-        bool modup_spilled = false;
-        const uint64_t one_limb_key = problem.key_digit_limb_bytes;
-        const bool should_spill = !builder.bram.CanAcquire(modup_output_bytes + one_limb_key);
-        if (should_spill) {
-            builder.bram.ReleaseOnIssue(modup_output_bytes);
+    // Spill the ct to HBM
+    for (uint32_t i = 0; i < digit_num; i++){
+        emit_op(
+            /*name*/"spill_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::StoreHBM,
+            /*transfer_path*/CycleTransferPath::SPMToHBM,
+            /*type*/CycleOpType::Spill,
+             /*bytes*/static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes,
+            /*input_limbs*/0,
+            /*output_limbs*/lk,
+            /*work_items*/static_cast<uint64_t>(ct_now) * lk
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+        );
+    }
+
+    for (uint32_t i = 0; i < p; i++){
+        for (uint32_t j = 0; j < digit_num; j++){
             emit_op(
-                "modup_spill",
-                CycleInstructionKind::StoreHBM,
-                CycleTransferPath::SPMToHBM,
-                CycleOpType::Spill,
-                modup_output_bytes,
-                0,
-                lk);
-            if (!builder.Ok()) {
-                return CycleProgram{};
-            }
-            modup_spilled = true;
-        }
-
-        if (modup_spilled) {
-            builder.bram.AcquireOnIssue(modup_output_bytes);
+                /*name*/"load_data_digit_" + std::to_string(j) + "_" + std::to_string(i),
+                /*kind*/CycleInstructionKind::LoadHBM,
+                /*transfer_path*/CycleTransferPath::HBMToSPM,
+                /*type*/CycleOpType::DataLoad,
+                 /*bytes*/static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes,
+                /*input_limbs*/lk,
+                /*output_limbs*/0,
+                /*work_items*/static_cast<uint64_t>(ct_now) * lk
+            );
+            builder.AcquireOnIssue(
+                static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+            );
+            // Load evalkey
             emit_op(
-                "innerprod_reload_modup_all",
-                CycleInstructionKind::LoadHBM,
-                CycleTransferPath::HBMToSPM,
-                CycleOpType::DataLoad,
-                modup_output_bytes,
-                lk,
-                0);
-            if (!builder.Ok()) {
-                return CycleProgram{};
-            }
-        }
+                /*name*/"load_evalkey_digit_" + std::to_string(j) + "_" + std::to_string(i),
+                /*kind*/CycleInstructionKind::LoadHBM,
+                /*transfer_path*/CycleTransferPath::HBMToSPM,
+                /*type*/CycleOpType::KeyLoad,
+                /*bytes*/static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes,   
+                /*input_limbs*/lk,
+                /*output_limbs*/0,
+                /*work_items*/static_cast<uint64_t>(ct_now) * lk
+            );
+            builder.AcquireOnIssue(
+                static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+            );
 
-        const uint64_t total_key_bytes =
-            static_cast<uint64_t>(p_lk) * problem.key_digit_limb_bytes;
-        builder.bram.AcquireOnIssue(total_key_bytes);
-        emit_op(
-            "innerprod_load_key_all",
-            CycleInstructionKind::LoadHBM,
-            CycleTransferPath::HBMToSPM,
-            CycleOpType::KeyLoad,
-            total_key_bytes,
-            p_lk,
-            0);
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-
-        const uint64_t accum_bytes =
-            static_cast<uint64_t>(ct_now) * p_lk * problem.ct_limb_bytes;
-        builder.bram.AcquireOnIssue(accum_bytes);
-        builder.bram.ReleaseOnIssue(total_key_bytes + modup_output_bytes);
-        emit_op(
-            "innerprod_mul_all",
-            CycleInstructionKind::EweMul,
-            CycleTransferPath::None,
-            CycleOpType::Multiply,
-            modup_output_bytes + total_key_bytes,
-            p_lk,
-            0);
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-
-        const bool is_last_digit = (digit_idx + 1 == problem.digits);
-        if (!is_last_digit) {
-            builder.bram.ReleaseOnIssue(accum_bytes);
+            // Mul-accumulate in eval form
             emit_op(
-                "innerprod_spill_partial",
-                CycleInstructionKind::StoreHBM,
-                CycleTransferPath::SPMToHBM,
-                CycleOpType::Spill,
-                accum_bytes,
-                0,
-                p_lk);
-            if (!builder.Ok()) {
-                return CycleProgram{};
+                /*name*/"mul_digit_" + std::to_string(j) + "_" + std::to_string(i),
+                /*kind*/CycleInstructionKind::EweMul,
+                /*transfer_path*/CycleTransferPath::None,
+                /*type*/CycleOpType::Multiply,
+                /*bytes*/static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes,
+                /*input_limbs*/lk,
+                /*output_limbs*/lk,
+                /*work_items*/static_cast<uint64_t>(ct_now) * lk
+            );
+            builder.ReleaseOnIssue(
+                static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+            );
+            builder.ReleaseOnIssue(
+                static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+            );
+            builder.AcquireOnIssue(
+                static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+            );
+
+            if(j > 0){
+                emit_op(
+                    /*name*/"add_digit_" + std::to_string(j) + "_" + std::to_string(i),
+                    /*kind*/CycleInstructionKind::EweAdd,
+                    /*transfer_path*/CycleTransferPath::None,
+                    /*type*/CycleOpType::Add,
+                    /*bytes*/static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes,
+                    /*input_limbs*/lk,
+                    /*output_limbs*/lk,
+                    /*work_items*/static_cast<uint64_t>(ct_now) * lk
+                );
+                builder.AcquireOnIssue(
+                    static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+                );
+                builder.ReleaseOnIssue(
+                    static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+                );
+                builder.ReleaseOnIssue(
+                    static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+                );
+                if (!builder.Ok()) {
+                    std::cerr << "Failed to build add for digit " << j << ", p " << i << std::endl;
+                    return CycleProgram();
+                }
             }
-            accum_in_bram = false;
-        } else {
-            accum_in_bram = true;
         }
-    }
-
-    for (uint32_t digit_idx = 1; digit_idx < problem.digits; ++digit_idx) {
-        const bool is_last_reduce = (digit_idx + 1 == problem.digits);
-        (void)is_last_reduce;
-
-        const uint64_t accum_bytes =
-            static_cast<uint64_t>(ct_now) * p_lk * problem.ct_limb_bytes;
-
-        if (!accum_in_bram) {
-            builder.bram.AcquireOnIssue(accum_bytes);
-            emit_op(
-                "reduce_reload_accum_lhs",
-                CycleInstructionKind::LoadHBM,
-                CycleTransferPath::HBMToSPM,
-                CycleOpType::DataLoad,
-                accum_bytes,
-                p_lk,
-                0);
-            if (!builder.Ok()) {
-                return CycleProgram{};
-            }
-            accum_in_bram = true;
-        }
-
-        builder.bram.AcquireOnIssue(accum_bytes);
+        // Store the result of this digit to HBM
         emit_op(
-            "reduce_reload_partial_rhs",
-            CycleInstructionKind::LoadHBM,
-            CycleTransferPath::HBMToSPM,
-            CycleOpType::DataLoad,
-            accum_bytes,
-            p_lk,
-            0);
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
+            /*name*/"store_result_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::StoreHBM,
+            /*transfer_path*/CycleTransferPath::SPMToHBM,
+            /*type*/CycleOpType::DataLoad,
+             /*bytes*/static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes,
+            /*input_limbs*/lk,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * lk
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * lk * problem.ct_limb_bytes
+        );
+    }
 
-        builder.bram.ReleaseOnIssue(accum_bytes);
+
+    // Load 2*k limbs for each p to do the final INTT and reduction
+    for (uint32_t i = 0; i < p; i++){
         emit_op(
-            "reduce_cross_digit_add",
-            CycleInstructionKind::EweAdd,
-            CycleTransferPath::None,
-            CycleOpType::Add,
-            accum_bytes,
-            p_lk,
-            0);
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
+            /*name*/"load_result_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::LoadHBM,
+            /*transfer_path*/CycleTransferPath::HBMToSPM,
+            /*type*/CycleOpType::DataLoad,
+             /*bytes*/static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes,
+            /*input_limbs*/k,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * k
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes
+        );
 
-        accum_in_bram = true;
-    }
-
-    const uint32_t p = problem.polys;
-    const uint32_t l = problem.limbs;
-    const uint32_t k = problem.num_k;
-    const uint32_t p_l = p * l;
-    const uint32_t p_k = p * k;
-
-    const uint64_t per_limb =
-        static_cast<uint64_t>(ct_now) * problem.ct_limb_bytes;
-    const uint64_t two_l_bytes = static_cast<uint64_t>(p_l) * per_limb;
-    const uint64_t two_k_bytes = static_cast<uint64_t>(p_k) * per_limb;
-    const uint64_t one_limb = per_limb;
-
-    if (accum_in_bram) {
-        builder.bram.ReleaseOnIssue(two_l_bytes);
+        // INTT
         emit_op(
-            "moddown_spill_2l",
-            CycleInstructionKind::StoreHBM,
-            CycleTransferPath::SPMToHBM,
-            CycleOpType::Spill,
-            two_l_bytes,
-            0,
-            p_l);
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-    } else {
-        builder.bram.AcquireOnIssue(two_k_bytes);
+            /*name*/"intt_final_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::INTT,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::INTT,
+             /*bytes*/static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes,
+            /*input_limbs*/k,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * k
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes
+        );
+
+        // BConv
         emit_op(
-            "moddown_reload_2k",
-            CycleInstructionKind::LoadHBM,
-            CycleTransferPath::HBMToSPM,
-            CycleOpType::DataLoad,
-            two_k_bytes,
-            p_k,
-            0);
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
+            /*name*/"bconv_final_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::BConv,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::BConv,
+             /*bytes*/static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes,
+            /*input_limbs*/k,
+            /*output_limbs*/l,
+            /*work_items*/static_cast<uint64_t>(ct_now) * k
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes
+        );
+
+        // NTT for the final result in digit form
+        emit_op(
+            /*name*/"ntt_final_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::NTT,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::NTT,
+            /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
     }
 
-    emit_op(
-        "moddown_intt",
-        CycleInstructionKind::INTT,
-        CycleTransferPath::None,
-        CycleOpType::INTT,
-        two_k_bytes,
-        p_k,
-        0);
+
+    // Load 2*l limbs and subtract the original ct in NTT form to get the final result in evaluation form
+    for (uint32_t i = 0; i < p; i++){
+        emit_op(
+            /*name*/"load_ntt_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::LoadHBM,
+            /*transfer_path*/CycleTransferPath::HBMToSPM,
+            /*type*/CycleOpType::DataLoad,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        emit_op(
+            /*name*/"sub_ntt_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::EweSub,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::Sub,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/l,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+
+        // Send to HBM for output
+        emit_op(
+            /*name*/"store_output_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::StoreHBM,
+            /*transfer_path*/CycleTransferPath::SPMToHBM,
+            /*type*/CycleOpType::DataLoad,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/0,
+            /*output_limbs*/l,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+    }
+
     if (!builder.Ok()) {
         return CycleProgram{};
     }
 
-    builder.bram.AcquireOnIssue(two_l_bytes);
-    builder.bram.ReleaseOnIssue(two_k_bytes);
-    emit_op(
-        "moddown_bconv",
-        CycleInstructionKind::BConv,
-        CycleTransferPath::None,
-        CycleOpType::BConv,
-        two_k_bytes + two_l_bytes,
-        p_k,
-        p_l);
-    if (!builder.Ok()) {
-        return CycleProgram{};
+    // check bram has data
+    if (builder.bram.Live()) {
+        std::cerr << "Error: BRAM live bytes is zero at the end of program building." << std::endl;
+        return CycleProgram();
     }
 
-    emit_op(
-        "moddown_ntt",
-        CycleInstructionKind::NTT,
-        CycleTransferPath::None,
-        CycleOpType::NTT,
-        two_l_bytes,
-        p_l,
-        0);
-    if (!builder.Ok()) {
-        return CycleProgram{};
-    }
-
-    builder.bram.AcquireOnIssue(one_limb);
-    builder.bram.ReleaseOnIssue(one_limb);
-    emit_op(
-        "moddown_reload_2l",
-        CycleInstructionKind::LoadHBM,
-        CycleTransferPath::HBMToSPM,
-        CycleOpType::DataLoad,
-        two_l_bytes,
-        p_l,
-        0);
-    if (!builder.Ok()) {
-        return CycleProgram{};
-    }
-
-    emit_op(
-        "moddown_subtract",
-        CycleInstructionKind::EweSub,
-        CycleTransferPath::None,
-        CycleOpType::Sub,
-        two_l_bytes,
-        p_l,
-        0);
-    if (!builder.Ok()) {
-        return CycleProgram{};
-    }
-
-    builder.bram.ReleaseOnIssue(two_l_bytes);
-    emit_op(
-        "moddown_store_output",
-        CycleInstructionKind::StoreHBM,
-        CycleTransferPath::SPMToHBM,
-        CycleOpType::Spill,
-        two_l_bytes,
-        0,
-        p_l);
-
-    if (!builder.Ok()) {
-        return CycleProgram{};
-    }
-
-    if (!builder.ValidateMemoryAccounting("Poseidon") || !builder.Ok()) {
-        fail();
-        return CycleProgram{};
-    }
+    
 
     builder.program.estimated_peak_live_bytes = builder.bram.Peak();
     return std::move(builder.program);

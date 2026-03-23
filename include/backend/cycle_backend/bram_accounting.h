@@ -17,8 +17,6 @@ public:
         return Ok();
     }
 
-
-
     bool ReleaseOnIssue(uint64_t bytes) {
         AddIssue(-ToSigned(bytes));
         return Ok();

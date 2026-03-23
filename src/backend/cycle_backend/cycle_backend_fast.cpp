@@ -21,7 +21,7 @@ CycleProgram BuildFastProgram(
     const uint32_t digit_limbs = problem.digit_limbs; // number of limbs in each digit
     const uint32_t l = problem.limbs; // number of limbs in one polynomial
     const uint32_t lk = problem.key_limbs; // number of limbs in the key, which is l + digit_limbs 
-
+    const uint32_t k = problem.num_k;
 
     auto emit_op = [&builder](
                        const std::string& name,
@@ -46,44 +46,41 @@ CycleProgram BuildFastProgram(
 
 
     // Step 1: Load all digit inputs to BRAM
-    std::cout << "Step 1: load ct to BRAM, total bytes: " << static_cast<uint64_t>(ct_now) * p * l * problem.ct_limb_bytes << std::endl;
-    builder.bram.AcquireOnIssue(
-        static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
-    );
-    emit_op(
-        /*name*/"load_input",
-        /*kind*/CycleInstructionKind::LoadHBM,
-        /*transfer_path*/CycleTransferPath::HBMToSPM,
-        /*type*/CycleOpType::DataLoad,
-        /*bytes*/static_cast<uint64_t>(ct_now) * p * l * problem.ct_limb_bytes,
-        /*input_limbs*/p * l,
-        /*output_limbs*/0);
-    if (!builder.Ok()) {
-        return CycleProgram{};
+    for (uint32_t i = 0; i < digit_num; i++) {
+        emit_op(
+            /*name*/"load_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::LoadHBM,
+            /*transfer_path*/CycleTransferPath::HBMToSPM,
+            /*type*/CycleOpType::DataLoad,
+            /*bytes*/static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes,
+            /*input_limbs*/digit_limbs,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * digit_limbs
+        );
+        builder.AcquireOnIssue(static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes);
     }
+  
 
     // Step 2: INTT for all limbs
-    std::cout << "Step 2: INTT for all limbs" << std::endl;
-    emit_op(
-        /*name*/"intt_all_limbs",
-        /*kind*/CycleInstructionKind::INTT,
-        /*transfer_path*/CycleTransferPath::None,
-        /*type*/CycleOpType::INTT,
-        /*bytes*/0,
-        /*input_limbs*/l * ct_now * p,
-        /*output_limbs*/0
-    );
-    if (!builder.Ok()) {
-        return CycleProgram{};
+   for (uint32_t i = 0; i < digit_num; i++) {
+        emit_op(
+            /*name*/"intt_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::INTT,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::INTT,
+            /*bytes*/0,
+            /*input_limbs*/digit_limbs * ct_now,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(digit_limbs) * ct_now
+        );
+        builder.bram.AcquireOnIssue(static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes);
+        builder.bram.ReleaseOnIssue(static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes);
     }
+  
 
     // Step 3: Interation BConv NTT Innerprod
-    std::cout << "Step 3: BConv NTT Innerprod" << std::endl;
     for (uint32_t i = 0; i < lk; i++) {
         for (uint32_t j = 0; j < digit_num; j++){
-            builder.bram.AcquireOnIssue(
-                static_cast<uint64_t>(1) * problem.ct_limb_bytes
-            );
             emit_op(
                 /*name*/"bconv",
                 /*kind*/CycleInstructionKind::BConv,
@@ -94,10 +91,8 @@ CycleProgram BuildFastProgram(
                 /*output_limbs*/1,
                 /*work_items*/static_cast<uint64_t>(ct_now) * digit_limbs
             );
+            builder.bram.AcquireOnIssue(static_cast<uint64_t>(1) * problem.ct_limb_bytes);
    
-            if (!builder.Ok()) {
-                return CycleProgram{}; 
-            }
             emit_op(
                 /*name*/"NTT",
                 /*kind*/CycleInstructionKind::NTT,
@@ -108,15 +103,22 @@ CycleProgram BuildFastProgram(
                 /*output_limbs*/0,
                 /*work_items*/static_cast<uint64_t>(ct_now)
             );
+            builder.ReleaseOnIssue(static_cast<uint64_t>(1) * problem.ct_limb_bytes);
+            builder.AcquireOnIssue(static_cast<uint64_t>(1) * problem.ct_limb_bytes);
 
             for (uint32_t k = 0; k < p; k++){
-                // Thie is multiply with evalkey
-                builder.bram.AcquireOnIssue(
-                    static_cast<uint64_t>(1) * problem.ct_limb_bytes
+                emit_op(
+                    /*name*/"load_evalkey",
+                    /*kind*/CycleInstructionKind::LoadHBM,
+                    /*transfer_path*/CycleTransferPath::HBMToSPM,
+                    /*type*/CycleOpType::KeyLoad,
+                    /*bytes*/static_cast<uint64_t>(1) * problem.ct_limb_bytes,
+                    /*input_limbs*/1,
+                    /*output_limbs*/0,
+                    /*work_items*/static_cast<uint64_t>(ct_now)
                 );
-                if (!builder.Ok()) {
-                    return CycleProgram{};
-                }
+                builder.AcquireOnIssue(static_cast<uint64_t>(1) * problem.ct_limb_bytes);
+              
                 emit_op(
                     /*name*/"mul_evalkey",
                     /*kind*/CycleInstructionKind::EweMul,
@@ -127,38 +129,31 @@ CycleProgram BuildFastProgram(
                     /*output_limbs*/0,
                     /*work_items*/static_cast<uint64_t>(ct_now) * p
                 );
+                builder.ReleaseOnIssue(static_cast<uint64_t>(1) * problem.ct_limb_bytes);
+                builder.AcquireOnIssue(static_cast<uint64_t>(1) * problem.ct_limb_bytes);
             }
             // release the ct limb after processing
-            builder.bram.ReleaseOnIssue(
-                static_cast<uint64_t>(1) * problem.ct_limb_bytes
-            );
-            if (!builder.Ok()) {
-                return CycleProgram{};
-            }
+            builder.bram.ReleaseOnIssue(static_cast<uint64_t>(1) * problem.ct_limb_bytes);
+        
             if (j > 0) {
-                // accumulate the results of different digits
-                emit_op(
-                    /*name*/"accumulate",
-                    /*kind*/CycleInstructionKind::EweAdd,
-                    /*transfer_path*/CycleTransferPath::None,
-                    /*type*/CycleOpType::Add,
-                    /*bytes*/static_cast<uint64_t>(ct_now) * p * 2 * problem.ct_limb_bytes,
-                    /*input_limbs*/p * 2,
-                    /*output_limbs*/0,
-                    /*work_items*/static_cast<uint64_t>(ct_now) * p
-                );
-                builder.bram.ReleaseOnIssue(
-                    static_cast<uint64_t>(p) * problem.ct_limb_bytes
-                );
-                if (!builder.Ok()) {
-                    return CycleProgram{};
+                for (uint32_t k = 0; k < p; k++){
+                    emit_op(
+                        /*name*/"accumulate",
+                        /*kind*/CycleInstructionKind::EweAdd,
+                        /*transfer_path*/CycleTransferPath::None,
+                        /*type*/CycleOpType::Add,
+                        /*bytes*/static_cast<uint64_t>(ct_now) * 1 * problem.ct_limb_bytes,
+                        /*input_limbs*/1,
+                        /*output_limbs*/1,
+                        /*work_items*/static_cast<uint64_t>(ct_now) * 1
+                    );
+                    builder.bram.ReleaseOnIssue(static_cast<uint64_t>(1) * problem.ct_limb_bytes);
+                    builder.bram.ReleaseOnIssue(static_cast<uint64_t>(1) * problem.ct_limb_bytes);
+                    builder.AcquireOnIssue(static_cast<uint64_t>(1) * problem.ct_limb_bytes);
                 }
             }
         }
-        // spill the accumulated result to HBM after processing each key limb, to free up BRAM for next key limb processing
-        builder.bram.ReleaseOnIssue(
-            static_cast<uint64_t>(p) * problem.ct_limb_bytes
-        );
+ 
         emit_op(
             /*name*/"store_intermediate",
             /*kind*/CycleInstructionKind::StoreHBM,
@@ -168,124 +163,149 @@ CycleProgram BuildFastProgram(
             /*input_limbs*/0,
             /*output_limbs*/p
         );
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }      
+        builder.ReleaseOnIssue(static_cast<uint64_t>(p) * problem.ct_limb_bytes);     
+    }
+    
+    for (uint32_t i = 0; i < digit_num; i++) {
+        builder.bram.ReleaseOnIssue(static_cast<uint64_t>(ct_now) * digit_limbs * problem.ct_limb_bytes);
     }
 
-    // 做完之后片上的数据都没有用了
-    builder.bram.ReleaseOnIssue(
-        static_cast<uint64_t>(l) * ct_now * p * problem.ct_limb_bytes
-    );
+
+      // Load 2*k limbs for each p to do the final INTT and reduction
+    for (uint32_t i = 0; i < p; i++){
+        emit_op(
+            /*name*/"load_result_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::LoadHBM,
+            /*transfer_path*/CycleTransferPath::HBMToSPM,
+            /*type*/CycleOpType::DataLoad,
+             /*bytes*/static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes,
+            /*input_limbs*/k,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * k
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes
+        );
+
+        // INTT
+        emit_op(
+            /*name*/"intt_final_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::INTT,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::INTT,
+             /*bytes*/static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes,
+            /*input_limbs*/k,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * k
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes
+        );
+
+        // BConv
+        emit_op(
+            /*name*/"bconv_final_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::BConv,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::BConv,
+             /*bytes*/static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes,
+            /*input_limbs*/k,
+            /*output_limbs*/l,
+            /*work_items*/static_cast<uint64_t>(ct_now) * k
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * k * problem.ct_limb_bytes
+        );
+
+        // NTT for the final result in digit form
+        emit_op(
+            /*name*/"ntt_final_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::NTT,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::NTT,
+            /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+    }
+
+
+    // Load 2*l limbs and subtract the original ct in NTT form to get the final result in evaluation form
+    for (uint32_t i = 0; i < p; i++){
+        emit_op(
+            /*name*/"load_ntt_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::LoadHBM,
+            /*transfer_path*/CycleTransferPath::HBMToSPM,
+            /*type*/CycleOpType::DataLoad,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/0,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        emit_op(
+            /*name*/"sub_ntt_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::EweSub,
+            /*transfer_path*/CycleTransferPath::None,
+            /*type*/CycleOpType::Sub,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/l,
+            /*output_limbs*/l,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+
+        builder.AcquireOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+
+        // Send to HBM for output
+        emit_op(
+            /*name*/"store_output_digit_" + std::to_string(i),
+            /*kind*/CycleInstructionKind::StoreHBM,
+            /*transfer_path*/CycleTransferPath::SPMToHBM,
+            /*type*/CycleOpType::DataLoad,
+             /*bytes*/static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes,
+            /*input_limbs*/0,
+            /*output_limbs*/l,
+            /*work_items*/static_cast<uint64_t>(ct_now) * l
+        );
+        builder.ReleaseOnIssue(
+            static_cast<uint64_t>(ct_now) * l * problem.ct_limb_bytes
+        );
+    }
+
+
+ 
+
     if (!builder.Ok()) {
         return CycleProgram{};
     }
 
-    
-
-    // Step 4: Load 2*k limbs ct to BRAM and do INTT
-    for (uint32_t i = 0; i < p; i++){
-        std::cout << "Step 4." << (i+1) << ": load intermediate result to BRAM" << std::endl;
-        builder.bram.AcquireOnIssue(static_cast<uint64_t>(lk-l) * problem.ct_limb_bytes);
-        emit_op(
-            /*name*/"load_intermediate",
-            /*kind*/CycleInstructionKind::LoadHBM,
-            /*transfer_path*/CycleTransferPath::HBMToSPM,
-            /*type*/CycleOpType::DataLoad,
-            /*bytes*/static_cast<uint64_t>(lk - l) * problem.ct_limb_bytes,
-            /*input_limbs*/lk - l,
-            /*output_limbs*/0,
-            /*work_items*/lk - l
-        );
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-        std::cout << "Step 4." << (i+1) << ": INTT for intermediate result" << std::endl;
-        emit_op(
-            /*name*/"intt_intermediate",
-            /*kind*/CycleInstructionKind::INTT,
-            /*transfer_path*/CycleTransferPath::None,
-            /*type*/CycleOpType::INTT,
-            /*bytes*/0,
-            /*input_limbs*/lk - l,
-            /*output_limbs*/0,
-            /*work_items*/lk - l
-        );
-        std::cout << "Step 4." << (i+1) << ": bconv for intermediate result" << std::endl;
-        emit_op(
-            /*name*/"bconv_intermediate",
-            /*kind*/CycleInstructionKind::BConv,
-            /*transfer_path*/CycleTransferPath::None,
-            /*type*/CycleOpType::BConv,
-            /*bytes*/0,
-            /*input_limbs*/lk - l,
-            /*output_limbs*/l,
-            /*work_items*/lk - l
-        );
-        builder.bram.AcquireOnIssue(
-            static_cast<uint64_t>(l) * problem.ct_limb_bytes
-        );
-        builder.bram.ReleaseOnIssue(
-            static_cast<uint64_t>(lk - l) * problem.ct_limb_bytes
-        );
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-
-        std::cout << "Step 4." << (i+1) << ": Load ct from HBM to BRAM" << std::endl;
-        builder.bram.AcquireOnIssue(
-            static_cast<uint64_t>(l) * problem.ct_limb_bytes
-        );
-        emit_op(
-            /*name*/"load_ct_for_sub",
-            /*kind*/CycleInstructionKind::LoadHBM,
-            /*transfer_path*/CycleTransferPath::HBMToSPM,
-            /*type*/CycleOpType::DataLoad,
-            /*bytes*/static_cast<uint64_t>(l) * problem.ct_limb_bytes,
-            /*input_limbs*/l,
-            /*output_limbs*/0,
-            /*work_items*/static_cast<uint64_t>(l)
-        );
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-
-        std::cout << "Step 4." << (i+1) << ": subtract" << std::endl;
-        emit_op(
-            /*name*/"subtract_intermediate",
-            /*kind*/CycleInstructionKind::EweSub,
-            /*transfer_path*/CycleTransferPath::None,
-            /*type*/CycleOpType::Sub,
-            /*bytes*/0,
-            /*input_limbs*/l,
-            /*output_limbs*/0,
-            /*work_items*/static_cast<uint64_t>(l)
-        );
-        builder.bram.ReleaseOnIssue(
-            static_cast<uint64_t>(l) * problem.ct_limb_bytes
-        );
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
-        std::cout << "Step 4." << (i+1) << ": store subtracted result back to HBM" << std::endl;
-        emit_op(
-            /*name*/"store_subtracted_intermediate",
-            /*kind*/CycleInstructionKind::StoreHBM,
-            /*transfer_path*/CycleTransferPath::SPMToHBM,
-            /*type*/CycleOpType::Spill,
-            /*bytes*/static_cast<uint64_t>(l) * problem.ct_limb_bytes,
-            /*input_limbs*/0,
-            /*output_limbs*/l,
-            /*work_items*/static_cast<uint64_t>(l)
-        );
-        builder.bram.ReleaseOnIssue(
-            static_cast<uint64_t>(l) * problem.ct_limb_bytes
-        );
-        if (!builder.Ok()) {
-            return CycleProgram{};
-        }
+    if(builder.bram.Live()){
+        std::cerr << "Warning: BRAM live bytes is not zero after processing, live bytes: " << builder.bram.Live() << std::endl;
+        return CycleProgram{};
     }
-  
 
     builder.program.estimated_peak_live_bytes = builder.bram.Peak();
     return std::move(builder.program);

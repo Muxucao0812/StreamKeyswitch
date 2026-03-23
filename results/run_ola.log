@@ -25,217 +25,328 @@ CSVOutput: results/metrics_ola.csv
 DumpLogicalGraph: true
 DumpRuntimePlan: true
 =========================
-Emitted group 0: load_input, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
-Emitted group 1: load_input, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=4194304
-Emitted group 2: load_input, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=6291456
-Emitted group 3: ola_intt_digits_stub, kind=3, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
-Emitted group 4: ola_intt_digits_stub, kind=3, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
-Emitted group 5: ola_intt_digits_stub, kind=3, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
-Emitted group 6: ola_spill_digit_stub, kind=1, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=4194304
-Emitted group 7: ola_spill_digit_stub, kind=1, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
-Emitted group 8: ola_bconv_digits_stub, kind=7, bytes=8126464, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=8126464
-Emitted group 9: ola_spill_digit_stub, kind=1, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=0
-Emitted group 10: ola_reload_digit_stub, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
-Emitted group 11: ola_bconv_digits_stub, kind=7, bytes=8126464, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=8126464
-Emitted group 12: ola_spill_digit_stub, kind=1, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=0
-Emitted group 13: ola_reload_digit_stub, kind=0, bytes=2097152, work_items=0, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
-Emitted group 14: ola_bconv_digits_stub, kind=7, bytes=8126464, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=8126464
-Emitted group 15: ola_ntt_digits_stub, kind=2, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=8126464
-Emitted group 16: ola_reload_digit_stub, kind=0, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
-Emitted group 17: ola_ntt_digits_stub, kind=2, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=16252928
-Emitted group 18: ola_reload_digit_stub, kind=0, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=24379392
-Emitted group 19: ola_ntt_digits_stub, kind=2, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=24379392
-Emitted group 20: ola_innerprod_load_key_stub, kind=0, bytes=8388662, work_items=0, micro_ops=62, est_cycles/op=103, total_est_cycles=5261, bram_live=27865907
-Emitted group 21: ola_innerprod_mul_stub, kind=4, bytes=16515126, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=27865907
-Emitted group 22: ola_innerprod_load_key_stub, kind=0, bytes=8388662, work_items=0, micro_ops=62, est_cycles/op=103, total_est_cycles=5261, bram_live=29609164
-Emitted group 23: ola_innerprod_mul_stub, kind=4, bytes=16515126, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=29609165
-Emitted group 24: ola_innerprod_accumulate_stub, kind=5, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=258, total_est_cycles=15874, bram_live=27865907
-Emitted group 25: ola_innerprod_load_key_stub, kind=0, bytes=8388662, work_items=0, micro_ops=62, est_cycles/op=103, total_est_cycles=5261, bram_live=29609164
-Emitted group 26: ola_innerprod_mul_stub, kind=4, bytes=16515126, work_items=0, micro_ops=62, est_cycles/op=260, total_est_cycles=15876, bram_live=29609165
-Emitted group 27: ola_innerprod_accumulate_stub, kind=5, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=258, total_est_cycles=15874, bram_live=27865907
-Emitted group 28: ola_intt_digits_stub, kind=3, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=27865907
-Emitted group 29: ola_intt_digits_stub, kind=3, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=27865907
-Emitted group 30: ola_intt_digits_stub, kind=3, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=27865907
-Emitted group 31: ola_spill_poly_stub, kind=1, bytes=6029312, work_items=0, micro_ops=1, est_cycles/op=3787, total_est_cycles=3787, bram_live=21836595
-Emitted group 32: ola_spill_poly_stub, kind=1, bytes=6029312, work_items=0, micro_ops=1, est_cycles/op=3787, total_est_cycles=3787, bram_live=15807283
-Emitted group 33: ola_modup_stub, kind=7, bytes=16252928, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=15807283
-Emitted group 34: ola_modup_stub, kind=7, bytes=16252928, work_items=0, micro_ops=64, est_cycles/op=276, total_est_cycles=16404, bram_live=15807283
-Emitted group 35: ola_ntt_digits_stub, kind=2, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=15807283
-Emitted group 36: ola_ntt_digits_stub, kind=2, bytes=8126464, work_items=0, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=15807283
-Emitted group 37: load_input, kind=0, bytes=6029312, work_items=0, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=21836595
-Emitted group 38: ola_reduce_cross_digit_stub, kind=5, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=258, total_est_cycles=15874, bram_live=21836595
-Emitted group 39: load_input, kind=0, bytes=6029312, work_items=0, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=27865907
-Emitted group 40: ola_reduce_cross_digit_stub, kind=5, bytes=16252928, work_items=0, micro_ops=62, est_cycles/op=258, total_est_cycles=15874, bram_live=27865907
+Building OLA program with ct 1, p 2, digit_num 3, digit_limbs 8, l 23, lk 31, k 8
+Emitted group 0: Load_digit0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=0
+Emitted group 1: Load_digit1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
+Emitted group 2: Load_digit2, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=4194304
+Emitted group 3: INTT_digit0, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 4: INTT_digit1, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 5: INTT_digit2, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=6291456
+Emitted group 6: Spill_digit0, kind=1, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=6291456
+Emitted group 7: Spill_digit1, kind=1, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=4194304
+Emitted group 8: Spill_digit2, kind=1, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=2097152
+Emitted group 9: Load_digit_for_bconv_0, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=0
+Emitted group 10: bconv_digit_0, kind=7, bytes=2097152, work_items=8, micro_ops=248, est_cycles/op=276, total_est_cycles=63508, bram_live=2097152
+Emitted group 11: ntt_digit_0, kind=2, bytes=8126464, work_items=8, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=8126464
+Emitted group 12: Spill_bconv_digit_0, kind=1, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
+Emitted group 13: Load_digit_for_bconv_1, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=0
+Emitted group 14: bconv_digit_1, kind=7, bytes=2097152, work_items=8, micro_ops=248, est_cycles/op=276, total_est_cycles=63508, bram_live=2097152
+Emitted group 15: ntt_digit_1, kind=2, bytes=8126464, work_items=8, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=8126464
+Emitted group 16: Spill_bconv_digit_1, kind=1, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
+Emitted group 17: Load_digit_for_bconv_2, kind=0, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=182, total_est_cycles=1329, bram_live=0
+Emitted group 18: bconv_digit_2, kind=7, bytes=2097152, work_items=8, micro_ops=248, est_cycles/op=276, total_est_cycles=63508, bram_live=2097152
+Emitted group 19: ntt_digit_2, kind=2, bytes=8126464, work_items=8, micro_ops=31, est_cycles/op=4108, total_est_cycles=126988, bram_live=8126464
+Emitted group 20: Spill_bconv_digit_2, kind=1, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
+Emitted group 21: Load_bconv_result_digit_0_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=0
+Emitted group 22: Load_eval_key_digit_0_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
+Emitted group 23: Inner_product_digit_0_0, kind=4, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=260, total_est_cycles=7940, bram_live=16252928
+Emitted group 24: Load_bconv_result_digit_1_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
+Emitted group 25: Load_eval_key_digit_1_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
+Emitted group 26: Inner_product_digit_1_0, kind=4, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=260, total_est_cycles=7940, bram_live=24379392
+Emitted group 27: Accumulate_digit_1_0, kind=5, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=258, total_est_cycles=7938, bram_live=16252928
+Emitted group 28: Load_bconv_result_digit_2_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=8126464
+Emitted group 29: Load_eval_key_digit_2_0, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=16252928
+Emitted group 30: Inner_product_digit_2_0, kind=4, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=260, total_est_cycles=7940, bram_live=24379392
+Emitted group 31: Accumulate_digit_2_0, kind=5, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=258, total_est_cycles=7938, bram_live=16252928
+Emitted group 32: INTT_poly_0, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=8126464
+Emitted group 33: Store_result_poly_0, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=8126464
+Emitted group 34: Load_bconv_result_digit_0_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=2097152
+Emitted group 35: Load_eval_key_digit_0_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=10223616
+Emitted group 36: Inner_product_digit_0_1, kind=4, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=260, total_est_cycles=7940, bram_live=18350080
+Emitted group 37: Load_bconv_result_digit_1_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=10223616
+Emitted group 38: Load_eval_key_digit_1_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=18350080
+Emitted group 39: Inner_product_digit_1_1, kind=4, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=260, total_est_cycles=7940, bram_live=26476544
+Emitted group 40: Accumulate_digit_1_1, kind=5, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=258, total_est_cycles=7938, bram_live=18350080
+Emitted group 41: Load_bconv_result_digit_2_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=10223616
+Emitted group 42: Load_eval_key_digit_2_1, kind=0, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=182, total_est_cycles=5098, bram_live=18350080
+Emitted group 43: Inner_product_digit_2_1, kind=4, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=260, total_est_cycles=7940, bram_live=26476544
+Emitted group 44: Accumulate_digit_2_1, kind=5, bytes=8126464, work_items=31, micro_ops=31, est_cycles/op=258, total_est_cycles=7938, bram_live=18350080
+Emitted group 45: INTT_poly_1, kind=3, bytes=2097152, work_items=8, micro_ops=8, est_cycles/op=4108, total_est_cycles=32780, bram_live=10223616
+Emitted group 46: Store_result_poly_1, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=10223616
+Emitted group 47: Bconv_poly_0, kind=7, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=4194304
+Emitted group 48: NTT_poly_0, kind=2, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=8126464
+Emitted group 49: Bconv_poly_1, kind=7, bytes=2097152, work_items=8, micro_ops=184, est_cycles/op=276, total_est_cycles=47124, bram_live=8126464
+Emitted group 50: NTT_poly_1, kind=2, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=4108, total_est_cycles=94220, bram_live=12058624
+Emitted group 51: Load_final_result_poly_0, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=12058624
+Emitted group 52: Subtract_eval_key_poly_0, kind=6, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=258, total_est_cycles=5890, bram_live=18087936
+Emitted group 53: Store_final_result_poly_0, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=12058624
+Emitted group 54: Load_final_result_poly_1, kind=0, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=6029312
+Emitted group 55: Subtract_eval_key_poly_1, kind=6, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=258, total_est_cycles=5890, bram_live=12058624
+Emitted group 56: Store_final_result_poly_1, kind=1, bytes=6029312, work_items=23, micro_ops=23, est_cycles/op=182, total_est_cycles=3787, bram_live=6029312
 
 ========== Detailed Execution Statistics ==========
 
 --- Summary ---
-Total cycles:           361789
-Total latency (ns):     1205964
-Peak BRAM live (bytes): 29609165
-HBM read (bytes):       63963298
-HBM write (bytes):      32505856
-Dependency stalls:      58629 cycles
-Resource stalls:        303160 cycles
-Instruction groups:     41
-Total instructions:     1440
+Total cycles:           321329
+Total latency (ns):     1071097
+Peak BRAM live (bytes): 26476544
+HBM read (bytes):       122159104
+HBM write (bytes):      54788096
+Dependency stalls:      51028 cycles
+Resource stalls:        270301 cycles
+Instruction groups:     57
+Total instructions:     2322
 
 --- Cycle Breakdown by Instruction Kind ---
-  LoadHBM: cycles=11886 (3.28534%)  count=334  bytes=63963298
-  StoreHBM: cycles=11224 (3.10236%)  count=80  bytes=32505856
-  NTT: cycles=164330 (45.4215%)  count=155  bytes=40632320
-  INTT: cycles=123255 (34.0682%)  count=117  bytes=30670848
-  EweMul: cycles=12483 (3.45035%)  count=186  bytes=49545378
-  EweAdd: cycles=16516 (4.56509%)  count=248  bytes=65011712
-  BConv: cycles=22095 (6.10715%)  count=320  bytes=56885248
+  LoadHBM: cycles=21886 (6.81109%)  count=466  bytes=122159104
+  StoreHBM: cycles=9851 (3.06571%)  count=209  bytes=54788096
+  NTT: cycles=147898 (46.027%)  count=139  bytes=36438016
+  INTT: cycles=41095 (12.7891%)  count=40  bytes=10485760
+  EweMul: cycles=12492 (3.8876%)  count=186  bytes=48758784
+  EweAdd: cycles=8264 (2.57182%)  count=124  bytes=32505856
+  EweSub: cycles=3100 (0.964743%)  count=46  bytes=12058624
+  BConv: cycles=76743 (23.883%)  count=1112  bytes=10485360
 
 --- EstimateCycle (1-Limb Input) by Operation ---
-  load_input: kind=LoadHBM  one_limb_cycles=182  groups=5  instrs=70
-  ola_intt_digits_stub: kind=INTT  one_limb_cycles=4108  groups=6  instrs=117
-  ola_spill_digit_stub: kind=StoreHBM  one_limb_cycles=182  groups=4  instrs=78
-  ola_bconv_digits_stub: kind=BConv  one_limb_cycles=276  groups=3  instrs=192
-  ola_reload_digit_stub: kind=LoadHBM  one_limb_cycles=182  groups=4  instrs=78
-  ola_ntt_digits_stub: kind=NTT  one_limb_cycles=4108  groups=5  instrs=155
-  ola_innerprod_load_key_stub: kind=LoadHBM  one_limb_cycles=103  groups=3  instrs=186
-  ola_innerprod_mul_stub: kind=EweMul  one_limb_cycles=260  groups=3  instrs=186
-  ola_innerprod_accumulate_stub: kind=EweAdd  one_limb_cycles=258  groups=2  instrs=124
-  ola_spill_poly_stub: kind=StoreHBM  one_limb_cycles=3787  groups=2  instrs=2
-  ola_modup_stub: kind=BConv  one_limb_cycles=276  groups=2  instrs=128
-  ola_reduce_cross_digit_stub: kind=EweAdd  one_limb_cycles=258  groups=2  instrs=124
+  Load_digit0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=8
+  Load_digit1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=8
+  Load_digit2: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=8
+  INTT_digit0: kind=INTT  one_limb_cycles=4108  groups=1  instrs=8
+  INTT_digit1: kind=INTT  one_limb_cycles=4108  groups=1  instrs=8
+  INTT_digit2: kind=INTT  one_limb_cycles=4108  groups=1  instrs=8
+  Spill_digit0: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=8
+  Spill_digit1: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=8
+  Spill_digit2: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=8
+  Load_digit_for_bconv_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=8
+  bconv_digit_0: kind=BConv  one_limb_cycles=276  groups=1  instrs=248
+  ntt_digit_0: kind=NTT  one_limb_cycles=4108  groups=1  instrs=31
+  Spill_bconv_digit_0: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=31
+  Load_digit_for_bconv_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=8
+  bconv_digit_1: kind=BConv  one_limb_cycles=276  groups=1  instrs=248
+  ntt_digit_1: kind=NTT  one_limb_cycles=4108  groups=1  instrs=31
+  Spill_bconv_digit_1: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=31
+  Load_digit_for_bconv_2: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=8
+  bconv_digit_2: kind=BConv  one_limb_cycles=276  groups=1  instrs=248
+  ntt_digit_2: kind=NTT  one_limb_cycles=4108  groups=1  instrs=31
+  Spill_bconv_digit_2: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=31
+  Load_bconv_result_digit_0_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  Load_eval_key_digit_0_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  Inner_product_digit_0_0: kind=EweMul  one_limb_cycles=260  groups=1  instrs=31
+  Load_bconv_result_digit_1_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  Load_eval_key_digit_1_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  Inner_product_digit_1_0: kind=EweMul  one_limb_cycles=260  groups=1  instrs=31
+  Accumulate_digit_1_0: kind=EweAdd  one_limb_cycles=258  groups=1  instrs=31
+  Load_bconv_result_digit_2_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  Load_eval_key_digit_2_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  Inner_product_digit_2_0: kind=EweMul  one_limb_cycles=260  groups=1  instrs=31
+  Accumulate_digit_2_0: kind=EweAdd  one_limb_cycles=258  groups=1  instrs=31
+  INTT_poly_0: kind=INTT  one_limb_cycles=4108  groups=1  instrs=8
+  Store_result_poly_0: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=23
+  Load_bconv_result_digit_0_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  Load_eval_key_digit_0_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  Inner_product_digit_0_1: kind=EweMul  one_limb_cycles=260  groups=1  instrs=31
+  Load_bconv_result_digit_1_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  Load_eval_key_digit_1_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  Inner_product_digit_1_1: kind=EweMul  one_limb_cycles=260  groups=1  instrs=31
+  Accumulate_digit_1_1: kind=EweAdd  one_limb_cycles=258  groups=1  instrs=31
+  Load_bconv_result_digit_2_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  Load_eval_key_digit_2_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=31
+  Inner_product_digit_2_1: kind=EweMul  one_limb_cycles=260  groups=1  instrs=31
+  Accumulate_digit_2_1: kind=EweAdd  one_limb_cycles=258  groups=1  instrs=31
+  INTT_poly_1: kind=INTT  one_limb_cycles=4108  groups=1  instrs=8
+  Store_result_poly_1: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=23
+  Bconv_poly_0: kind=BConv  one_limb_cycles=276  groups=1  instrs=184
+  NTT_poly_0: kind=NTT  one_limb_cycles=4108  groups=1  instrs=23
+  Bconv_poly_1: kind=BConv  one_limb_cycles=276  groups=1  instrs=184
+  NTT_poly_1: kind=NTT  one_limb_cycles=4108  groups=1  instrs=23
+  Load_final_result_poly_0: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=23
+  Subtract_eval_key_poly_0: kind=EweSub  one_limb_cycles=258  groups=1  instrs=23
+  Store_final_result_poly_0: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=23
+  Load_final_result_poly_1: kind=LoadHBM  one_limb_cycles=182  groups=1  instrs=23
+  Subtract_eval_key_poly_1: kind=EweSub  one_limb_cycles=258  groups=1  instrs=23
+  Store_final_result_poly_1: kind=StoreHBM  one_limb_cycles=182  groups=1  instrs=23
 
 --- Group Timeline ---
   ID  Name                     Start     End       Duration  BRAM_before  BRAM_after   Bytes
-   0  load_input                     0       367        367            0      2097152  2097152
-   1  load_input                   367       734        367      2097152      4194304  2097152
-   2  load_input                   734      1101        367      4194304      6291456  2097152
-   3  ola_intt_digits_stub        1101      9320       8219      6291456      6291456  2097152
-   4  ola_intt_digits_stub        9320     17539       8219      6291456      6291456  2097152
-   5  ola_intt_digits_stub       17539     25758       8219      6291456      6291456  2097152
-   6  ola_spill_digit_stub       25758     26125        367      6291456      4194304  2097152
-   7  ola_spill_digit_stub       26125     26492        367      4194304      2097152  2097152
-   8  ola_bconv_digits_stub      26492     30911       4419      2097152      8126464  8126464
-   9  ola_spill_digit_stub       30911     32369       1458      8126464            0  8126464
-  10  ola_reload_digit_stub      32369     32736        367            0      2097152  2097152
-  11  ola_bconv_digits_stub      32736     37155       4419      2097152      8126464  8126464
-  12  ola_spill_digit_stub       37155     38613       1458      8126464            0  8126464
-  13  ola_reload_digit_stub      38613     38980        367            0      2097152  2097152
-  14  ola_bconv_digits_stub      38980     43399       4419      2097152      8126464  8126464
-  15  ola_ntt_digits_stub        43399     76265      32866      8126464      8126464  8126464
-  16  ola_reload_digit_stub      76265     77723       1458      8126464     16252928  8126464
-  17  ola_ntt_digits_stub        77723    110589      32866     16252928     16252928  8126464
-  18  ola_reload_digit_stub     110589    112047       1458     16252928     24379392  8126464
-  19  ola_ntt_digits_stub       112047    144913      32866     24379392     24379392  8126464
-  20  ola_innerprod_load_key_stub  144913    146562       1649     24379392     27865907  8388662
-  21  ola_innerprod_mul_stub    146562    150723       4161     27865907     27865907  16515126
-  22  ola_innerprod_load_key_stub  150723    152372       1649     27865907     29609164  8388662
-  23  ola_innerprod_mul_stub    152372    156533       4161     29609164     29609165  16515126
-  24  ola_innerprod_accumulate_stub  156533    160662       4129     29609165     27865907  16252928
-  25  ola_innerprod_load_key_stub  160662    162311       1649     27865907     29609164  8388662
-  26  ola_innerprod_mul_stub    162311    166472       4161     29609164     29609165  16515126
-  27  ola_innerprod_accumulate_stub  166472    170601       4129     29609165     27865907  16252928
-  28  ola_intt_digits_stub      170601    203467      32866     27865907     27865907  8126464
-  29  ola_intt_digits_stub      203467    236333      32866     27865907     27865907  8126464
-  30  ola_intt_digits_stub      236333    269199      32866     27865907     27865907  8126464
-  31  ola_spill_poly_stub       269199    272986       3787     27865907     21836595  6029312
-  32  ola_spill_poly_stub       272986    276773       3787     21836595     15807283  6029312
-  33  ola_modup_stub            276773    281192       4419     15807283     15807283  16252928
-  34  ola_modup_stub            281192    285611       4419     15807283     15807283  16252928
-  35  ola_ntt_digits_stub       285611    318477      32866     15807283     15807283  8126464
-  36  ola_ntt_digits_stub       318477    351343      32866     15807283     15807283  8126464
-  37  load_input                351343    352437       1094     15807283     21836595  6029312
-  38  ola_reduce_cross_digit_stub  352437    356566       4129     21836595     21836595  16252928
-  39  load_input                356566    357660       1094     21836595     27865907  6029312
-  40  ola_reduce_cross_digit_stub  357660    361789       4129     27865907     27865907  16252928
+   0  Load_digit0                    0       367        367            0            0  2097152
+   1  Load_digit1                  367       734        367            0      2097152  2097152
+   2  Load_digit2                  734      1101        367      2097152      4194304  2097152
+   3  INTT_digit0                 1101      9320       8219      4194304      6291456  2097152
+   4  INTT_digit1                 9320     17539       8219      6291456      6291456  2097152
+   5  INTT_digit2                17539     25758       8219      6291456      6291456  2097152
+   6  Spill_digit0               25758     26125        367      6291456      6291456  2097152
+   7  Spill_digit1               26125     26492        367      6291456      4194304  2097152
+   8  Spill_digit2               26492     26859        367      4194304      2097152  2097152
+   9  Load_digit_for_bconv_0     26859     27226        367      2097152            0  2097152
+  10  bconv_digit_0              27226     44341      17115            0      2097152  2097152
+  11  ntt_digit_0                44341     77207      32866      2097152      8126464  8126464
+  12  Spill_bconv_digit_0        77207     78665       1458      8126464      8126464  8126464
+  13  Load_digit_for_bconv_1     78665     79032        367      8126464            0  2097152
+  14  bconv_digit_1              79032     96147      17115            0      2097152  2097152
+  15  ntt_digit_1                96147    129013      32866      2097152      8126464  8126464
+  16  Spill_bconv_digit_1       129013    130471       1458      8126464      8126464  8126464
+  17  Load_digit_for_bconv_2    130471    130838        367      8126464            0  2097152
+  18  bconv_digit_2             130838    147953      17115            0      2097152  2097152
+  19  ntt_digit_2               147953    180819      32866      2097152      8126464  8126464
+  20  Spill_bconv_digit_2       180819    182277       1458      8126464      8126464  8126464
+  21  Load_bconv_result_digit_0_0  182277    183735       1458      8126464            0  8126464
+  22  Load_eval_key_digit_0_0   183735    185193       1458            0      8126464  8126464
+  23  Inner_product_digit_0_0   185193    187275       2082      8126464     16252928  8126464
+  24  Load_bconv_result_digit_1_0  187275    188733       1458     16252928      8126464  8126464
+  25  Load_eval_key_digit_1_0   188733    190191       1458      8126464     16252928  8126464
+  26  Inner_product_digit_1_0   190191    192273       2082     16252928     24379392  8126464
+  27  Accumulate_digit_1_0      192273    194339       2066     24379392     16252928  8126464
+  28  Load_bconv_result_digit_2_0  194339    195797       1458     16252928      8126464  8126464
+  29  Load_eval_key_digit_2_0   195797    197255       1458      8126464     16252928  8126464
+  30  Inner_product_digit_2_0   197255    199337       2082     16252928     24379392  8126464
+  31  Accumulate_digit_2_0      199337    201403       2066     24379392     16252928  8126464
+  32  INTT_poly_0               201403    209622       8219     16252928      8126464  2097152
+  33  Store_result_poly_0       209622    210716       1094      8126464      8126464  6029312
+  34  Load_bconv_result_digit_0_1  210716    212174       1458      8126464      2097152  8126464
+  35  Load_eval_key_digit_0_1   212174    213632       1458      2097152     10223616  8126464
+  36  Inner_product_digit_0_1   213632    215714       2082     10223616     18350080  8126464
+  37  Load_bconv_result_digit_1_1  215714    217172       1458     18350080     10223616  8126464
+  38  Load_eval_key_digit_1_1   217172    218630       1458     10223616     18350080  8126464
+  39  Inner_product_digit_1_1   218630    220712       2082     18350080     26476544  8126464
+  40  Accumulate_digit_1_1      220712    222778       2066     26476544     18350080  8126464
+  41  Load_bconv_result_digit_2_1  222778    224236       1458     18350080     10223616  8126464
+  42  Load_eval_key_digit_2_1   224236    225694       1458     10223616     18350080  8126464
+  43  Inner_product_digit_2_1   225694    227776       2082     18350080     26476544  8126464
+  44  Accumulate_digit_2_1      227776    229842       2066     26476544     18350080  8126464
+  45  INTT_poly_1               229842    238061       8219     18350080     10223616  2097152
+  46  Store_result_poly_1       238061    239155       1094     10223616     10223616  6029312
+  47  Bconv_poly_0              239155    251854      12699     10223616      4194304  2097152
+  48  NTT_poly_0                251854    276504      24650      4194304      8126464  6029312
+  49  Bconv_poly_1              276504    289203      12699      8126464      8126464  2097152
+  50  NTT_poly_1                289203    313853      24650      8126464     12058624  6029312
+  51  Load_final_result_poly_0  313853    314947       1094     12058624     12058624  6029312
+  52  Subtract_eval_key_poly_0  314947    316497       1550     12058624     18087936  6029312
+  53  Store_final_result_poly_0  316497    317591       1094     18087936     12058624  6029312
+  54  Load_final_result_poly_1  317591    318685       1094     12058624      6029312  6029312
+  55  Subtract_eval_key_poly_1  318685    320235       1550      6029312     12058624  6029312
+  56  Store_final_result_poly_1  320235    321329       1094     12058624      6029312  6029312
 
 --- BRAM Timeline (cycle, live_bytes) ---
 # cycle,bram_bytes
 0,0
 0,0
-367,2097152
-367,2097152
-734,4194304
-734,4194304
-1101,6291456
-1101,6291456
+367,0
+367,0
+734,2097152
+734,2097152
+1101,4194304
+1101,4194304
 9320,6291456
 9320,6291456
 17539,6291456
 17539,6291456
 25758,6291456
 25758,6291456
-26125,4194304
-26125,4194304
-26492,2097152
-26492,2097152
-30911,8126464
-30911,8126464
-32369,0
-32369,0
-32736,2097152
-32736,2097152
-37155,8126464
-37155,8126464
-38613,0
-38613,0
-38980,2097152
-38980,2097152
-43399,8126464
-43399,8126464
-76265,8126464
-76265,8126464
-77723,16252928
-77723,16252928
-110589,16252928
-110589,16252928
-112047,24379392
-112047,24379392
-144913,24379392
-144913,24379392
-146562,27865907
-146562,27865907
-150723,27865907
-150723,27865907
-152372,29609164
-152372,29609164
-156533,29609165
-156533,29609165
-160662,27865907
-160662,27865907
-162311,29609164
-162311,29609164
-166472,29609165
-166472,29609165
-170601,27865907
-170601,27865907
-203467,27865907
-203467,27865907
-236333,27865907
-236333,27865907
-269199,27865907
-269199,27865907
-272986,21836595
-272986,21836595
-276773,15807283
-276773,15807283
-281192,15807283
-281192,15807283
-285611,15807283
-285611,15807283
-318477,15807283
-318477,15807283
-351343,15807283
-351343,15807283
-352437,21836595
-352437,21836595
-356566,21836595
-356566,21836595
-357660,27865907
-357660,27865907
-361789,27865907
+26125,6291456
+26125,6291456
+26492,4194304
+26492,4194304
+26859,2097152
+26859,2097152
+27226,0
+27226,0
+44341,2097152
+44341,2097152
+77207,8126464
+77207,8126464
+78665,8126464
+78665,8126464
+79032,0
+79032,0
+96147,2097152
+96147,2097152
+129013,8126464
+129013,8126464
+130471,8126464
+130471,8126464
+130838,0
+130838,0
+147953,2097152
+147953,2097152
+180819,8126464
+180819,8126464
+182277,8126464
+182277,8126464
+183735,0
+183735,0
+185193,8126464
+185193,8126464
+187275,16252928
+187275,16252928
+188733,8126464
+188733,8126464
+190191,16252928
+190191,16252928
+192273,24379392
+192273,24379392
+194339,16252928
+194339,16252928
+195797,8126464
+195797,8126464
+197255,16252928
+197255,16252928
+199337,24379392
+199337,24379392
+201403,16252928
+201403,16252928
+209622,8126464
+209622,8126464
+210716,8126464
+210716,8126464
+212174,2097152
+212174,2097152
+213632,10223616
+213632,10223616
+215714,18350080
+215714,18350080
+217172,10223616
+217172,10223616
+218630,18350080
+218630,18350080
+220712,26476544
+220712,26476544
+222778,18350080
+222778,18350080
+224236,10223616
+224236,10223616
+225694,18350080
+225694,18350080
+227776,26476544
+227776,26476544
+229842,18350080
+229842,18350080
+238061,10223616
+238061,10223616
+239155,10223616
+239155,10223616
+251854,4194304
+251854,4194304
+276504,8126464
+276504,8126464
+289203,8126464
+289203,8126464
+313853,12058624
+313853,12058624
+314947,12058624
+314947,12058624
+316497,18087936
+316497,18087936
+317591,12058624
+317591,12058624
+318685,6029312
+318685,6029312
+320235,12058624
+320235,12058624
+321329,6029312
 
 --- Transfer vs Compute ---
-Transfer: 23110 cycles (6.3877%)
-Compute:  338679 cycles (93.6123%)
+Transfer: 31737 cycles (9.87679%)
+Compute:  289592 cycles (90.1232%)
 ====================================================
 
 Scheduler=fifo
@@ -246,21 +357,21 @@ Seed=123
 NumCards=1
 === Request Metrics ===
 Completed requests: 1
-Mean latency(ns): 1205964.0000
-P95 latency(ns): 1205964
-P99 latency(ns): 1205964
-Max latency(ns): 1205964
+Mean latency(ns): 1071097.0000
+P95 latency(ns): 1071097
+P99 latency(ns): 1071097
+Max latency(ns): 1071097
 Mean queue time(ns): 0.0000
-Mean service time(ns): 1205964.0000
+Mean service time(ns): 1071097.0000
 === User Metrics ===
-User 0: completed=1, mean_latency(ns)=1205964.0000, throughput(req/ns)=0.0000, reload_count=1
+User 0: completed=1, mean_latency(ns)=1071097.0000, throughput(req/ns)=0.0000, reload_count=1
 === Card Metrics ===
 Card 0: utilization=1.0000, reload_count=1, served_requests=1
 === System Metrics ===
 Total throughput(req/ns): 0.0000
 Total reload count: 1
 Jain fairness index: 1.0000
-Simulation window(ns): [64, 1206028], duration=1205964
+Simulation window(ns): [23, 1071120], duration=1071097
 PoolConfigSource=built-in default
 TreeConfigSource=built-in default
 HEParamsSource=built-in default
